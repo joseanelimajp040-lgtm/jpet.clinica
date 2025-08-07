@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const save = {
         cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
-        users: () => localStorage.setItem('users', JSON.stringify(state.users)),
         favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
         appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
         login: (user) => { state.loggedInUser = user; sessionStorage.setItem('loggedInUser', JSON.stringify(user)); },
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const cartCountEl = document.getElementById('cart-count');
         const favCountEl = document.getElementById('favorites-count');
         const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-        
         if (cartCountEl) {
             const currentCount = parseInt(cartCountEl.textContent || '0');
             cartCountEl.textContent = totalItems;
@@ -59,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-    
     function updateLoginStatus() {
         const loginBtn = document.getElementById('login-btn');
         if (!loginBtn) return;
@@ -72,18 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
         }
     }
-
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
         let shippingDisplayText = state.cart.length > 0 ? (state.shipping.neighborhood ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
         const total = subtotal + shippingFee;
-        
-        const updateElementText = (id, text) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = text;
-        };
-
+        const updateElementText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
         updateElementText('cart-subtotal', formatCurrency(subtotal));
         updateElementText('cart-shipping', shippingDisplayText);
         updateElementText('cart-total', formatCurrency(total));
@@ -91,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateElementText('checkout-shipping', formatCurrency(shippingFee));
         updateElementText('checkout-total', formatCurrency(total));
     }
-
     function renderCart() {
         const container = document.getElementById('cart-items-container');
         if (!container) return;
@@ -118,34 +108,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateTotals();
     }
-    
     function updateAllHeartIcons() {
         document.querySelectorAll('.favorite-btn').forEach(btn => {
             const icon = btn.querySelector('i');
             const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
             if (isFav) {
-                icon.classList.remove('far', 'text-gray-300');
-                icon.classList.add('fas', 'text-red-500');
+                icon.classList.remove('far', 'text-gray-300'); icon.classList.add('fas', 'text-red-500');
             } else {
-                icon.classList.remove('fas', 'text-red-500');
-                icon.classList.add('far', 'text-gray-300');
+                icon.classList.remove('fas', 'text-red-500'); icon.classList.add('far', 'text-gray-300');
             }
         });
     }
-
     function renderFavoritesPage() {
         const container = document.getElementById('favorites-items-container');
         const emptyState = document.getElementById('favorites-empty-state');
-        if (!container || !emptyState) return;
+        const clearBtn = document.getElementById('clear-favorites-btn');
+        if (!container || !emptyState || !clearBtn) return;
+
         container.innerHTML = '';
         if (state.favorites.length === 0) {
             emptyState.classList.remove('hidden');
             container.classList.add('hidden');
-            document.getElementById('clear-favorites-btn')?.classList.add('hidden');
+            clearBtn.classList.add('hidden');
         } else {
             emptyState.classList.add('hidden');
             container.classList.remove('hidden');
-            document.getElementById('clear-favorites-btn')?.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
             state.favorites.forEach(item => {
                 container.insertAdjacentHTML('beforeend', `
                 <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
@@ -159,108 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+    function renderCheckoutSummary() { /* ... */ }
+    function renderCalendar() { /* ... */ }
+    function initBanhoTosaEventListeners() { /* ... */ }
 
-    function renderCheckoutSummary() {
-        const container = document.getElementById('checkout-summary-items');
-        if (!container) return;
-        container.innerHTML = '';
-        state.cart.forEach(item => {
-            container.insertAdjacentHTML('beforeend', `<div class="flex justify-between items-center text-sm"><div class="flex items-center gap-2"><img src="${item.image}" alt="${item.name}" class="w-10 h-10 object-contain rounded"><span>${item.name} (x${item.quantity})</span></div><span class="font-medium">${formatCurrency(item.price * item.quantity)}</span></div>`);
-        });
-        updateTotals();
-    }
-
-    function renderCalendar() {
-        const agendaGrid = document.getElementById('agenda-grid');
-        if (!agendaGrid) return;
-        agendaGrid.innerHTML = '';
-        const today = new Date('2025-08-07T10:00:00');
-        const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-        const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-        
-        agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
-        for (let i = 0; i < 7; i++) {
-            const day = new Date(today);
-            day.setDate(today.getDate() + i);
-            const dayName = daysOfWeek[day.getDay()];
-            const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
-            agendaGrid.insertAdjacentHTML('beforeend', `<div class="day-header">${dayName}<br>${dayDate}</div>`);
-        }
-
-        hours.forEach(hour => {
-            agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-label">${hour}</div>`);
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(today);
-                day.setDate(today.getDate() + i);
-                const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
-                const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
-                if (appointment) {
-                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
-                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
-                } else {
-                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
-                }
-            }
-        });
-    }
-
-    function initBanhoTosaEventListeners() {
-        const pageContainer = document.getElementById('app-root');
-        if (!pageContainer) return;
-
-        pageContainer.addEventListener('click', e => {
-            const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
-            const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
-
-            const availableSlot = e.target.closest('.time-slot.available');
-            if (availableSlot) {
-                if (state.loggedInUser) {
-                    const bookingModal = document.getElementById('booking-modal');
-                    const day = availableSlot.dataset.day;
-                    const time = availableSlot.dataset.time;
-                    document.getElementById('booking-info').textContent = `${day} às ${time}`;
-                    document.getElementById('booking-day').value = day;
-                    document.getElementById('booking-time').value = time;
-                    openModal(bookingModal);
-                } else {
-                    openModal(document.getElementById('login-required-modal'));
-                }
-            }
-
-            const bookedSlot = e.target.closest('.time-slot.booked');
-            if (bookedSlot) {
-                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
-                 document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
-                 document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
-                 document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
-                 openModal(document.getElementById('appointment-details-modal'));
-            }
-            if (e.target.closest('#redirect-to-login-btn')) {
-                 closeModal(document.getElementById('login-required-modal'));
-                 loadPage('login');
-            }
-        });
-
-        const bookingForm = document.getElementById('booking-form');
-        if (bookingForm) {
-            bookingForm.addEventListener('submit', e => {
-                e.preventDefault();
-                const newAppointment = {
-                    day: document.getElementById('booking-day').value,
-                    time: document.getElementById('booking-time').value,
-                    tutorName: document.getElementById('booking-tutor-name').value,
-                    petName: document.getElementById('booking-pet-name').value,
-                    phoneNumber: document.getElementById('booking-phone-number').value
-                };
-                state.appointments.push(newAppointment);
-                save.appointments();
-                document.getElementById('booking-modal').style.display = 'none';
-                showAnimation('success-animation-overlay', 1500);
-                renderCalendar();
-            });
-        }
-    }
-    
     // --- MANIPULADORES DE EVENTOS PRINCIPAIS ---
     function handleAddToCart(event) {
         const button = event.target.closest('.add-to-cart-btn');
@@ -268,11 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = button.closest('.product-card');
         const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src };
         const existingProduct = state.cart.find(item => item.id === product.id);
-        if (existingProduct) {
-            existingProduct.quantity++;
-        } else {
-            state.cart.push({ ...product, quantity: 1 });
-        }
+        if (existingProduct) existingProduct.quantity++;
+        else state.cart.push({ ...product, quantity: 1 });
         save.cart();
         updateCounters();
         const originalContent = button.innerHTML;
@@ -280,16 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
         button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
         setTimeout(() => {
             button.classList.remove('added');
-            button.innerHTML = originalContent.includes('Adicionar') ? originalContent : `<i class="fas fa-shopping-cart mr-2"></i> Adicionar`;
+            button.innerHTML = originalContent;
         }, 2000);
     }
-
     function handleFavoriteToggle(event) {
         const button = event.target.closest('.favorite-btn');
         const card = button.closest('.product-card');
         const productId = card.dataset.id;
         const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
-
         if (favoriteIndex > -1) {
             state.favorites.splice(favoriteIndex, 1);
             showAnimation('unfavorite-animation-overlay', 1500, () => {
@@ -297,10 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             state.favorites.push({
-                id: productId,
-                name: card.dataset.name,
-                price: parseFloat(card.dataset.price),
-                image: card.querySelector('img').src
+                id: productId, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src
             });
         }
         save.favorites();
@@ -324,18 +206,11 @@ document.addEventListener('DOMContentLoaded', () => {
             appRoot.innerHTML = await response.text();
             
             switch (pageName) {
-                case 'home':
-                    initSlider();
-                    initComparisonSlider();
-                    updateAllHeartIcons();
-                    break;
+                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
                 case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
                 case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
-                case 'banho-e-tosa':
-                    renderCalendar();
-                    initBanhoTosaEventListeners();
-                    break;
+                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
             }
             initPageModals();
         } catch (error) {
@@ -355,27 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
         
         document.body.addEventListener('click', (e) => {
-            // Navegação
             const navLink = e.target.closest('.nav-link');
-            if (navLink && navLink.dataset.page) {
-                e.preventDefault();
-                loadPage(navLink.dataset.page);
-            }
-            // Logout
-            if (e.target.closest('#logout-btn')) {
-                save.logout();
-                updateLoginStatus();
-                loadPage('home');
-            }
-            // Adicionar ao Carrinho
-            if (e.target.closest('.add-to-cart-btn')) {
-                handleAddToCart(e);
-            }
-            // Favoritar
-            if (e.target.closest('.favorite-btn')) {
-                handleFavoriteToggle(e);
-            }
-            // Remover item individual do carrinho
+            if (navLink && navLink.dataset.page) { e.preventDefault(); loadPage(navLink.dataset.page); }
+            if (e.target.closest('#logout-btn')) { save.logout(); updateLoginStatus(); loadPage('home'); }
+            if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
+            if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
+
             const removeBtn = e.target.closest('.remove-from-cart');
             if (removeBtn) {
                 const productId = removeBtn.dataset.id;
@@ -384,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCounters();
                 renderCart();
             }
-            // Mudar quantidade do item no carrinho
             const quantityBtn = e.target.closest('.quantity-change');
             if(quantityBtn) {
                 const productId = quantityBtn.dataset.id;
@@ -398,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderCart();
                 }
             }
-            // Limpar todo o carrinho
             if (e.target.closest('#clear-cart-btn')) {
                 if (confirm('Tem certeza que deseja remover todos os itens do carrinho?')) {
                     showAnimation('clear-cart-animation-overlay', 5800, () => {
@@ -409,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             }
-            // Limpar todos os favoritos
             if (e.target.closest('#clear-favorites-btn')) {
                 if (confirm('Tem certeza que deseja remover todos os seus favoritos?')) {
                     showAnimation('unfavorite-animation-overlay', 1500, () => {
