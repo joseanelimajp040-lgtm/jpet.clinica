@@ -3,8 +3,6 @@ import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM carregado. Iniciando script principal...");
-
     // --- STATE & DOM REFERENCES ---
     const state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
@@ -17,12 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const appRoot = document.getElementById('app-root');
     const loadingOverlay = document.getElementById('loading-overlay');
 
-    // --- FUNÇÕES ---
-    // (Todas as suas funções de renderização e auxiliares vão aqui)
+    // --- FUNÇÕES DE PERSISTÊNCIA E UTILITÁRIAS ---
     const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const save = {
-        cart: () => { console.log("Salvando carrinho..."); localStorage.setItem('cart', JSON.stringify(state.cart)); },
-        favorites: () => { console.log("Salvando favoritos..."); localStorage.setItem('favorites', JSON.stringify(state.favorites)); },
+        cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
+        favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
         appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
         login: (user) => { state.loggedInUser = user; sessionStorage.setItem('loggedInUser', JSON.stringify(user)); },
         logout: () => { state.loggedInUser = null; sessionStorage.removeItem('loggedInUser'); }
@@ -37,12 +34,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }, duration);
         }
     }
+    function censorString(str) {
+        if (!str) return '';
+        if (str.length <= 4) return str.length > 1 ? str[0] + '*'.repeat(str.length - 1) : '*';
+        const start = str.substring(0, 2);
+        const end = str.substring(str.length - 2);
+        return `${start}${'*'.repeat(str.length - 4)}${end}`;
+    }
+
+    // --- FUNÇÕES DE RENDERIZAÇÃO E ATUALIZAÇÃO DA UI ---
     function updateCounters() {
         const cartCountEl = document.getElementById('cart-count');
         const favCountEl = document.getElementById('favorites-count');
         const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-        if (cartCountEl) cartCountEl.textContent = totalItems;
+        if (cartCountEl) {
+            const currentCount = parseInt(cartCountEl.textContent || '0');
+            cartCountEl.textContent = totalItems;
+            if (totalItems > currentCount) {
+                cartCountEl.classList.add('animate-bounce-custom');
+                setTimeout(() => cartCountEl.classList.remove('animate-bounce-custom'), 600);
+            }
+        }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
+    }
+    function updateLoginStatus() {
+        const loginBtn = document.getElementById('login-btn');
+        if (!loginBtn) return;
+        if (state.loggedInUser) {
+            const firstName = state.loggedInUser.fullname.split(' ')[0];
+            loginBtn.dataset.page = '';
+            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${firstName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
+        } else {
+            loginBtn.dataset.page = 'login';
+            loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
+        }
+    }
+    function updateTotals() {
+        const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const shippingFee = state.shipping.fee || 0;
+        let shippingDisplayText = state.cart.length > 0 ? (state.shipping.neighborhood ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
+        const total = subtotal + shippingFee;
+        const updateElementText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+        updateElementText('cart-subtotal', formatCurrency(subtotal));
+        updateElementText('cart-shipping', shippingDisplayText);
+        updateElementText('cart-total', formatCurrency(total));
+        updateElementText('checkout-subtotal', formatCurrency(subtotal));
+        updateElementText('checkout-shipping', formatCurrency(shippingFee));
+        updateElementText('checkout-total', formatCurrency(total));
     }
     function renderCart() {
         const container = document.getElementById('cart-items-container');
@@ -66,16 +104,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateTotals();
     }
-    // ... Coloque aqui as outras funções render, como renderFavoritesPage, etc.
-    function updateTotals() { /* ... */ }
-    function renderFavoritesPage() { /* ... */ }
-    function updateLoginStatus() { /* ... */ }
-    function updateAllHeartIcons() { /* ... */ }
+    function updateAllHeartIcons() {
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const icon = btn.querySelector('i');
+            const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
+            if (isFav) { icon.classList.remove('far', 'text-gray-300'); icon.classList.add('fas', 'text-red-500'); }
+            else { icon.classList.remove('fas', 'text-red-500'); icon.classList.add('far', 'text-gray-300'); }
+        });
+    }
+    function renderFavoritesPage() {
+        const container = document.getElementById('favorites-items-container');
+        const emptyState = document.getElementById('favorites-empty-state');
+        const clearBtn = document.getElementById('clear-favorites-btn');
+        if (!container || !emptyState || !clearBtn) return;
+        container.innerHTML = '';
+        if (state.favorites.length === 0) {
+            emptyState.classList.remove('hidden');
+            container.classList.add('hidden');
+            clearBtn.classList.add('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            container.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
+            state.favorites.forEach(item => {
+                container.insertAdjacentHTML('beforeend', `
+                <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
+                    <div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3>
+                        <div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div>
+                        <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button>
+                    </div>
+                </div>`);
+            });
+        }
+    }
     function renderCheckoutSummary() { /* ... */ }
     function renderCalendar() { /* ... */ }
     function initBanhoTosaEventListeners() { /* ... */ }
-    function handleAddToCart(event) { /* ... */ }
-    function handleFavoriteToggle(event) { /* ... */ }
+
+    // --- MANIPULADORES DE EVENTOS PRINCIPAIS ---
+    function handleAddToCart(event) {
+        const button = event.target.closest('.add-to-cart-btn');
+        if (button.classList.contains('added')) return;
+        const card = button.closest('.product-card');
+        const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src };
+        const existingProduct = state.cart.find(item => item.id === product.id);
+        if (existingProduct) existingProduct.quantity++;
+        else state.cart.push({ ...product, quantity: 1 });
+        save.cart();
+        updateCounters();
+        const originalContent = button.innerHTML;
+        button.classList.add('added');
+        button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
+        setTimeout(() => {
+            button.classList.remove('added');
+            button.innerHTML = originalContent;
+        }, 2000);
+    }
+    function handleFavoriteToggle(event) {
+        const button = event.target.closest('.favorite-btn');
+        const card = button.closest('.product-card');
+        const productId = card.dataset.id;
+        const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
+        if (favoriteIndex > -1) {
+            state.favorites.splice(favoriteIndex, 1);
+            showAnimation('unfavorite-animation-overlay', 1500, () => {
+                if (document.getElementById('favorites-items-container')) renderFavoritesPage();
+            });
+        } else {
+            state.favorites.push({
+                id: productId, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src
+            });
+        }
+        save.favorites();
+        updateCounters();
+        updateAllHeartIcons();
+    }
 
     // --- CARREGAMENTO DE PÁGINAS ---
     async function loadComponent(url, placeholderId) {
@@ -116,56 +221,52 @@ document.addEventListener('DOMContentLoaded', () => {
             loadComponent('components/footer.html', 'footer-placeholder')
         ]);
         
-        console.log("Listener de cliques principal está sendo adicionado ao BODY.");
         document.body.addEventListener('click', (e) => {
-            console.log("%c--- CLIQUE DETECTADO ---", "color: #00A8A8; font-weight: bold;");
-            console.log("Elemento clicado:", e.target);
-
-            // Delegação para Navegação
             const navLink = e.target.closest('.nav-link');
-            if (navLink && navLink.dataset.page) {
-                console.log("Ação: Navegar para a página:", navLink.dataset.page);
-                e.preventDefault();
-                loadPage(navLink.dataset.page);
-            }
+            if (navLink && navLink.dataset.page) { e.preventDefault(); loadPage(navLink.dataset.page); }
+            if (e.target.closest('#logout-btn')) { save.logout(); updateLoginStatus(); loadPage('home'); }
+            if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
+            if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
-            // Delegação para Remover item individual
             const removeBtn = e.target.closest('.remove-from-cart');
             if (removeBtn) {
-                console.log("%cAção: REMOVER ITEM INDIVIDUAL", "color: red; font-weight: bold;");
                 const productId = removeBtn.dataset.id;
-                console.log("ID do produto a ser removido:", productId);
                 state.cart = state.cart.filter(item => item.id !== productId);
                 save.cart();
                 updateCounters();
                 renderCart();
-                console.log("Item removido e carrinho re-renderizado.");
             }
-
-            // Delegação para Limpar Carrinho
+            const quantityBtn = e.target.closest('.quantity-change');
+            if(quantityBtn) {
+                const productId = quantityBtn.dataset.id;
+                const change = parseInt(quantityBtn.dataset.change);
+                const item = state.cart.find(item => item.id === productId);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity < 1) item.quantity = 1;
+                    save.cart();
+                    updateCounters();
+                    renderCart();
+                }
+            }
             if (e.target.closest('#clear-cart-btn')) {
-                console.log("%c-Ação: LIMPAR CARRINHO INTEIRO", "color: red; font-weight: bold;");
                 if (confirm('Tem certeza que deseja remover todos os itens do carrinho?')) {
-                    console.log("Usuário confirmou. Limpando carrinho...");
                     showAnimation('clear-cart-animation-overlay', 5800, () => {
                         state.cart = [];
                         save.cart();
                         updateCounters();
                         renderCart();
-                        console.log("Animação completa. Carrinho limpo.");
                     });
-                } else {
-                    console.log("Usuário cancelou a limpeza do carrinho.");
                 }
             }
-             // Delegação para Limpar Favoritos
             if (e.target.closest('#clear-favorites-btn')) {
-                console.log("%c-Ação: LIMPAR FAVORITOS", "color: red; font-weight: bold;");
                 if (confirm('Tem certeza que deseja remover todos os seus favoritos?')) {
-                    state.favorites = [];
-                    save.favorites();
-                    updateCounters();
-                    renderFavoritesPage();
+                    showAnimation('unfavorite-animation-overlay', 1500, () => {
+                        state.favorites = [];
+                        save.favorites();
+                        updateCounters();
+                        renderFavoritesPage();
+                    });
                 }
             }
         });
