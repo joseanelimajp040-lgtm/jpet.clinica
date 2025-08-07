@@ -1,0 +1,1149 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+input,
+textarea {
+    user-select: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+}
+
+.bg-primary {
+    background-color: #FF6B00;
+}
+
+.bg-secondary {
+    background-color: #00A8A8;
+}
+
+.text-primary {
+    color: #FF6B00;
+}
+
+.text-secondary {
+    color: #00A8A8;
+}
+
+.border-primary {
+    border-color: #FF6B00;
+}
+
+.border-secondary {
+    border-color: #00A8A8;
+}
+
+.hover\:bg-primary:hover {
+    background-color: #E05E00;
+}
+
+.hover\:bg-secondary:hover {
+    background-color: #009494;
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, #FF6B00 0%, #00A8A8 100%);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.search-bar:focus {
+    border-color: #FF6B00;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    width: 90%;
+    max-width: 500px;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.animal-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.animal-option:hover {
+    background-color: #f0f0f0;
+    transform: translateX(5px);
+}
+
+.animal-option i {
+    font-size: 2rem;
+    margin-right: 1rem;
+    width: 40px;
+    text-align: center;
+}
+
+.modal-back {
+    cursor: pointer;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.modal-back:hover {
+    transform: translateX(-3px);
+}
+
+/* Error message style */
+.search-error {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background-color: #FF6B00;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 10;
+    animation: fadeIn 0.3s ease-out;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-error:after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 10%;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent #FF6B00 transparent;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slider Styles */
+.slider-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.slider {
+    display: flex;
+    width: 300%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.slide {
+    position: relative;
+    width: 33.333%;
+    height: 100%;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slide-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    color: white;
+    padding: 2rem 1.5rem 1rem;
+    transform: translateY(100%);
+    transition: transform 0.5s ease;
+}
+
+.slide:hover .slide-overlay {
+    transform: translateY(0);
+}
+
+.slide-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease 0.2s;
+}
+
+.slide-desc {
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease 0.3s;
+}
+
+.slide:hover .slide-title,
+.slide:hover .slide-desc {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.slider-nav {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.slider-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background-color: white;
+    transform: scale(1.3);
+}
+
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.slider-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.slider-arrow.left {
+    left: 1rem;
+}
+
+.slider-arrow.right {
+    right: 1rem;
+}
+
+/* Animation for cart count */
+.animate-bounce-custom {
+    animation: bounce-custom 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes bounce-custom {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+}
+
+/* Animation for search input shake */
+.animate-shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Styles for cart quantity input */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* Checkout page specific styles */
+.payment-option {
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.payment-option.selected {
+    border-color: #FF6B00;
+    box-shadow: 0 0 0 2px #FF6B00;
+}
+
+.form-input {
+    @apply w-full px-3 py-2 border-2 border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-primary;
+}
+
+.form-input.input-error {
+    @apply border-red-500 focus:ring-red-500;
+}
+
+.form-input.input-success {
+    border-color: #22c55e;
+    /* Verde */
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4);
+    background-color: #f0fdf4;
+}
+
+/* --- Início: Estilos da Tela de Carregamento --- */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
+    z-index: 9999;
+    flex-direction: column;
+}
+
+.loader-container {
+    position: relative;
+    width: 150px;
+    height: 100px;
+    margin-bottom: 2rem;
+}
+
+.loader-dog,
+.loader-cat {
+    position: absolute;
+    font-size: 50px;
+    bottom: 0;
+}
+
+.loader-dog {
+    color: #FF6B00;
+    animation: dog-run 1.5s infinite;
+}
+
+.loader-cat {
+    color: #00A8A8;
+    animation: cat-jump 1.5s infinite;
+    left: 80px;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(0, 168, 168, 0.2);
+    border-top-color: #00A8A8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes dog-run {
+    0% {
+        transform: translateX(-30px) scaleX(1);
+    }
+    40% {
+        transform: translateX(50px) scaleX(1);
+    }
+    50% {
+        transform: translateX(50px) scaleX(-1);
+    }
+    90% {
+        transform: translateX(-30px) scaleX(-1);
+    }
+    100% {
+        transform: translateX(-30px) scaleX(1);
+    }
+}
+
+@keyframes cat-jump {
+    0% {
+        transform: translateY(0) rotate(0);
+    }
+    25% {
+        transform: translateY(-30px) rotate(15deg);
+    }
+    50% {
+        transform: translateY(0) rotate(0);
+    }
+    75% {
+        transform: translateY(-30px) rotate(-15deg);
+    }
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Fim: Estilos da Tela de Carregamento --- */
+
+/* --- Início: Animações para Ícones dos Modais --- */
+@keyframes animate-dog {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(8deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+    75% {
+        transform: rotate(-8deg);
+    }
+}
+
+@keyframes animate-cat {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-6px) scale(1.05);
+    }
+}
+
+@keyframes animate-paw {
+    0%,
+    100% {
+        transform: scale(1) rotate(0);
+    }
+    50% {
+        transform: scale(1.15) rotate(10deg);
+    }
+}
+
+@keyframes animate-wobble {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    25% {
+        transform: rotate(-7deg);
+    }
+    75% {
+        transform: rotate(7deg);
+    }
+}
+
+@keyframes animate-swim {
+    0%,
+    100% {
+        transform: translateX(0) rotateY(0);
+    }
+    50% {
+        transform: translateX(6px) rotateY(20deg);
+    }
+}
+
+@keyframes animate-bird {
+    0%,
+    100% {
+        transform: translateY(0) rotate(5deg);
+    }
+    50% {
+        transform: translateY(-4px) rotate(-5deg);
+    }
+}
+
+@keyframes animate-pulse-medical {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.animal-option:hover .fa-dog {
+    animation: animate-dog 0.8s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-cat {
+    animation: animate-cat 0.7s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-paw {
+    animation: animate-paw 0.6s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-bone,
+.animal-option:hover .fa-drumstick-bite {
+    animation: animate-wobble 0.5s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-fish {
+    animation: animate-swim 1.2s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-dove {
+    animation: animate-bird 0.9s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-briefcase-medical {
+    animation: animate-pulse-medical 1s ease-in-out infinite;
+}
+
+@keyframes animate-pills {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    25% {
+        transform: rotate(-10deg) translateX(-3px);
+    }
+    75% {
+        transform: rotate(10deg) translateX(3px);
+    }
+}
+
+@keyframes animate-virus-slash {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes animate-capsules {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+    20% {
+        transform: translate(1px, -1px) rotate(5deg);
+    }
+    40% {
+        transform: translate(-1px, 1px) rotate(-5deg);
+    }
+    60% {
+        transform: translate(1px, 1px) rotate(5deg);
+    }
+    80% {
+        transform: translate(-1px, -1px) rotate(-5deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(0);
+    }
+}
+
+.animal-option:hover .fa-pills {
+    animation: animate-pills 0.6s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-virus-slash {
+    animation: animate-virus-slash 0.8s linear infinite;
+}
+
+.animal-option:hover .fa-capsules {
+    animation: animate-capsules 0.7s linear infinite;
+}
+
+/* --- Fim: Animações para Ícones dos Modais --- */
+
+/* --- Início: Estilos da API de CEP --- */
+#cep-loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 168, 168, 0.2);
+    border-top-color: #00A8A8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes field-fill-animation {
+    from {
+        background-color: rgba(0, 168, 168, 0.15);
+        transform: scale(1.02);
+    }
+    to {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+.animate-field-fill {
+    animation: field-fill-animation 0.5s ease-out;
+}
+
+/* --- Fim: Estilos da API de CEP --- */
+
+/* --- Início: Estilos da Seção "Nossos Serviços" --- */
+.service-card {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(255, 107, 0, 0.2);
+}
+
+.service-icon-bg {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1.5rem;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #FF6B00 0%, #00A8A8 100%);
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon-bg {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.service-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.service-card p {
+    color: #4b5563;
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.service-action-btn {
+    display: inline-block;
+    margin-top: auto;
+    background-color: #00A8A8;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+
+.service-action-btn:hover {
+    background-color: #007f7f;
+    transform: scale(1.05);
+}
+
+/* --- Fim: Estilos da Seção "Nossos Serviços" --- */
+
+/* --- Início: Estilos da Agenda --- */
+#agenda-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    gap: 2px;
+}
+
+.day-header,
+.time-label,
+.time-slot {
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.day-header {
+    background-color: #FF6B00;
+    color: white;
+}
+
+.time-label {
+    background-color: #f3f4f6;
+    border-right: 2px solid #e5e7eb;
+}
+
+.time-slot {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    min-height: 70px;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.time-slot.available {
+    background-color: #fff5ed;
+    cursor: pointer;
+}
+
+.time-slot.available:hover {
+    background-color: #fed7aa;
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.time-slot.booked {
+    background-color: #00A8A8;
+    color: white;
+    cursor: pointer;
+}
+
+.time-slot.booked:hover {
+    background-color: #007f7f;
+}
+
+.time-slot.booked .booked-name {
+    font-weight: 700;
+}
+
+.time-slot.booked .booked-status {
+    font-size: 0.65rem;
+    opacity: 0.8;
+}
+
+/* --- Fim: Estilos da Agenda --- */
+
+/* --- Início: Animação de Sucesso e Erro --- */
+#success-animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fade-in 0.3s;
+}
+
+.checkmark-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0.8);
+    animation: scale-up 0.4s 0.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.checkmark {
+    width: 50px;
+    height: 25px;
+    border-bottom: 8px solid #22c55e;
+    border-left: 8px solid #22c55e;
+    transform: rotate(-45deg) scale(0);
+    animation: draw-check 0.3s 0.5s ease-out forwards;
+}
+
+.error-circle {
+    width: 80px;
+    height: 80px;
+    border: 4px solid #ef4444;
+    /* red-500 */
+    border-radius: 50%;
+    position: relative;
+    animation: shake-error 0.6s;
+}
+
+.error-x-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    background-color: #ef4444;
+    border-radius: 2px;
+}
+
+.line1 {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.line2 {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes shake-error {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20%,
+    60% {
+        transform: translateX(-8px);
+    }
+    40%,
+    80% {
+        transform: translateX(8px);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scale-up {
+    from {
+        transform: scale(0.8);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes draw-check {
+    from {
+        transform: rotate(-45deg) scale(0);
+    }
+    to {
+        transform: rotate(-45deg) scale(1);
+    }
+}
+
+/* --- Fim: Animação de Sucesso --- */
+
+/* --- Início: Animação de Desfavoritar --- */
+#unfavorite-animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fade-in 0.3s;
+}
+
+.unfavorite-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0.8);
+    animation: scale-up 0.4s 0.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.unfavorite-circle .fa-heart-crack {
+    font-size: 50px;
+    color: #ef4444;
+    /* Vermelho */
+    animation: heart-crack-shake 0.5s 0.5s ease-in-out;
+}
+
+@keyframes heart-crack-shake {
+    0% {
+        transform: scale(1) rotate(0);
+    }
+    25% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    50% {
+        transform: scale(1) rotate(5deg);
+    }
+    75% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* --- Fim: Animação de Desfavoritar --- */
+
+/* --- Início: Animação de Limpar Carrinho (NOVA VERSÃO) --- */
+#clear-cart-animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fade-in 0.3s;
+}
+
+.clear-cart-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform: scale(0.8);
+    animation: scale-up 0.4s 0.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    overflow: hidden;
+}
+
+.bubble-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -50px;
+    /* Começa de baixo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 168, 168, 0.2);
+    border: 2px solid rgba(0, 168, 168, 0.4);
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.bubble i {
+    font-size: 18px;
+    color: #007f7f;
+    opacity: 0.8;
+}
+
+/* Configurações individuais de cada bolha */
+.bubble:nth-child(1) {
+    left: 20%;
+    width: 40px;
+    height: 40px;
+    animation: float-up 4s ease-in-out 0.2s, pop 0.3s ease-out 4.2s forwards;
+}
+
+.bubble:nth-child(2) {
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    animation: float-up 5s ease-in-out 0.5s, pop 0.3s ease-out 5.5s forwards;
+}
+
+.bubble:nth-child(3) {
+    left: 70%;
+    width: 45px;
+    height: 45px;
+    animation: float-up 3.5s ease-in-out 0.8s, pop 0.3s ease-out 4.3s forwards;
+}
+
+.bubble:nth-child(4) {
+    left: 35%;
+    width: 35px;
+    height: 35px;
+    animation: float-up 4.5s ease-in-out 1.1s, pop 0.3s ease-out 5.6s forwards;
+}
+
+.clear-cart-message {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #00A8A8;
+    opacity: 0;
+    animation: message-fade-in 0.5s ease-out 1s forwards;
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-100px) translateX(15px);
+    }
+    100% {
+        transform: translateY(-200px) translateX(-10px);
+        opacity: 1;
+    }
+}
+
+@keyframes pop {
+    from {
+        transform-origin: center;
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform-origin: center;
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes message-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* --- Fim: Animação de Limpar Carrinho --- */
+
+/* --- Início: Animação de Hover para Coração de Favorito --- */
+.favorite-btn>i {
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.favorite-btn:hover>i {
+    transform: scale(1.25);
+}
+
+.favorite-btn:hover>i.text-gray-300 {
+    color: #6b7280;
+    /* text-gray-500 */
+}
+
+.favorite-btn:hover>i.text-red-500 {
+    color: #b91c1c;
+    /* text-red-700 */
+}
+
+/* --- Fim: Animação de Hover para Coração de Favorito --- */
+
+/* Favorite animation */
+@keyframes heart-pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-heart-pulse {
+    animation: heart-pulse 0.4s ease-in-out;
+}
+
+/* --- Início: Animação do Botão Adicionar ao Carrinho --- */
+.add-to-cart-btn {
+    transition: background-color 0.3s ease-in-out;
+}
+
+.add-to-cart-btn.added {
+    background-color: #FF6B00;
+    /* Cor primária laranja */
+    pointer-events: none;
+}
+
+/* --- Fim: Animação do Botão Adicionar ao Carrinho --- */
+
+/* Vet Card Styles - DEPRECATED, kept for safety, but new styles are inline */
+.vet-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}

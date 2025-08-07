@@ -1,0 +1,78 @@
+<div id="top-banner" class="bg-white text-gray-600 text-sm py-2 px-4 border-b border-gray-200">
+    <div class="container mx-auto relative flex justify-center items-center">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-stethoscope text-2xl text-primary"></i>
+            <span class="font-medium text-gray-800">Conheça nossos Médicos Veterinários*</span>
+            <a href="#" id="saiba-mais-vets-btn" class="nav-link text-blue-600 underline hover:text-blue-800 font-medium" data-page="veterinarios">Saiba mais</a>
+        </div>
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex">
+            <a href="https://maps.app.goo.gl/WhMrteoFFtgH2GvC8" target="_blank" class="hover:text-primary flex items-center">
+                <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i> Encontre nossa loja
+            </a>
+        </div>
+    </div>
+</div>
+<div id="secondary-banner" class="bg-primary py-3 hidden"></div>
+
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#" class="nav-link text-3xl font-bold logo-link" data-page="home">
+                    <span class="text-primary">j.</span><span class="text-secondary">A</span><span class="text-gray-800"> Pet Clínica</span>
+                </a>
+            </div>
+            
+            <div class="flex-1 mx-8 relative">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-black rounded-full focus:outline-none search-bar">
+                    <button id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
+            </div>
+            
+            <div class="flex items-center">
+                <a href="#" id="favorites-icon-link" class="relative mr-4 nav-link" data-page="favorites">
+                    <i class="fas fa-heart text-2xl text-gray-700"></i>
+                    <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <a href="#" class="relative cart-icon-link nav-link" data-page="cart">
+                    <i class="fas fa-shopping-cart text-2xl text-gray-700"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-secondary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+    
+<nav class="bg-primary text-white">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between">
+            <div class="dropdown relative">
+                <button class="bg-secondary hover:bg-teal-700 px-6 py-3 font-medium flex items-center">
+                    <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                </button>
+                <div class="dropdown-menu absolute left-0 mt-1 w-64 bg-white shadow-lg rounded-md hidden z-50">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b border-gray-100"><i class="fas fa-dog mr-2 text-primary"></i> Cães</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b border-gray-100"><i class="fas fa-cat mr-2 text-primary"></i> Gatos</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b border-gray-100"><i class="fas fa-dove mr-2 text-primary"></i> Aves</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b border-gray-100"><i class="fas fa-fish mr-2 text-primary"></i> Peixes</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b border-gray-100"><i class="fas fa-paw mr-2 text-primary"></i> Roedores</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i class="fas fa-prescription-bottle-alt mr-2 text-primary"></i> Medicamentos</a>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="py-3 px-2 font-medium hover:bg-orange-700">Promoções</a>
+                <a href="#" id="racao-btn-nav" class="py-3 px-2 font-medium hover:bg-orange-700">Rações</a>
+                <a href="#" id="medicamentos-btn" class="py-3 px-2 font-medium hover:bg-orange-700">Medicamentos</a>
+                <a href="#" class="py-3 px-2 font-medium hover:bg-orange-700">Farmácia</a>
+                <a href="#" id="banho-tosa-btn" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="banho-e-tosa">Banho e tosa</a>
+                 <button id="login-btn" class="bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-5 rounded-full flex items-center space-x-2 nav-link" data-page="login">
+                     <i class="fas fa-user"></i> <span>Entre ou Cadastre-se</span>
+                 </button>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>j.A Pet Clínica - Medicamentos e Rações para Pets</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-50">
+
+    <div id="loading-overlay" class="hidden justify-center items-center">
+        <div class="loader-container">
+            <i class="fas fa-dog loader-dog"></i>
+            <i class="fas fa-cat loader-cat"></i>
+        </div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="success-animation-overlay" class="hidden">
+        <div class="checkmark-circle"><div class="checkmark"></div></div>
+    </div>
+    <div id="unfavorite-animation-overlay" class="hidden">
+        <div class="unfavorite-circle"><i class="fas fa-heart-crack"></i></div>
+    </div>
+    <div id="clear-cart-animation-overlay" class="hidden">
+        <div class="clear-cart-circle">
+            <div class="bubble-container">
+                <div class="bubble"><i class="fas fa-bone"></i></div>
+                <div class="bubble"><i class="fas fa-pills"></i></div>
+                <div class="bubble"><i class="fas fa-cat"></i></div>
+                <div class="bubble"><i class="fas fa-fish"></i></div>
+            </div>
+            <div class="clear-cart-message"></div>
+        </div>
+    </div>
+    
+    <div id="header-placeholder"></div>
+    <main id="app-root"></main>
+    <div id="footer-placeholder"></div>
+
+    <a href="https://wa.me/message/UWELXKHLLEPLM1" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 transition duration-300 z-50">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+  <script src="assets/js/main.js" type="module" defer></script>
+
+</body>
+</html>
