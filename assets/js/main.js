@@ -114,32 +114,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     function renderFavoritesPage() {
-        const container = document.getElementById('favorites-items-container');
-        const emptyState = document.getElementById('favorites-empty-state');
-        const clearBtn = document.getElementById('clear-favorites-btn');
-        if (!container || !emptyState || !clearBtn) return;
-        container.innerHTML = '';
-        if (state.favorites.length === 0) {
-            emptyState.classList.remove('hidden');
-            container.classList.add('hidden');
-            clearBtn.classList.add('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-            container.classList.remove('hidden');
-            clearBtn.classList.remove('hidden');
-            state.favorites.forEach(item => {
-                container.insertAdjacentHTML('beforeend', `
-                <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
-                    <div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div>
-                    <div class="p-4">
-                        <h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3>
-                        <div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div>
-                        <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button>
-                    </div>
-                </div>`);
-            });
-        }
+    const container = document.getElementById('favorites-items-container');
+    const emptyState = document.getElementById('favorites-empty-state');
+    const clearBtn = document.getElementById('clear-favorites-btn');
+    const summaryEl = document.getElementById('favorites-summary'); // <-- LINHA NOVA
+
+    // Condição atualizada para garantir que todos os elementos existem
+    if (!container || !emptyState || !clearBtn || !summaryEl) return;
+
+    // LÓGICA NOVA PARA ATUALIZAR O TEXTO DO RESUMO
+    const count = state.favorites.length;
+    summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
+
+    // O resto da função continua como antes
+    container.innerHTML = '';
+    if (state.favorites.length === 0) {
+        emptyState.classList.remove('hidden');
+        container.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+    } else {
+        emptyState.classList.add('hidden');
+        container.classList.remove('hidden');
+        clearBtn.classList.remove('hidden');
+        state.favorites.forEach(item => {
+            container.insertAdjacentHTML('beforeend', `
+            <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
+                <div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div>
+                <div class="p-4">
+                    <h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3>
+                    <div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div>
+                    <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button>
+                </div>
+            </div>`);
+        });
     }
+}
     function renderCheckoutSummary() {
         const container = document.getElementById('checkout-summary-items');
         if (!container) return;
@@ -370,3 +379,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
