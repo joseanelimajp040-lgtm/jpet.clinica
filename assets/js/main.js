@@ -2,7 +2,7 @@ import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 import { initSlider, initComparisonSlider } from './slider.js';
-// ... outros imports
+/*// ... outros imports
 
 // --- REGISTRO DO SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-// --- FIM DO REGISTRO ---
+// --- FIM DO REGISTRO ---*/
 
 document.addEventListener('DOMContentLoaded', () => {
     // ... o resto do seu main.js continua aqui ...
@@ -398,5 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
 
 
