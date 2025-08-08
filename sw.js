@@ -1,19 +1,24 @@
-const CACHE_NAME = 'ja-pet-clinica-cache-v1';
-// Adicione aqui os arquivos principais do seu site que você quer que funcionem offline.
+// sw.js - Versão Corrigida
+
+const CACHE_NAME = 'ja-pet-clinica-cache-v2'; // Mudei a versão para forçar a atualização
+const repoName = '/jpet.clinica/';
+
+// Lista de arquivos com os caminhos completos
 const urlsToCache = [
-  '/',
-  'index.html',
-  'manifest.json',
-  'assets/css/style.css',
-  'assets/js/main.js',
-  'assets/js/slider.js',
-  'assets/js/modals.js',
-  'assets/js/cart.js',
-  // Adicione aqui o link para uma imagem de logo ou um 'fallback' de imagem
-  'https://i.postimg.cc/W3Q0hCWZ/IMG-3941.jpg' 
+  repoName,
+  `${repoName}index.html`,
+  `${repoName}manifest.json`,
+  `${repoName}assets/css/style.css`,
+  `${repoName}assets/js/main.js`,
+  `${repoName}assets/js/slider.js`,
+  `${repoName}assets/js/modals.js`,
+  `${repoName}assets/js/cart.js`,
+  `${repoName}pages/home.html`,
+  // Adicione outras páginas importantes se desejar
+  // Ex: `${repoName}pages/cart.html`,
 ];
 
-// Evento de Instalação: Salva os arquivos no cache
+// Instala o Service Worker e armazena os arquivos em cache
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -24,29 +29,33 @@ self.addEventListener('install', event => {
   );
 });
 
-// Evento de Fetch: Intercepta as requisições
-// Se o recurso estiver no cache, entrega a partir do cache.
-// Se não, busca na rede, entrega e salva uma cópia no cache.
+// Limpa caches antigos quando um novo Service Worker é ativado
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Intercepta as requisições e responde com o cache se disponível
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
+        // Se o recurso estiver no cache, retorna ele
         if (response) {
-          return response; // Retorna do cache
+          return response;
         }
-        return fetch(event.request).then(
-          response => {
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
-          }
-        );
+        // Se não, busca na rede
+        return fetch(event.request);
       })
   );
 });
