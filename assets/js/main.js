@@ -1,7 +1,26 @@
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
+import { initSlider, initComparisonSlider } from './slider.js';
+// ... outros imports
 
+// --- REGISTRO DO SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/jpet.clinica/sw.js')
+      .then(registration => {
+        console.log('Service Worker registrado com sucesso:', registration);
+      })
+      .catch(error => {
+        console.log('Falha ao registrar o Service Worker:', error);
+      });
+  });
+}
+// --- FIM DO REGISTRO ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ... o resto do seu main.js continua aqui ...
+});
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE & DOM REFERENCES ---
     const state = {
@@ -379,4 +398,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
 
