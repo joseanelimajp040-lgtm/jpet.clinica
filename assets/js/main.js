@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const save = {
         cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
+        users: () => localStorage.setItem('users', JSON.stringify(state.users)),
         favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
         appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
         login: (user) => { state.loggedInUser = user; sessionStorage.setItem('loggedInUser', JSON.stringify(user)); },
@@ -139,10 +140,99 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    function renderCheckoutSummary() { /* ... */ }
-    function renderCalendar() { /* ... */ }
-    function initBanhoTosaEventListeners() { /* ... */ }
+    function renderCheckoutSummary() { /* Sua função renderCheckoutSummary aqui */ }
+    
+    function renderCalendar() {
+        const agendaGrid = document.getElementById('agenda-grid');
+        if (!agendaGrid) return;
+        agendaGrid.innerHTML = '';
+        const today = new Date('2025-08-07T10:00:00');
+        const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+        
+        agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(today);
+            day.setDate(today.getDate() + i);
+            const dayName = daysOfWeek[day.getDay()];
+            const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
+            agendaGrid.insertAdjacentHTML('beforeend', `<div class="day-header">${dayName}<br>${dayDate}</div>`);
+        }
 
+        hours.forEach(hour => {
+            agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-label">${hour}</div>`);
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(today);
+                day.setDate(today.getDate() + i);
+                const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
+                const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
+                if (appointment) {
+                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
+                } else {
+                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
+                }
+            }
+        });
+    }
+
+    function initBanhoTosaEventListeners() {
+        const pageContainer = document.getElementById('app-root');
+        if (!pageContainer) return;
+
+        pageContainer.addEventListener('click', e => {
+            const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
+            const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
+
+            const availableSlot = e.target.closest('.time-slot.available');
+            if (availableSlot) {
+                if (state.loggedInUser) {
+                    const bookingModal = document.getElementById('booking-modal');
+                    const day = availableSlot.dataset.day;
+                    const time = availableSlot.dataset.time;
+                    document.getElementById('booking-info').textContent = `${day} às ${time}`;
+                    document.getElementById('booking-day').value = day;
+                    document.getElementById('booking-time').value = time;
+                    openModal(bookingModal);
+                } else {
+                    openModal(document.getElementById('login-required-modal'));
+                }
+            }
+
+            const bookedSlot = e.target.closest('.time-slot.booked');
+            if (bookedSlot) {
+                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+                 document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
+                 document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
+                 document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
+                 openModal(document.getElementById('appointment-details-modal'));
+            }
+            if (e.target.closest('#redirect-to-login-btn')) {
+                 closeModal(document.getElementById('login-required-modal'));
+                 loadPage('login');
+            }
+        });
+
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const newAppointment = {
+                    day: document.getElementById('booking-day').value,
+                    time: document.getElementById('booking-time').value,
+                    tutorName: document.getElementById('booking-tutor-name').value,
+                    petName: document.getElementById('booking-pet-name').value,
+                    phoneNumber: document.getElementById('booking-phone-number').value
+                };
+                state.appointments.push(newAppointment);
+                save.appointments();
+                document.getElementById('booking-modal').style.display = 'none';
+                showAnimation('success-animation-overlay', 1500);
+                renderCalendar();
+            });
+        }
+    }
+    
     // --- MANIPULADORES DE EVENTOS PRINCIPAIS ---
     function handleAddToCart(event) {
         const button = event.target.closest('.add-to-cart-btn');
@@ -202,7 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'cart': renderCart(); initCartPageListeners(); break;
                 case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
                 case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
-                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
+                case 'banho-e-tosa':
+                    renderCalendar();
+                    initBanhoTosaEventListeners();
+                    break;
             }
             initPageModals();
         } catch (error) {
