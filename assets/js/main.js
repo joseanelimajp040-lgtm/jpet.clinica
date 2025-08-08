@@ -2,9 +2,9 @@ import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 import { initSlider, initComparisonSlider } from './slider.js';
-/*// ... outros imports
+// ... outros imports
 
-// --- REGISTRO DO SERVICE WORKER ---
+/*// --- REGISTRO DO SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/jpet.clinica/sw.js')
@@ -398,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
 
 
 
