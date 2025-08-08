@@ -1,10 +1,9 @@
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
-import { initSlider, initComparisonSlider } from './slider.js';
-// ... outros imports
 
-/*// --- REGISTRO DO SERVICE WORKER ---
+// --- REGISTRO DO SERVICE WORKER (DESATIVADO TEMPORARIAMENTE) ---
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/jpet.clinica/sw.js')
@@ -16,11 +15,9 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-// --- FIM DO REGISTRO ---*/
+*/
+// --- FIM DO REGISTRO ---
 
-document.addEventListener('DOMContentLoaded', () => {
-    // ... o resto do seu main.js continua aqui ...
-});
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE & DOM REFERENCES ---
     const state = {
@@ -133,41 +130,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     function renderFavoritesPage() {
-    const container = document.getElementById('favorites-items-container');
-    const emptyState = document.getElementById('favorites-empty-state');
-    const clearBtn = document.getElementById('clear-favorites-btn');
-    const summaryEl = document.getElementById('favorites-summary'); // <-- LINHA NOVA
-
-    // Condição atualizada para garantir que todos os elementos existem
-    if (!container || !emptyState || !clearBtn || !summaryEl) return;
-
-    // LÓGICA NOVA PARA ATUALIZAR O TEXTO DO RESUMO
-    const count = state.favorites.length;
-    summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
-
-    // O resto da função continua como antes
-    container.innerHTML = '';
-    if (state.favorites.length === 0) {
-        emptyState.classList.remove('hidden');
-        container.classList.add('hidden');
-        clearBtn.classList.add('hidden');
-    } else {
-        emptyState.classList.add('hidden');
-        container.classList.remove('hidden');
-        clearBtn.classList.remove('hidden');
-        state.favorites.forEach(item => {
-            container.insertAdjacentHTML('beforeend', `
-            <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
-                <div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div>
-                <div class="p-4">
-                    <h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3>
-                    <div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div>
-                    <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button>
-                </div>
-            </div>`);
-        });
+        const container = document.getElementById('favorites-items-container');
+        const emptyState = document.getElementById('favorites-empty-state');
+        const clearBtn = document.getElementById('clear-favorites-btn');
+        const summaryEl = document.getElementById('favorites-summary');
+        if (!container || !emptyState || !clearBtn || !summaryEl) return;
+        const count = state.favorites.length;
+        summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
+        container.innerHTML = '';
+        if (state.favorites.length === 0) {
+            emptyState.classList.remove('hidden');
+            container.classList.add('hidden');
+            clearBtn.classList.add('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            container.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
+            state.favorites.forEach(item => {
+                container.insertAdjacentHTML('beforeend', `
+                <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
+                    <div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3>
+                        <div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div>
+                        <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button>
+                    </div>
+                </div>`);
+            });
+        }
     }
-}
     function renderCheckoutSummary() {
         const container = document.getElementById('checkout-summary-items');
         if (!container) return;
@@ -264,8 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MANIPULADORES DE EVENTOS PRINCIPAIS ---
     function handleAddToCart(event) {
         const button = event.target.closest('.add-to-cart-btn');
-        if (button.classList.contains('added')) return;
+        if (!button || button.classList.contains('added')) return;
         const card = button.closest('.product-card');
+        if (!card) return;
         const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src };
         const existingProduct = state.cart.find(item => item.id === product.id);
         if (existingProduct) existingProduct.quantity++;
@@ -282,7 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function handleFavoriteToggle(event) {
         const button = event.target.closest('.favorite-btn');
+        if (!button) return;
         const card = button.closest('.product-card');
+        if (!card) return;
         const productId = card.dataset.id;
         const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
         if (favoriteIndex > -1) {
@@ -398,7 +392,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
-
-
-
-
