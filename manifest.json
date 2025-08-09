@@ -9,17 +9,17 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/images/icons/192.png",
+      "src": "assets/images/icons/android-launchericon-192-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "assets/images/icons/512.png",
+      "src": "assets/images/icons/android-launchericon-512-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "assets/images/icons/maskable-icon.png",
+      "src": "assets/images/icons/maskable_icon.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
