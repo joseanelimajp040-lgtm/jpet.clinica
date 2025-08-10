@@ -34,6 +34,7 @@
             </div>
             
             <div class="flex items-center">
+                <div id="theme-toggle-placeholder" class="mr-4"></div>
                 <a href="#" class="nav-link relative mr-4" data-page="favorites">
                     <i class="fas fa-heart text-2xl text-gray-700"></i>
                     <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
@@ -55,9 +56,17 @@
                     <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
                 </button>
                 <div class="dropdown-menu absolute left-0 mt-1 w-64 bg-white shadow-lg rounded-md hidden z-50">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b"><i class="fas fa-dog fa-fw mr-2 text-primary"></i> Cães</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b"><i class="fas fa-cat fa-fw mr-2 text-primary"></i> Gatos</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b"><i class="fas fa-dove fa-fw mr-2 text-primary"></i> Aves</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b"><i class="fas fa-fish fa-fw mr-2 text-primary"></i> Peixes</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 border-b"><i class="fas fa-paw fa-fw mr-2 text-primary"></i> Roedores</a>
+                    
+                    <div class="border-t my-1 md:hidden"></div>
+
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-tags fa-fw mr-2 text-primary"></i>Promoções</a>
-                    <a href="#" id="racao-btn-dropdown" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-bone fa-fw mr-2 text-primary"></i>Rações</a>
-                    <a href="#" id="medicamentos-btn-dropdown" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-pills fa-fw mr-2 text-primary"></i>Medicamentos</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-bone fa-fw mr-2 text-primary"></i>Rações</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-pills fa-fw mr-2 text-primary"></i>Medicamentos</a>
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden"><i class="fas fa-clinic-medical fa-fw mr-2 text-primary"></i>Farmácia</a>
                     <a href="#" class="nav-link block px-4 py-2 text-gray-800 hover:bg-gray-100 md:hidden" data-page="banho-e-tosa"><i class="fas fa-shower fa-fw mr-2 text-primary"></i>Banho e tosa</a>
                 </div>
