@@ -80,20 +80,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-   // Em assets/js/main.js
-function updateLoginStatus() {
+   function updateLoginStatus() {
     const loginPlaceholder = document.getElementById('login-placeholder');
     if (!loginPlaceholder) return;
 
     let buttonHTML = '';
 
-    if (state.loggedInUser) {
-        const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    if (state.loggedInUser && state.loggedInUser.fullname) {
+        const firstName = state.loggedInUser.fullname.split(' ')[0];
         // Botão "Olá, Nome" para Desktop
-        const desktopHTML = `<div class="hidden md:flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-        // Ícone de Logout para Mobile
-        const mobileHTML = `<button id="logout-btn-mobile" class="md:hidden text-white bg-red-500 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-sign-out-alt"></i></button>`;
-        buttonHTML = desktopHTML + mobileHTML;
+        buttonHTML = `<div class="hidden md:flex items-center space-x-3">
+                        <i class="fas fa-user-check text-green-300"></i>
+                        <span class="font-medium text-white">Olá, ${firstName}</span>
+                        <button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button>
+                      </div>
+                      <button id="logout-btn-mobile" class="md:hidden text-white bg-red-500 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </button>`;
     } else {
         // Botão "Entre ou Cadastre-se" para todas as telas, mas com texto/ícone responsivo
         buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2" data-page="login">
