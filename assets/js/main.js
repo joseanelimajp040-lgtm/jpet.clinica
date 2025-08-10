@@ -2,7 +2,7 @@ import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
-// --- SERVICE WORKER (Mantido desativado por segurança) ---
+// --- REGISTRO DO SERVICE WORKER (Mantido desativado por segurança) ---
 /*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -15,11 +15,14 @@ if ('serviceWorker' in navigator) {
 // --- FIM DO REGISTRO ---
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- INICIALIZAÇÃO DO FIREBASE ---
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
     // --- STATE & DOM REFERENCES ---
-    const state = {
+    let state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
-        users: JSON.parse(localStorage.getItem('users')) || [],
-        loggedInUser: JSON.parse(sessionStorage.getItem('loggedInUser')) || null,
+        loggedInUser: null, // O Firebase vai controlar isso agora
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
         shipping: { fee: 0, neighborhood: '' }
@@ -31,11 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const save = {
         cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
-        users: () => localStorage.setItem('users', JSON.stringify(state.users)),
         favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
         appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
-        login: (user) => { state.loggedInUser = user; sessionStorage.setItem('loggedInUser', JSON.stringify(user)); },
-        logout: () => { state.loggedInUser = null; sessionStorage.removeItem('loggedInUser'); }
     };
     function showAnimation(overlayId, duration, callback) {
         const overlay = document.getElementById(overlayId);
@@ -70,20 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-    
     function updateLoginStatus() {
         const loginBtn = document.getElementById('login-btn');
         if (!loginBtn) return;
-        if (state.loggedInUser && state.loggedInUser.fullname) {
-            const firstName = state.loggedInUser.fullname.split(' ')[0];
+        if (state.loggedInUser) {
+            const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
             loginBtn.dataset.page = '';
-            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${firstName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
+            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
         } else {
             loginBtn.dataset.page = 'login';
             loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
         }
     }
-
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -137,13 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
         container.innerHTML = '';
         if (state.favorites.length === 0) {
-            emptyState.classList.remove('hidden');
-            container.classList.add('hidden');
-            clearBtn.classList.add('hidden');
+            emptyState.classList.remove('hidden'); container.classList.add('hidden'); clearBtn.classList.add('hidden');
         } else {
-            emptyState.classList.add('hidden');
-            container.classList.remove('hidden');
-            clearBtn.classList.remove('hidden');
+            emptyState.classList.add('hidden'); container.classList.remove('hidden'); clearBtn.classList.remove('hidden');
             state.favorites.forEach(item => {
                 container.insertAdjacentHTML('beforeend', `
                 <div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}">
@@ -235,10 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
             bookingForm.addEventListener('submit', e => {
                 e.preventDefault();
                 const newAppointment = {
-                    day: document.getElementById('booking-day').value,
-                    time: document.getElementById('booking-time').value,
-                    tutorName: document.getElementById('booking-tutor-name').value,
-                    petName: document.getElementById('booking-pet-name').value,
+                    day: document.getElementById('booking-day').value, time: document.getElementById('booking-time').value,
+                    tutorName: document.getElementById('booking-tutor-name').value, petName: document.getElementById('booking-pet-name').value,
                     phoneNumber: document.getElementById('booking-phone-number').value
                 };
                 state.appointments.push(newAppointment);
@@ -250,13 +242,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- MANIPULADORES DE EVENTOS PRINCIPAIS ---
+    // --- MANIPULADORES DE EVENTOS DE AUTENTICAÇÃO FIREBASE ---
+    function handleCreateAccount(event) {
+        event.preventDefault();
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const errorEl = document.getElementById('signup-error');
+        errorEl.classList.add('hidden');
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                const user = userCredential.user;
+                return user.updateProfile({ displayName: name })
+                    .then(() => {
+                        return db.collection('users').doc(user.uid).set({
+                            name: name, email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+            })
+            .then(() => {
+                alert(`Conta para ${name} criada com sucesso! Por favor, faça o login.`);
+                loadPage('login');
+            })
+            .catch(error => {
+                console.error("Erro ao criar conta:", error);
+                errorEl.textContent = "Erro: " + error.message;
+                errorEl.classList.remove('hidden');
+            });
+    }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('login-error');
+        errorEl.classList.add('hidden');
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                loadPage('home');
+            })
+            .catch(error => {
+                console.error("Erro ao fazer login:", error);
+                errorEl.textContent = "E-mail ou senha inválidos.";
+                errorEl.classList.remove('hidden');
+            });
+    }
+
+    function handleLogout() {
+        auth.signOut().catch(error => console.error("Erro ao fazer logout:", error));
+    }
+    
+    // --- OBSERVADOR DE ESTADO DE AUTENTICAÇÃO ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            db.collection('users').doc(user.uid).get().then(doc => {
+                const userData = doc.data();
+                state.loggedInUser = {
+                    email: user.email,
+                    uid: user.uid,
+                    displayName: userData ? userData.name : user.email.split('@')[0]
+                };
+                if (document.getElementById('login-btn')) updateLoginStatus();
+            });
+        } else {
+            state.loggedInUser = null;
+            if (document.getElementById('login-btn')) updateLoginStatus();
+        }
+    });
+
+    // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
     function handleAddToCart(event) {
         const button = event.target.closest('.add-to-cart-btn');
         if (!button || button.classList.contains('added')) return;
-        const card = button.closest('.product-card');
+        const card = button.closest('.product-card, .container');
         if (!card) return;
-        const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.querySelector('img').src };
+        const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.dataset.image };
         const existingProduct = state.cart.find(item => item.id === product.id);
         if (existingProduct) existingProduct.quantity++;
         else state.cart.push({ ...product, quantity: 1 });
@@ -290,47 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
         save.favorites();
         updateCounters();
         updateAllHeartIcons();
-    }
-    function handleLogin(event) {
-        event.preventDefault();
-        const identifier = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value;
-        const errorEl = document.getElementById('login-error');
-        const foundUser = state.users.find(user => (user.email === identifier || user.cpf === identifier) && user.password === password);
-        if (foundUser) {
-            save.login(foundUser);
-            alert(`Bem-vindo(a) de volta, ${foundUser.fullname.split(' ')[0]}!`);
-            loadPage('home');
-        } else {
-            if (errorEl) {
-                errorEl.textContent = "E-mail/CPF ou senha inválidos.";
-                errorEl.classList.remove('hidden');
-            } else {
-                alert("E-mail/CPF ou senha inválidos.");
-            }
-        }
-    }
-    function handleCreateAccount(event) {
-        event.preventDefault();
-        const fullname = document.getElementById('signup-fullname')?.value;
-        const cpf = document.getElementById('signup-cpf')?.value;
-        const phone = document.getElementById('signup-phone')?.value;
-        const email = document.getElementById('signup-email')?.value;
-        const password = document.getElementById('signup-password')?.value;
-        if (state.users.find(user => user.email === email)) {
-            alert('Este e-mail já está cadastrado.');
-            return;
-        }
-        const newUser = { fullname, cpf, phone, email, password };
-        state.users.push(newUser);
-        save.users();
-        alert('Conta criada com sucesso! Por favor, faça o login.');
-        loadPage('login');
-    }
-    function handleLogout() {
-        save.logout();
-        alert('Você saiu da sua conta.');
-        loadPage('home');
     }
 
     // --- CARREGAMENTO DE PÁGINAS ---
@@ -430,7 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTotals();
         });
 
-        updateLoginStatus();
         updateCounters();
         await loadPage('home');
     }
