@@ -5,21 +5,25 @@
                 <div class="text-center mb-4"><i class="fas fa-user-plus text-5xl text-primary"></i></div>
                 <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Crie sua Conta</h1>
                 <form id="create-account-form" novalidate>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2"><label for="signup-fullname" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="signup-fullname" class="form-input" placeholder="Seu nome completo" required></div>
-                        <div><label for="signup-cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF</label><input type="text" id="signup-cpf" class="form-input" placeholder="000.000.000-00" required></div>
-                        <div><label for="signup-phone" class="block text-sm font-medium text-gray-700 mb-1">Celular</label><input type="tel" id="signup-phone" class="form-input" placeholder="(83) 99999-9999" required></div>
-                        <div class="md:col-span-2"><label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label><input type="email" id="signup-email" class="form-input" placeholder="seu@email.com" required></div>
-                        <div><label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label><input type="password" id="signup-password" class="form-input" placeholder="Crie uma senha" required></div>
-                        <div><label for="signup-password-confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label><input type="password" id="signup-password-confirm" class="form-input" placeholder="Confirme sua senha" required>
-                            <p id="signup-password-confirm-error" class="text-red-500 text-sm mt-1 hidden">As senhas não coincidem.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="signup-name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                            <input type="text" id="signup-name" class="form-input" placeholder="Como devemos te chamar?" required>
+                        </div>
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <input type="email" id="signup-email" class="form-input" placeholder="seu@email.com" required>
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Senha (mínimo 6 caracteres)</label>
+                            <input type="password" id="signup-password" class="form-input" placeholder="Crie uma senha" required>
                         </div>
                     </div>
                     <p id="signup-error" class="text-red-500 text-sm mt-4 text-center hidden"></p>
                     <button type="submit" class="w-full bg-primary hover:bg-orange-700 text-white py-3 mt-6 rounded-lg font-bold transition duration-300">Criar Conta</button>
                 </form>
                 <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">Já tem uma conta? <a href="#" id="back-to-login-link" class="nav-link font-medium text-secondary hover:underline" data-page="login">Faça login</a></p>
+                    <p class="text-sm text-gray-600">Já tem uma conta? <a href="#" class="nav-link font-medium text-secondary hover:underline" data-page="login">Faça login</a></p>
                 </div>
             </div>
         </div>
