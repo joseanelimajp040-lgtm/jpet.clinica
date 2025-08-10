@@ -2,18 +2,10 @@ import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
-// --- INICIALIZAÇÃO DO FIREBASE (FORA DO DOMCONTENTLOADED) ---
-// ** SUBSTITUA PELAS SUAS CREDENCIAIS REAIS DO FIREBASE **
-const firebaseConfig = {
-    apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
-    authDomain: "banco-de-dados-japet.firebaseapp.com",
-    projectId: "banco-de-dados-japet",
-    storageBucket: "banco-de-dados-japet.firebasestorage.app",
-    messagingSenderId: "548299221616",
-    appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
-};
-firebase.initializeApp(firebaseConfig);
-// --- FIM DA INICIALIZAÇÃO ---
+// --- INICIALIZAÇÃO DO FIREBASE ---
+// Certifique-se de que seu firebaseConfig está no index.html e é chamado ANTES deste script
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 /* --- SERVICE WORKER (Mantido desativado por segurança) --- */
 /*
@@ -28,12 +20,10 @@ if ('serviceWorker' in navigator) {
 // --- FIM DO REGISTRO ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
+    // --- STATE & DOM REFERENCES ---
     let state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
-        loggedInUser: null,
+        loggedInUser: null, // O Firebase vai controlar isso
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
         shipping: { fee: 0, neighborhood: '' }
@@ -41,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appRoot = document.getElementById('app-root');
     const loadingOverlay = document.getElementById('loading-overlay');
 
+    // --- FUNÇÕES DE PERSISTÊNCIA E UTILITÁRIAS ---
     const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const save = {
         cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
@@ -65,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${start}${'*'.repeat(str.length - 4)}${end}`;
     }
 
+    // --- FUNÇÕES DE RENDERIZAÇÃO E ATUALIZAÇÃO DA UI ---
     function updateCounters() {
         const cartCountEl = document.getElementById('cart-count');
         const favCountEl = document.getElementById('favorites-count');
@@ -160,10 +152,98 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    function renderCheckoutSummary() { /* ...código completo... */ }
-    function renderCalendar() { /* ...código completo... */ }
-    function initBanhoTosaEventListeners() { /* ...código completo... */ }
+    function renderCheckoutSummary() {
+        const container = document.getElementById('checkout-summary-items');
+        if (!container) return;
+        container.innerHTML = '';
+        state.cart.forEach(item => {
+            container.insertAdjacentHTML('beforeend', `<div class="flex justify-between items-center text-sm"><div class="flex items-center gap-2"><img src="${item.image}" alt="${item.name}" class="w-10 h-10 object-contain rounded"><span>${item.name} (x${item.quantity})</span></div><span class="font-medium">${formatCurrency(item.price * item.quantity)}</span></div>`);
+        });
+        updateTotals();
+    }
+    function renderCalendar() {
+        const agendaGrid = document.getElementById('agenda-grid');
+        if (!agendaGrid) return;
+        agendaGrid.innerHTML = '';
+        const today = new Date('2025-08-07T10:00:00');
+        const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+        agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(today);
+            day.setDate(today.getDate() + i);
+            const dayName = daysOfWeek[day.getDay()];
+            const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
+            agendaGrid.insertAdjacentHTML('beforeend', `<div class="day-header">${dayName}<br>${dayDate}</div>`);
+        }
+        hours.forEach(hour => {
+            agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-label">${hour}</div>`);
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(today);
+                day.setDate(today.getDate() + i);
+                const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
+                const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
+                if (appointment) {
+                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
+                } else {
+                    agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
+                }
+            }
+        });
+    }
+    function initBanhoTosaEventListeners() {
+        const pageContainer = document.getElementById('app-root');
+        if (!pageContainer) return;
+        pageContainer.addEventListener('click', e => {
+            const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
+            const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
+            const availableSlot = e.target.closest('.time-slot.available');
+            if (availableSlot) {
+                if (state.loggedInUser) {
+                    const bookingModal = document.getElementById('booking-modal');
+                    const day = availableSlot.dataset.day;
+                    const time = availableSlot.dataset.time;
+                    document.getElementById('booking-info').textContent = `${day} às ${time}`;
+                    document.getElementById('booking-day').value = day;
+                    document.getElementById('booking-time').value = time;
+                    openModal(bookingModal);
+                } else {
+                    openModal(document.getElementById('login-required-modal'));
+                }
+            }
+            const bookedSlot = e.target.closest('.time-slot.booked');
+            if (bookedSlot) {
+                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+                 document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
+                 document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
+                 document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
+                 openModal(document.getElementById('appointment-details-modal'));
+            }
+            if (e.target.closest('#redirect-to-login-btn')) {
+                 closeModal(document.getElementById('login-required-modal'));
+                 loadPage('login');
+            }
+        });
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const newAppointment = {
+                    day: document.getElementById('booking-day').value, time: document.getElementById('booking-time').value,
+                    tutorName: document.getElementById('booking-tutor-name').value, petName: document.getElementById('booking-pet-name').value,
+                    phoneNumber: document.getElementById('booking-phone-number').value
+                };
+                state.appointments.push(newAppointment);
+                save.appointments();
+                document.getElementById('booking-modal').style.display = 'none';
+                showAnimation('success-animation-overlay', 1500);
+                renderCalendar();
+            });
+        }
+    }
     
+    // --- MANIPULADORES DE EVENTOS DE AUTENTICAÇÃO (FIREBASE) ---
     function handleCreateAccount(event) {
         event.preventDefault();
         const name = document.getElementById('signup-name').value;
@@ -171,19 +251,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('signup-password').value;
         const errorEl = document.getElementById('signup-error');
         errorEl.classList.add('hidden');
+
         auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
                 const user = userCredential.user;
                 return user.updateProfile({ displayName: name })
-                    .then(() => db.collection('users').doc(user.uid).set({
-                        name: name, email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }));
+                    .then(() => {
+                        return db.collection('users').doc(user.uid).set({
+                            name: name, email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
             })
             .then(() => {
-                alert(`Conta para ${name} criada com sucesso!`);
+                alert(`Conta para ${name} criada com sucesso! Por favor, faça o login.`);
                 loadPage('login');
             })
             .catch(error => {
+                console.error("Erro ao criar conta:", error);
                 errorEl.textContent = "Erro: " + error.message;
                 errorEl.classList.remove('hidden');
             });
@@ -194,9 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('login-password').value;
         const errorEl = document.getElementById('login-error');
         errorEl.classList.add('hidden');
+
         auth.signInWithEmailAndPassword(email, password)
-            .then(() => loadPage('home'))
+            .then(userCredential => {
+                loadPage('home');
+            })
             .catch(error => {
+                console.error("Erro ao fazer login:", error);
                 errorEl.textContent = "E-mail ou senha inválidos.";
                 errorEl.classList.remove('hidden');
             });
@@ -205,73 +293,44 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signOut().catch(error => console.error("Erro ao fazer logout:", error));
     }
     
+    // --- OBSERVADOR DE ESTADO DE AUTENTICAÇÃO DO FIREBASE ---
     auth.onAuthStateChanged(user => {
         if (user) {
             state.loggedInUser = { email: user.email, uid: user.uid, displayName: user.displayName };
         } else {
             state.loggedInUser = null;
         }
-        if (document.getElementById('login-btn')) updateLoginStatus();
+        if (document.getElementById('login-btn')) {
+            updateLoginStatus();
+        }
     });
 
-    function handleAddToCart(event) { /* ...código completo... */ }
-    function handleFavoriteToggle(event) { /* ...código completo... */ }
-
-    // ESTA É A FUNÇÃO QUE ESTAVA FALTANDO
-    async function loadComponent(url, placeholderId) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Failed to load ${url}`);
-            document.getElementById(placeholderId).innerHTML = await response.text();
-        } catch (error) { console.error(error); }
-    }
-
-    async function loadPage(pageName) {
-        loadingOverlay.style.display = 'flex';
-        try {
-            const response = await fetch(`pages/${pageName}.html`);
-            if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
-            appRoot.innerHTML = await response.text();
-            
-            switch (pageName) {
-                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
-                case 'cart': renderCart(); initCartPageListeners(); break;
-                case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
-                case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
-                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
-            }
-            initPageModals();
-            updateLoginStatus();
-        } catch (error) {
-            console.error('Falha ao carregar a página:', error);
-            appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
-        } finally {
-            setTimeout(() => loadingOverlay.style.display = 'none', 300);
-            window.scrollTo(0, 0);
-        }
-    }
-
-    async function initializeApp() {
-        await Promise.all([
-            loadComponent('components/header.html', 'header-placeholder'),
-            loadComponent('components/footer.html', 'footer-placeholder')
-        ]);
-        
-        document.body.addEventListener('click', (e) => {
-            if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
-            if (e.target.closest('#logout-btn')) handleLogout();
-            if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
-            if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
-            // ... resto dos listeners de clique ...
-        });
-        document.body.addEventListener('submit', e => {
-            if (e.target.id === 'login-form') handleLogin(e);
-            if (e.target.id === 'create-account-form') handleCreateAccount(e);
-        });
-        
+    // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
+    function handleAddToCart(event) {
+        const button = event.target.closest('.add-to-cart-btn');
+        if (!button || button.classList.contains('added')) return;
+        const card = button.closest('.product-card, .container');
+        if (!card) return;
+        const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.dataset.image };
+        const existingProduct = state.cart.find(item => item.id === product.id);
+        if (existingProduct) existingProduct.quantity++;
+        else state.cart.push({ ...product, quantity: 1 });
+        save.cart();
         updateCounters();
-        await loadPage('home');
+        const originalContent = button.innerHTML;
+        button.classList.add('added');
+        button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
+        setTimeout(() => {
+            button.classList.remove('added');
+            button.innerHTML = originalContent;
+        }, 2000);
     }
-    
-    initializeApp();
-});
+    function handleFavoriteToggle(event) {
+        const button = event.target.closest('.favorite-btn');
+        if (!button) return;
+        const card = button.closest('.product-card');
+        if (!card) return;
+        const productId = card.dataset.id;
+        const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
+        if (favoriteIndex > -1) {
+            state.favorites.splice(
