@@ -6,11 +6,27 @@
     <title>j.A Pet Clínica - Medicamentos e Rações para Pets</title>
     
     <base href="/jpet.clinica/">
-
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/icons/apple-icon-precomposed.png?v=3">
     
-    <link rel="apple-touch-icon" href="assets/images/icons/Design512.png?v=3">
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+      // A configuração do seu projeto Firebase.
+      // PEGUE ISSO NO PAINEL DO SEU FIREBASE: Configurações do Projeto > Geral > Seus apps
+      const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_AUTH_DOMAIN",
+        projectId: "SEU_PROJECT_ID",
+        storageBucket: "SEU_STORAGE_BUCKET",
+        messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+        appId: "SEU_APP_ID"
+      };
+      // Inicializa o Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -56,4 +72,5 @@
 
 </body>
 </html>
+
 
