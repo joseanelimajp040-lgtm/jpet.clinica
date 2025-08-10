@@ -4,12 +4,12 @@ import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
 // --- INICIALIZAÇÃO DO FIREBASE ---
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
+    authDomain: "banco-de-dados-japet.firebaseapp.com",
+    projectId:  "banco-de-dados-japet",
+    storageBucket: "banco-de-dados-japet.firebasestorage.app",
+    messagingSenderId: "548299221616",
+    appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
 };
 firebase.initializeApp(firebaseConfig);
 // --- FIM DA INICIALIZAÇÃO ---
@@ -96,3 +96,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
