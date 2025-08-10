@@ -83,17 +83,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
     function updateLoginStatus() {
-        const loginBtn = document.getElementById('login-btn');
-        if (!loginBtn) return;
-        if (state.loggedInUser) {
-            const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-            loginBtn.dataset.page = '';
-            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-        } else {
-            loginBtn.dataset.page = 'login';
-            loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
-        }
+    // Seleciona TODOS os locais onde o botão de login pode aparecer
+    const loginPlaceholders = document.querySelectorAll('#login-placeholder-desktop, #login-placeholder-mobile');
+    if (loginPlaceholders.length === 0) return;
+
+    let buttonHTML; // Variável para guardar o HTML do botão
+
+    if (state.loggedInUser) {
+        const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+        // HTML para quando o usuário está logado
+        buttonHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
+    } else {
+        // HTML para quando o usuário está deslogado
+        buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-5 rounded-full flex items-center space-x-2" data-page="login"><i class="fas fa-user"></i><span>Entre ou Cadastre-se</span></button>`;
     }
+
+    // Aplica o mesmo HTML em ambos os placeholders
+    loginPlaceholders.forEach(placeholder => {
+        placeholder.innerHTML = buttonHTML;
+    });
+}
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -455,3 +464,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
