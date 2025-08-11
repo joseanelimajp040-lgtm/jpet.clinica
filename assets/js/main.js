@@ -74,22 +74,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
 // Em assets/js/main.js
-// ACHE a função abaixo e SUBSTITUA por esta
 function updateLoginStatus() {
     const loginPlaceholder = document.getElementById('login-placeholder');
     if (!loginPlaceholder) return;
 
     let buttonHTML = '';
 
-    if (state.loggedInUser) { // Usa a lógica do Firebase
-        const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-        // Botão para Desktop
-        const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-        // Botão para Mobile com nome completo
-        const mobileHTML = `<div class="md:hidden flex items-center text-white"><span class="font-medium mr-2">Olá, ${displayName}</span><button id="logout-btn-mobile" class="bg-red-500 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button></div>`;
-        buttonHTML = desktopHTML + mobileHTML;
+    if (state.loggedInUser && state.loggedInUser.fullname) {
+        const firstName = state.loggedInUser.fullname.split(' ')[0];
+        
+        // HTML para quando o usuário está LOGADO (com o estilo de pílula)
+        buttonHTML = `<div class="bg-secondary text-white font-medium py-2 px-4 rounded-full flex items-center space-x-3">
+                        <i class="fas fa-user-check"></i>
+                        <span class="whitespace-nowrap">Olá, ${firstName}</span>
+                        <button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 flex-shrink-0">Sair</button>
+                      </div>`;
+
     } else {
-        // Botão de login/cadastro
+        // HTML para quando o usuário está DESLOGADO
         buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login">
                         <i class="fas fa-user"></i>
                         <span>Entre ou Cadastre-se</span>
@@ -98,7 +100,6 @@ function updateLoginStatus() {
 
     loginPlaceholder.innerHTML = buttonHTML;
 }
-
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -445,6 +446,7 @@ function updateLoginStatus() {
     
     initializeApp();
 });
+
 
 
 
