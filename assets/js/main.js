@@ -16,11 +16,11 @@ firebase.initializeApp(firebaseConfig);
 /* --- SERVICE WORKER (Mantido desativado por segurança) --- */
 /*
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/jpet.clinica/sw.js')
-      .then(registration => console.log('Service Worker registrado com sucesso:', registration))
-      .catch(error => console.log('Falha ao registrar o Service Worker:', error));
-  });
+ window.addEventListener('load', () => {
+   navigator.serviceWorker.register('/jpet.clinica/sw.js')
+     .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+     .catch(error => console.log('Falha ao registrar o Service Worker:', error));
+ });
 }
 */
 
@@ -80,31 +80,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-   // Em assets/js/main.js
-function updateLoginStatus() {
-    const loginPlaceholder = document.getElementById('login-placeholder');
-    if (!loginPlaceholder) return;
 
-    let buttonHTML = '';
+    // ATUALIZADO: Esta função agora lida com placeholders de desktop e mobile
+    function updateLoginStatus() {
+        const desktopPlaceholder = document.getElementById('login-placeholder-desktop');
+        const mobilePlaceholder = document.getElementById('login-placeholder-mobile');
+        const placeholders = [desktopPlaceholder, mobilePlaceholder];
 
-    if (state.loggedInUser) {
-        const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-        // Botão para Desktop
-        const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-        // Botão para Mobile
-        const mobileHTML = `<div class="md:hidden flex items-center text-white"><span class="font-medium mr-2 whitespace-nowrap overflow-hidden text-ellipsis">${displayName}</span><button id="logout-btn-mobile" class="bg-red-500 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button></div>`;
-        buttonHTML = desktopHTML + mobileHTML;
-    } else {
-        // Botão de login/cadastro (texto completo no mobile, como pedido)
-        buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login">
+        placeholders.forEach(placeholder => {
+            if (!placeholder) return;
+
+            if (state.loggedInUser) {
+                const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+                placeholder.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-user-check text-green-300"></i>
+                        <span class="font-medium">Olá, ${displayName}</span>
+                        <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button>
+                    </div>`;
+            } else {
+                placeholder.innerHTML = `
+                    <a href="#" class="nav-link flex items-center space-x-2" data-page="login">
                         <i class="fas fa-user"></i>
                         <span>Entre ou Cadastre-se</span>
-                     </button>`;
+                    </a>`;
+            }
+        });
     }
 
-    loginPlaceholder.innerHTML = buttonHTML;
-}
-    }
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -191,7 +194,7 @@ function updateLoginStatus() {
                 const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
                 const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
                 if (appointment) {
-                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "'");
                     agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
                 } else {
                     agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
@@ -221,15 +224,15 @@ function updateLoginStatus() {
             }
             const bookedSlot = e.target.closest('.time-slot.booked');
             if (bookedSlot) {
-                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
                  document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
                  document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
                  document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
                  openModal(document.getElementById('appointment-details-modal'));
             }
             if (e.target.closest('#redirect-to-login-btn')) {
-                 closeModal(document.getElementById('login-required-modal'));
-                 loadPage('login');
+                closeModal(document.getElementById('login-required-modal'));
+                loadPage('login');
             }
         });
         const bookingForm = document.getElementById('booking-form');
@@ -301,9 +304,8 @@ function updateLoginStatus() {
         } else {
             state.loggedInUser = null;
         }
-        if (document.getElementById('login-btn')) {
-            updateLoginStatus();
-        }
+        // Chamada única que atualiza ambos os locais
+        updateLoginStatus();
     });
 
     // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
@@ -390,7 +392,8 @@ function updateLoginStatus() {
         
         document.body.addEventListener('click', (e) => {
             if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
-            if (e.target.closest('#logout-btn')) handleLogout();
+            // ATUALIZADO: Agora busca pela classe .logout-btn
+            if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
             if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
             if (e.target.closest('.remove-from-cart')) {
@@ -451,5 +454,3 @@ function updateLoginStatus() {
     
     initializeApp();
 });
-
-
