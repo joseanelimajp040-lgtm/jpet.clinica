@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
 
-    // ATUALIZADO: Apenas o estado de login foi ajustado
     function updateLoginStatus() {
         const desktopPlaceholder = document.getElementById('login-placeholder-desktop');
         const mobilePlaceholder = document.getElementById('login-placeholder-mobile');
@@ -92,9 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (state.loggedInUser) {
                 const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-                const firstName = fullName.split(' ')[0]; // Pega apenas o primeiro nome
+                const firstName = fullName.split(' ')[0]; 
 
-                // Estilo para o estado LOGADO com apenas o PRIMEIRO NOME
                 placeholder.innerHTML = `
                     <div class="flex items-center justify-between bg-secondary text-white rounded-full pl-3 pr-1 py-1">
                         <div class="flex items-center space-x-2">
@@ -104,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 ml-2">Sair</button>
                     </div>`;
             } else {
-                // Estilo para o estado DESLOGADO (tamanho original restaurado)
                 placeholder.innerHTML = `
                     <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
                         <i class="fas fa-user"></i>
@@ -310,7 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             state.loggedInUser = null;
         }
-        // Chamada única que atualiza ambos os locais
         updateLoginStatus();
     });
 
@@ -357,19 +353,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CARREGAMENTO DE PÁGINAS ---
-    async function loadComponent(url, placeholderId) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Failed to load ${url}`);
-            document.getElementById(placeholderId).innerHTML = await response.text();
-        } catch (error) { console.error(error); }
-    }
     async function loadPage(pageName) {
         loadingOverlay.style.display = 'flex';
         try {
             const response = await fetch(`pages/${pageName}.html`);
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
+
+            // LÓGICA PARA MOSTRAR/ESCONDER O BANNER SUPERIOR
+            const topBanner = document.getElementById('top-banner');
+            if (topBanner) {
+                if (pageName === 'home') {
+                    topBanner.classList.remove('hidden');
+                } else {
+                    topBanner.classList.add('hidden');
+                }
+            }
             
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
