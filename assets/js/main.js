@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const agendaGrid = document.getElementById('agenda-grid');
         if (!agendaGrid) return;
         agendaGrid.innerHTML = '';
-        const today = new Date('2025-08-07T10:00:00');
+        const today = new Date('2025-08-12T10:00:00'); // Note: Using today's date for relevance
         const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
         agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
@@ -353,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CARREGAMENTO DE PÁGINAS ---
-
-    // <<< ESTA FUNÇÃO ESTAVA FALTANDO E FOI REINSERIDA AQUI >>>
     async function loadComponent(url, placeholderId) {
         try {
             const response = await fetch(url);
@@ -370,12 +368,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 
+            // LÓGICA PARA MOSTRAR/ESCONDER OS BANNERS
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
                     topBanner.classList.remove('hidden');
                 } else {
                     topBanner.classList.add('hidden');
+                }
+            }
+            
+            // <<< NOVA LÓGICA PARA A BARRA DE NAVEGAÇÃO PRINCIPAL >>>
+            const mainNavBar = document.getElementById('main-nav-bar');
+            if (mainNavBar) {
+                if (pageName === 'home') {
+                    mainNavBar.classList.remove('hidden');
+                } else {
+                    mainNavBar.classList.add('hidden');
                 }
             }
             
