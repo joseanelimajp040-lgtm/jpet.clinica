@@ -92,7 +92,7 @@ function updateLoginStatus() {
         // Botão para Desktop
         const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
         // Botão para Mobile
-        const mobileHTML = `<button id="logout-btn-mobile" class="md:hidden text-white bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button>`;
+        const mobileHTML = `<div class="md:hidden flex items-center text-white"><span class="font-medium mr-2 whitespace-nowrap overflow-hidden text-ellipsis">${displayName}</span><button id="logout-btn-mobile" class="bg-red-500 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button></div>`;
         buttonHTML = desktopHTML + mobileHTML;
     } else {
         // Botão de login/cadastro (texto completo no mobile, como pedido)
@@ -451,4 +451,5 @@ function updateLoginStatus() {
     
     initializeApp();
 });
+
 
