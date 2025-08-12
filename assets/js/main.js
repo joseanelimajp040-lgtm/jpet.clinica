@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STATE & DOM REFERENCES ---
     let state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
-        loggedInUser: null,
+        loggedInUser: null, // Controlado pelo Firebase
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
         shipping: { fee: 0, neighborhood: '' }
@@ -72,34 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-    
-// Em assets/js/main.js
-function updateLoginStatus() {
-    const loginPlaceholder = document.getElementById('login-placeholder');
-    if (!loginPlaceholder) return;
-
-    let buttonHTML = '';
-
-    if (state.loggedInUser && state.loggedInUser.fullname) {
-        const firstName = state.loggedInUser.fullname.split(' ')[0];
-        
-        // HTML para quando o usuário está LOGADO (com o estilo de pílula)
-        buttonHTML = `<div class="bg-secondary text-white font-medium py-2 px-4 rounded-full flex items-center space-x-3">
-                        <i class="fas fa-user-check"></i>
-                        <span class="whitespace-nowrap">Olá, ${firstName}</span>
-                        <button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 flex-shrink-0">Sair</button>
-                      </div>`;
-
-    } else {
-        // HTML para quando o usuário está DESLOGADO
-        buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login">
-                        <i class="fas fa-user"></i>
-                        <span>Entre ou Cadastre-se</span>
-                     </button>`;
+    function updateLoginStatus() {
+        const loginPlaceholder = document.getElementById('login-placeholder');
+        if (!loginPlaceholder) return;
+        let buttonHTML = '';
+        if (state.loggedInUser) {
+            const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+            const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
+            const mobileHTML = `<div class="md:hidden flex items-center text-white"><span class="font-medium mr-2">Olá, ${displayName}</span><button id="logout-btn-mobile" class="bg-red-500 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button></div>`;
+            buttonHTML = desktopHTML + mobileHTML;
+        } else {
+            buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login"><i class="fas fa-user"></i><span>Entre ou Cadastre-se</span></button>`;
+        }
+        loginPlaceholder.innerHTML = buttonHTML;
     }
-
-    loginPlaceholder.innerHTML = buttonHTML;
-}
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -253,6 +239,7 @@ function updateLoginStatus() {
         const password = document.getElementById('signup-password').value;
         const errorEl = document.getElementById('signup-error');
         errorEl.classList.add('hidden');
+
         auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
                 const user = userCredential.user;
@@ -277,8 +264,11 @@ function updateLoginStatus() {
         const password = document.getElementById('login-password').value;
         const errorEl = document.getElementById('login-error');
         errorEl.classList.add('hidden');
+
         auth.signInWithEmailAndPassword(email, password)
-            .then(() => loadPage('home'))
+            .then(() => {
+                // Não precisa fazer nada aqui, o onAuthStateChanged vai cuidar de tudo
+            })
             .catch(error => {
                 console.error("Erro ao fazer login:", error);
                 errorEl.textContent = "E-mail ou senha inválidos.";
@@ -293,10 +283,14 @@ function updateLoginStatus() {
     auth.onAuthStateChanged(user => {
         if (user) {
             state.loggedInUser = { email: user.email, uid: user.uid, displayName: user.displayName };
+            // Se o usuário acabou de logar e está na página de login, redireciona
+            if (appRoot.querySelector('#login-form')) {
+                loadPage('home');
+            } else {
+                updateLoginStatus(); // Apenas atualiza o botão se já estiver em outra página
+            }
         } else {
             state.loggedInUser = null;
-        }
-        if (document.getElementById('login-placeholder')) {
             updateLoginStatus();
         }
     });
@@ -446,8 +440,3 @@ function updateLoginStatus() {
     
     initializeApp();
 });
-
-
-
-
-
