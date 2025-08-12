@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 
-            // LÓGICA PARA MOSTRAR/ESCONDER O BANNER SUPERIOR
+            // LÓGICA CORRIGIDA E SEGURA PARA MOSTRAR/ESCONDER O BANNER
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
