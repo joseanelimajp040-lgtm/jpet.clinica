@@ -21,13 +21,26 @@ export function initPageModals() {
 
     // Gatilhos que abrem os modals
     document.body.addEventListener('click', e => {
+        // <<< INÍCIO DO NOVO CÓDIGO PARA ADOÇÃO >>>
+        // Modal de Adoção de Cães
+        if (e.target.closest('#caes-adocao-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('adocao-caes-modal'));
+        }
+        // Modal de Adoção de Gatos
+        if (e.target.closest('#gatos-adocao-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('adocao-gatos-modal'));
+        }
+        // <<< FIM DO NOVO CÓDIGO PARA ADOÇÃO >>>
+
         // Modal de Rações
-        if (e.target.closest('#racao-btn') || e.target.closest('#racao-btn-nav')) {
+        if (e.target.closest('#racao-btn') || e.target.closest('#racao-btn-nav') || e.target.closest('#racao-btn-dropdown')) {
             e.preventDefault();
             openModal(document.getElementById('racao-modal'));
         }
         // Modal de Medicamentos
-        if (e.target.closest('#medicamentos-btn') || e.target.closest('#medicamentos-cat-btn')) {
+        if (e.target.closest('#medicamentos-btn-nav') || e.target.closest('#medicamentos-btn-dropdown')) {
             e.preventDefault();
             openModal(document.getElementById('medicamentos-modal'));
         }
