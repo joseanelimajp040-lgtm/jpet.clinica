@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
 
-    // ATUALIZADO: Esta função agora lida com placeholders de desktop e mobile
+    // ATUALIZADO: Esta função aplica o novo estilo de "pílula"
     function updateLoginStatus() {
         const desktopPlaceholder = document.getElementById('login-placeholder-desktop');
         const mobilePlaceholder = document.getElementById('login-placeholder-mobile');
@@ -92,17 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (state.loggedInUser) {
                 const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+                // Estilo de pílula para o estado LOGADO
                 placeholder.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-user-check text-green-300"></i>
-                        <span class="font-medium">Olá, ${displayName}</span>
-                        <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button>
+                    <div class="flex items-center justify-between bg-secondary text-white rounded-full pl-3 pr-1 py-1">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-user-check"></i>
+                            <span class="font-medium text-sm whitespace-nowrap">Olá, ${displayName}</span>
+                        </div>
+                        <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 ml-2">Sair</button>
                     </div>`;
             } else {
+                // Estilo de pílula para o estado DESLOGADO
                 placeholder.innerHTML = `
-                    <a href="#" class="nav-link flex items-center space-x-2" data-page="login">
+                    <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-3 py-2 rounded-full hover:bg-teal-700" data-page="login">
                         <i class="fas fa-user"></i>
-                        <span>Entre ou Cadastre-se</span>
+                        <span class="whitespace-nowrap">Entre ou Cadastre-se</span>
                     </a>`;
             }
         });
@@ -392,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.addEventListener('click', (e) => {
             if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
-            // ATUALIZADO: Agora busca pela classe .logout-btn
             if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
             if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
