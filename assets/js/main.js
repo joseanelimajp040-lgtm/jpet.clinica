@@ -80,17 +80,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
-    function updateLoginStatus() {
-        const loginBtn = document.getElementById('login-btn');
-        if (!loginBtn) return;
-        if (state.loggedInUser) {
-            const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-            loginBtn.dataset.page = '';
-            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-        } else {
-            loginBtn.dataset.page = 'login';
-            loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
-        }
+   // Em assets/js/main.js
+function updateLoginStatus() {
+    const loginPlaceholder = document.getElementById('login-placeholder');
+    if (!loginPlaceholder) return;
+
+    let buttonHTML = '';
+
+    if (state.loggedInUser) {
+        const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+        // Botão para Desktop
+        const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
+        // Botão para Mobile
+        const mobileHTML = `<button id="logout-btn-mobile" class="md:hidden text-white bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button>`;
+        buttonHTML = desktopHTML + mobileHTML;
+    } else {
+        // Botão de login/cadastro (texto completo no mobile, como pedido)
+        buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login">
+                        <i class="fas fa-user"></i>
+                        <span>Entre ou Cadastre-se</span>
+                     </button>`;
+    }
+
+    loginPlaceholder.innerHTML = buttonHTML;
+}
     }
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -438,3 +451,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
