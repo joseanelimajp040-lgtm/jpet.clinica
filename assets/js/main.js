@@ -353,6 +353,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CARREGAMENTO DE PÁGINAS ---
+
+    // <<< ESTA FUNÇÃO ESTAVA FALTANDO E FOI REINSERIDA AQUI >>>
+    async function loadComponent(url, placeholderId) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to load ${url}`);
+            document.getElementById(placeholderId).innerHTML = await response.text();
+        } catch (error) { console.error(error); }
+    }
+
     async function loadPage(pageName) {
         loadingOverlay.style.display = 'flex';
         try {
@@ -360,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 
-            // LÓGICA CORRIGIDA E SEGURA PARA MOSTRAR/ESCONDER O BANNER
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
