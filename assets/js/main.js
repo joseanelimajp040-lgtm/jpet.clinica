@@ -13,8 +13,16 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-/* --- SERVICE WORKER --- */
-// (código do service worker comentado)
+/* --- SERVICE WORKER (Mantido desativado por segurança) --- */
+/*
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/jpet.clinica/sw.js')
+      .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+      .catch(error => console.log('Falha ao registrar o Service Worker:', error));
+  });
+}
+*/
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- INSTÂNCIAS DO FIREBASE ---
@@ -73,18 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favCountEl) favCountEl.textContent = state.favorites.length;
     }
     function updateLoginStatus() {
-        const loginPlaceholder = document.getElementById('login-placeholder');
-        if (!loginPlaceholder) return;
-        let buttonHTML = '';
+        const loginBtn = document.getElementById('login-btn');
+        if (!loginBtn) return;
         if (state.loggedInUser) {
             const displayName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-            const desktopHTML = `<div class="hidden md:flex items-center space-x-3 text-white"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
-            const mobileHTML = `<div class="md:hidden flex items-center text-white"><span class="font-medium mr-2">Olá, ${displayName}</span><button id="logout-btn-mobile" class="bg-red-500 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"><i class="fas fa-sign-out-alt text-xs"></i></button></div>`;
-            buttonHTML = desktopHTML + mobileHTML;
+            loginBtn.dataset.page = '';
+            loginBtn.innerHTML = `<div class="flex items-center space-x-3"><i class="fas fa-user-check text-green-300"></i><span class="font-medium">Olá, ${displayName}</span><button id="logout-btn" class="text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1">Sair</button></div>`;
         } else {
-            buttonHTML = `<button class="nav-link bg-secondary hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full flex items-center space-x-2 whitespace-nowrap" data-page="login"><i class="fas fa-user"></i><span>Entre ou Cadastre-se</span></button>`;
+            loginBtn.dataset.page = 'login';
+            loginBtn.innerHTML = `<i class="fas fa-user"></i><span>Entre ou Cadastre-se</span>`;
         }
-        loginPlaceholder.innerHTML = buttonHTML;
     }
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -239,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('signup-password').value;
         const errorEl = document.getElementById('signup-error');
         errorEl.classList.add('hidden');
-
         auth.createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
                 const user = userCredential.user;
@@ -264,11 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('login-password').value;
         const errorEl = document.getElementById('login-error');
         errorEl.classList.add('hidden');
-
         auth.signInWithEmailAndPassword(email, password)
-            .then(() => {
-                // Não precisa fazer nada aqui, o onAuthStateChanged vai cuidar de tudo
-            })
+            .then(() => loadPage('home'))
             .catch(error => {
                 console.error("Erro ao fazer login:", error);
                 errorEl.textContent = "E-mail ou senha inválidos.";
@@ -283,14 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if (user) {
             state.loggedInUser = { email: user.email, uid: user.uid, displayName: user.displayName };
-            // Se o usuário acabou de logar e está na página de login, redireciona
-            if (appRoot.querySelector('#login-form')) {
-                loadPage('home');
-            } else {
-                updateLoginStatus(); // Apenas atualiza o botão se já estiver em outra página
-            }
         } else {
             state.loggedInUser = null;
+        }
+        if (document.getElementById('login-btn')) {
             updateLoginStatus();
         }
     });
@@ -379,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.addEventListener('click', (e) => {
             if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
-            if (e.target.closest('#logout-btn') || e.target.closest('#logout-btn-mobile')) { handleLogout(); }
+            if (e.target.closest('#logout-btn')) handleLogout();
             if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
             if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
             if (e.target.closest('.remove-from-cart')) {
