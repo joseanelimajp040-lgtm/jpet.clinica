@@ -21,7 +21,6 @@ export function initPageModals() {
 
     // Gatilhos que abrem os modals
     document.body.addEventListener('click', e => {
-        // <<< INÍCIO DO NOVO CÓDIGO PARA ADOÇÃO >>>
         // Modal de Adoção de Cães
         if (e.target.closest('#caes-adocao-btn')) {
             e.preventDefault();
@@ -32,18 +31,21 @@ export function initPageModals() {
             e.preventDefault();
             openModal(document.getElementById('adocao-gatos-modal'));
         }
-        // <<< FIM DO NOVO CÓDIGO PARA ADOÇÃO >>>
 
         // Modal de Rações
         if (e.target.closest('#racao-btn') || e.target.closest('#racao-btn-nav') || e.target.closest('#racao-btn-dropdown')) {
             e.preventDefault();
             openModal(document.getElementById('racao-modal'));
         }
-        // Modal de Medicamentos
-        if (e.target.closest('#medicamentos-btn-nav') || e.target.closest('#medicamentos-btn-dropdown')) {
+
+        // <<< INÍCIO DA CORREÇÃO >>>
+        // Modal de Medicamentos (agora verifica os 3 botões possíveis)
+        if (e.target.closest('#medicamentos-btn-nav') || e.target.closest('#medicamentos-btn-dropdown') || e.target.closest('#medicamentos-cat-btn')) {
             e.preventDefault();
             openModal(document.getElementById('medicamentos-modal'));
         }
+        // <<< FIM DA CORREÇÃO >>>
+
         // Modal de Frete no Carrinho
         if (e.target.closest('#shipping-info-btn')) {
              openModal(document.getElementById('shipping-modal'));
