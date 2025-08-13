@@ -227,11 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const bookedSlot = e.target.closest('.time-slot.booked');
             if (bookedSlot) {
-                 const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
-                 document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
-                 document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
-                 document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
-                 openModal(document.getElementById('appointment-details-modal'));
+                const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
+                document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
+                document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
+                document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
+                openModal(document.getElementById('appointment-details-modal'));
             }
             if (e.target.closest('#redirect-to-login-btn')) {
                 closeModal(document.getElementById('login-required-modal'));
@@ -368,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 
-            // LÓGICA PARA MOSTRAR/ESCONDER OS BANNERS
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
@@ -378,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // <<< NOVA LÓGICA PARA A BARRA DE NAVEGAÇÃO PRINCIPAL >>>
             const mainNavBar = document.getElementById('main-nav-bar');
             if (mainNavBar) {
                 if (pageName === 'home') {
@@ -388,13 +386,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
+            // <<< INÍCIO DA MODIFICAÇÃO >>>
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
                 case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
                 case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
                 case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
+                // Adicionando as novas páginas para que o site as reconheça
+                case 'adocao-caes': 
+                    break;
+                case 'adocao-gatos': 
+                    break;
             }
+            // <<< FIM DA MODIFICAÇÃO >>>
+
             initPageModals();
             updateLoginStatus();
         } catch (error) {
