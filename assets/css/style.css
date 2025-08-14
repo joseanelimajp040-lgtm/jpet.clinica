@@ -1146,4 +1146,89 @@ input[type='number'] {
 .vet-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+
 }
+
+/* ========== INÍCIO: ESTILOS DA SEÇÃO DO APP ========== */
+
+/* Cor de fundo laranja fraco para a seção */
+.bg-app-section {
+    background-color: #fff7f0; /* Um laranja bem claro, quase branco */
+}
+
+/* Estrutura do celular (mockup) */
+.phone-mockup {
+    position: relative;
+    width: 180px;
+    height: 360px;
+    background-color: #1f2937; /* Cinza escuro (cor do celular) */
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 0 3px #374151;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    transform: rotate(-10deg);
+    transition: all 0.4s ease-in-out;
+}
+
+.phone-mockup:hover {
+    transform: rotate(-5deg) scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), inset 0 0 0 3px #4b5563;
+}
+
+/* Tela do celular */
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #FF6B00 0%, #00A8A8 100%); /* Usando seu gradiente */
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+/* Notch (entalhe da câmera) */
+.phone-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 15px;
+    background-color: #1f2937;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Logo dentro da tela */
+.phone-logo {
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.phone-logo .text-primary { color: #fff; } /* Ajuste para o gradiente */
+.phone-logo .text-secondary { color: #fde68a; } /* Amarelo claro para contraste */
+
+/* Ícones de app na tela */
+.phone-app-icons {
+    position: absolute;
+    bottom: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.phone-app-icon {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+}
+
+/* ========== FIM: ESTILOS DA SEÇÃO DO APP ========== */
