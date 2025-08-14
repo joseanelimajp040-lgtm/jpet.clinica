@@ -1232,3 +1232,75 @@ input[type='number'] {
 }
 
 /* ========== FIM: ESTILOS DA SEÇÃO DO APP ========== */
+
+/* ========== INÍCIO: ESTILOS PÁGINA COMO BAIXAR APP ========== */
+
+.os-card {
+    background-color: white;
+    border-radius: 1rem; /* 16px */
+    padding: 2rem; /* 32px */
+    text-align: center;
+    border: 1px solid #e5e7eb; /* Borda cinza clara */
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.os-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    border-color: #00A8A8; /* Cor secundária (verde azulado) */
+}
+
+.os-card .os-icon {
+    font-size: 6rem; /* 96px */
+    margin-bottom: 1.5rem; /* 24px */
+    transition: transform 0.3s ease-in-out;
+}
+
+.os-card:hover .os-icon {
+    transform: scale(1.1);
+}
+
+.os-card h3 {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 700;
+    color: #1f2937; /* Cinza escuro */
+    margin-bottom: 0.5rem; /* 8px */
+}
+
+.os-card p {
+    color: #4b5563; /* Cinza médio */
+    flex-grow: 1; /* Faz o parágrafo ocupar o espaço para alinhar os botões */
+    margin-bottom: 1.5rem; /* 24px */
+}
+
+.os-card .os-button {
+    display: inline-block;
+    margin-top: auto; /* Alinha o botão na parte inferior */
+    background-color: #00A8A8;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.os-card:hover .os-button {
+    background-color: #007f7f;
+    transform: scale(1.05);
+}
+
+/* Cores específicas dos ícones */
+.os-icon.android {
+    color: #3ddc84;
+}
+
+.os-icon.apple {
+    color: #333333;
+}
+
+/* ========== FIM: ESTILOS PÁGINA COMO BAIXAR APP ========== */
