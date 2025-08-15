@@ -1467,37 +1467,36 @@ input[type='number'] {
 
 /* ========== FIM: ÍCONES DECORATIVOS LATERAIS ========== */
 
-/* ========== INÍCIO: ANIMAÇÕES DA SEÇÃO APP ========== */
+/* ========== INÍCIO: ANIMAÇÕES DA SEÇÃO APP (MÉTODO ROBUSTO) ========== */
 
 /* Define a animação de entrada (deslizar para cima e aparecer) */
 @keyframes slide-in-up {
   from {
     opacity: 0;
-    transform: translateY(25px); /* O elemento começa 25px para baixo */
+    transform: translateY(25px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);   /* O elemento termina na sua posição original */
+    transform: translateY(0);
   }
 }
 
 /*
-  Estado inicial dos elementos que serão animados.
-  Eles começam invisíveis e transparentes.
+  Estado inicial dos elementos.
+  Eles ficam invisíveis até a classe 'animated' ser adicionada.
 */
 .animate-on-load {
   opacity: 0;
+  /* Adiciona uma transição suave para o caso de o JS demorar um pouco */
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/*
-  Esta classe é adicionada via JavaScript para iniciar a animação.
-  A propriedade 'forwards' garante que o elemento permaneça visível no final.
-*/
+/* Classe que o JavaScript adiciona para iniciar a animação */
 .animate-on-load.animated {
   animation: slide-in-up 0.7s ease-out forwards;
 }
 
-/* Classes de atraso para criar um efeito cascata elegante */
+/* Classes de atraso para o efeito cascata */
 .delay-1.animated {
   animation-delay: 0.2s;
 }
@@ -1508,16 +1507,12 @@ input[type='number'] {
   animation-delay: 0.6s;
 }
 
-/*
-  Animação para o botão "Veja como baixar".
-  Ao passar o mouse, ele aumenta de tamanho e ganha uma sombra sutil.
-*/
+/* Animação para o botão "Veja como baixar" */
 .nav-link[data-page="como-baixar-app"]:hover {
-  transform: scale(1.05); /* Aumenta levemente o tamanho */
-  box-shadow: 0 8px 25px rgba(0, 168, 168, 0.3); /* Adiciona uma sombra para dar destaque */
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 168, 168, 0.3);
 }
 
-/* Garante uma transição suave para o efeito de hover do botão */
 .nav-link[data-page="como-baixar-app"] {
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
 }
