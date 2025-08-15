@@ -437,7 +437,6 @@ case 'instalar-ios': break;
                     });
                 }, 100); // 100ms de delay
             }
-        }
 // ...
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
@@ -509,6 +508,7 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
+
 
 
 
