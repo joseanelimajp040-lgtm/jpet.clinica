@@ -6,6 +6,16 @@ body {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    min-height: 100vh; /* Garante altura mínima da tela */
+    display: flex;
+    flex-direction: column;
+}
+html {
+    height: 100%;
+}
+
+#app-root {
+    flex-grow: 1; /* Faz o conteúdo principal crescer para preencher o espaço */
 }
 
 input,
@@ -1337,43 +1347,40 @@ input[type='number'] {
     font-weight: 600;
 }
 
-/* ========== INÍCIO: ELEMENTOS DECORATIVOS LATERAIS (VERSÃO ATUALIZADA) ========== */
+/* ========== INÍCIO: ELEMENTOS DECORATIVOS LATERAIS ========== */
 
-/* Aplica a classe ao body para ativar os efeitos */
 .body-has-decorations {
     position: relative;
     overflow-x: hidden;
 }
 
-/* Apenas mostra os elementos em telas grandes (desktops) */
 @media (min-width: 1024px) {
     .body-has-decorations::before,
     .body-has-decorations::after {
         content: '';
         position: fixed;
         border-radius: 50%;
-        z-index: -1; /* Coloca os elementos atrás de todo o conteúdo */
-        filter: blur(120px); /* Efeito de desfoque ainda mais suave */
-        opacity: 0.4; /* Deixa a cor bem sutil */
+        z-index: -1; 
+        filter: blur(120px); 
+        opacity: 0.4; 
         will-change: transform;
     }
 
-    /* Círculo laranja no canto superior esquerdo (maior e mais próximo) */
     .body-has-decorations::before {
         width: 500px;
         height: 500px;
-        background-color: #FF6B00; /* Cor primária */
+        background-color: #FF6B00; 
         top: -200px;
         left: -250px;
     }
 
-    /* Círculo verde-azulado no canto inferior direito (maior e mais próximo) */
     .body-has-decorations::after {
         width: 550px;
         height: 550px;
-        background-color: #00A8A8; /* Cor secundária */
+        background-color: #00A8A8; 
         bottom: -280px;
         right: -250px;
     }
 }
+
 /* ========== FIM: ELEMENTOS DECORATIVOS LATERAIS ========== */
