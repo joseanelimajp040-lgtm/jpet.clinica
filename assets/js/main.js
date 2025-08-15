@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const agendaGrid = document.getElementById('agenda-grid');
         if (!agendaGrid) return;
         agendaGrid.innerHTML = '';
-        const today = new Date('2025-08-12T10:00:00'); // Note: Using today's date for relevance
+        const today = new Date('2025-08-15T10:00:00');
         const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
         agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
@@ -386,22 +386,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // <<< INÍCIO DA MODIFICAÇÃO >>>
+            if (pageName === 'instalar-ios') {
+                document.body.classList.add('body-has-decorations');
+            } else {
+                document.body.classList.remove('body-has-decorations');
+            }
+            
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
                 case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
                 case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
                 case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
-                // Adicionando as novas páginas para que o site as reconheça
-                case 'adocao-caes': 
-                    break;
-                case 'adocao-gatos': 
-                    break;
-case 'como-baixar-app': break;
-case 'instalar-ios': break;
+                case 'adocao-caes': break; 
+                case 'adocao-gatos': break;
+                case 'como-baixar-app': break;
+                case 'instalar-ios': break;
             }
-            // <<< FIM DA MODIFICAÇÃO >>>
 
             initPageModals();
             updateLoginStatus();
@@ -411,6 +412,15 @@ case 'instalar-ios': break;
         } finally {
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
+
+            // Adiciona a animação apenas na página inicial
+            if (pageName === 'home') {
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100);
+            }
         }
     }
 
@@ -484,4 +494,3 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
-
