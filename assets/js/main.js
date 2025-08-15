@@ -419,6 +419,20 @@ case 'instalar-ios': break;
             console.error('Falha ao carregar a página:', error);
             appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
         } finally {
+ setTimeout(() => loadingOverlay.style.display = 'none', 300);
+            window.scrollTo(0, 0);
+
+            // ADICIONE O CÓDIGO ABAIXO
+            if (pageName === 'home') {
+                // Adiciona a classe 'animated' com um pequeno delay para a animação acontecer
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100); // 100ms de delay
+            }
+        }
+// ...
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
         }
@@ -494,6 +508,7 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
+
 
 
 
