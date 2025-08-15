@@ -377,6 +377,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
+            // Gerencia os elementos decorativos de fundo
+            if (pageName === 'instalar-ios') {
+                document.body.classList.add('body-has-decorations');
+            } else {
+                document.body.classList.remove('body-has-decorations');
+            }
+            
+            switch (pageName) {
+            }
+            
             const mainNavBar = document.getElementById('main-nav-bar');
             if (mainNavBar) {
                 if (pageName === 'home') {
@@ -484,5 +494,6 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
+
 
 
