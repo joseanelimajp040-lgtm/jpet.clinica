@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const agendaGrid = document.getElementById('agenda-grid');
         if (!agendaGrid) return;
         agendaGrid.innerHTML = '';
-        const today = new Date('2025-08-12T10:00:00'); // Note: Using today's date for relevance
+        const today = new Date('2025-08-15T10:00:00');
         const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
         agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
@@ -377,16 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // Gerencia os elementos decorativos de fundo
-            if (pageName === 'instalar-ios') {
-                document.body.classList.add('body-has-decorations');
-            } else {
-                document.body.classList.remove('body-has-decorations');
-            }
-            
-            switch (pageName) {
-            }
-            
             const mainNavBar = document.getElementById('main-nav-bar');
             if (mainNavBar) {
                 if (pageName === 'home') {
@@ -396,30 +386,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // <<< INÍCIO DA MODIFICAÇÃO >>>
-            // ... dentro da função loadPage ...
+            if (pageName === 'instalar-ios') {
+                document.body.classList.add('body-has-decorations');
+            } else {
+                document.body.classList.remove('body-has-decorations');
+            }
+            
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
-                // ... outros cases
+                case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
+                case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
+                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
+                case 'adocao-caes': break; 
+                case 'adocao-gatos': break;
+                case 'como-baixar-app': break;
                 case 'instalar-ios': break;
             }
-// Aciona a animação apenas na página inicial
-            if (pageName === 'home') {
-                // Adiciona a classe 'animated' com um pequeno delay para a animação acontecer
-                setTimeout(() => {
-                    document.querySelectorAll('.animate-on-load').forEach(el => {
-                        el.classList.add('animated');
-                    });
-                }, 100); // 100ms de delay
-            }
-            // >>> COLE O NOVO CÓDIGO DE ANIMAÇÃO AQUI <<<
-
-            initPageModals();
-            updateLoginStatus();
-// ...
-            }
-            // <<< FIM DA MODIFICAÇÃO >>>
 
             initPageModals();
             updateLoginStatus();
@@ -429,23 +412,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
-        }
-    }
-// ...
-        } finally {
-            setTimeout(() => loadingOverlay.style.display = 'none', 300);
-            window.scrollTo(0, 0);
 
-            // ADICIONE O CÓDIGO ABAIXO
+            // Adiciona a animação apenas na página inicial
             if (pageName === 'home') {
-                // Adiciona a classe 'animated' com um pequeno delay para a animação acontecer
                 setTimeout(() => {
                     document.querySelectorAll('.animate-on-load').forEach(el => {
                         el.classList.add('animated');
                     });
-                }, 100); // 100ms de delay
+                }, 100);
             }
-// ...
+        }
+    }
+
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
         await Promise.all([
@@ -516,8 +494,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
-
-
-
-
-
