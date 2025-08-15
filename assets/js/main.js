@@ -423,7 +423,22 @@ case 'instalar-ios': break;
             window.scrollTo(0, 0);
         }
     }
+// ...
+        } finally {
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
+            window.scrollTo(0, 0);
 
+            // ADICIONE O CÓDIGO ABAIXO
+            if (pageName === 'home') {
+                // Adiciona a classe 'animated' com um pequeno delay para a animação acontecer
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100); // 100ms de delay
+            }
+        }
+// ...
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
         await Promise.all([
@@ -494,5 +509,6 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
+
 
 
