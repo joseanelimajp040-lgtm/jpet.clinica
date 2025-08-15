@@ -397,19 +397,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // <<< INÍCIO DA MODIFICAÇÃO >>>
+            // ... dentro da função loadPage ...
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
-                case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
-                case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
-                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
-                // Adicionando as novas páginas para que o site as reconheça
-                case 'adocao-caes': 
-                    break;
-                case 'adocao-gatos': 
-                    break;
-case 'como-baixar-app': break;
-case 'instalar-ios': break;
+                // ... outros cases
+                case 'instalar-ios': break;
+            }
+// Aciona a animação apenas na página inicial
+            if (pageName === 'home') {
+                // Adiciona a classe 'animated' com um pequeno delay para a animação acontecer
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100); // 100ms de delay
+            }
+            // >>> COLE O NOVO CÓDIGO DE ANIMAÇÃO AQUI <<<
+
+            initPageModals();
+            updateLoginStatus();
+// ...
             }
             // <<< FIM DA MODIFICAÇÃO >>>
 
@@ -508,6 +516,7 @@ case 'instalar-ios': break;
     
     initializeApp();
 });
+
 
 
 
