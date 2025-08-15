@@ -1392,7 +1392,7 @@ input[type='number'] {
 /* Estilo base para os ícones */
 .side-icon {
     position: fixed;
-    color: rgba(40, 40, 40, 0.08); /* Cor cinza bem sutil */
+    color: rgba(40, 40, 40, 0.12); /* Visibilidade aumentada */
     font-size: 2rem;
     z-index: -1; /* Garante que fiquem atrás do conteúdo, mas sobre as luzes */
     opacity: 0; /* Começam invisíveis para uma transição suave */
@@ -1466,3 +1466,4 @@ input[type='number'] {
 }
 
 /* ========== FIM: ÍCONES DECORATIVOS LATERAIS ========== */
+
