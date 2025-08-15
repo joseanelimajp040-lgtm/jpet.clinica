@@ -1347,40 +1347,42 @@ input[type='number'] {
     font-weight: 600;
 }
 
-/* ========== INÍCIO: ELEMENTOS DECORATIVOS LATERAIS ========== */
+/* ========== INÍCIO: ELEMENTOS DECORATIVOS LATERAIS (VERSÃO FINAL) ========== */
 
 .body-has-decorations {
-    position: relative;
-    overflow-x: hidden;
+    position: relative; /* Mantém o contexto para os elementos */
+    overflow-x: hidden; /* Evita barras de rolagem indesejadas */
 }
 
-@media (min-width: 1024px) {
-    .body-has-decorations::before,
-    .body-has-decorations::after {
-        content: '';
-        position: fixed;
-        border-radius: 50%;
-        z-index: -1; 
-        filter: blur(120px); 
-        opacity: 0.4; 
-        will-change: transform;
-    }
+/* Garante que o fundo sempre ocupe a tela toda */
+.body-has-decorations::before,
+.body-has-decorations::after {
+    content: '';
+    position: fixed; /* Fixa os elementos na TELA e não na PÁGINA */
+    z-index: -1;
+    will-change: transform;
+}
 
+/* Mostra os elementos apenas em telas grandes (desktops) */
+@media (min-width: 1024px) {
     .body-has-decorations::before {
-        width: 500px;
-        height: 500px;
-        background-color: #FF6B00; 
+        width: 450px;
+        height: 450px;
+        background-color: #FF6B00; /* Cor Primária */
         top: -200px;
-        left: -250px;
+        left: -220px;
+        filter: blur(100px);
+        opacity: 0.6; /* Cor mais forte */
     }
 
     .body-has-decorations::after {
         width: 550px;
         height: 550px;
-        background-color: #00A8A8; 
-        bottom: -280px;
+        background-color: #00A8A8; /* Cor Secundária */
+        bottom: -250px;
         right: -250px;
+        filter: blur(100px);
+        opacity: 0.6; /* Cor mais forte */
     }
 }
-
 /* ========== FIM: ELEMENTOS DECORATIVOS LATERAIS ========== */
