@@ -1467,22 +1467,3 @@ input[type='number'] {
 
 /* ========== FIM: ÍCONES DECORATIVOS LATERAIS ========== */
 
-/* ========== INÍCIO: ANIMAÇÃO DE ENTRADA PARA TEXTOS ========== */
-
-.animate-on-load {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.animate-on-load.animated {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Adicionando delays diferentes para cada elemento */
-.animate-on-load.delay-1 { transition-delay: 0.1s; }
-.animate-on-load.delay-2 { transition-delay: 0.2s; }
-.animate-on-load.delay-3 { transition-delay: 0.3s; }
-
-/* ========== FIM: ANIMAÇÃO DE ENTRADA PARA TEXTOS ========== */
