@@ -399,6 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'adocao-gatos': 
                     break;
 case 'como-baixar-app': break;
+case 'instalar-ios': break;
             }
             // <<< FIM DA MODIFICAÇÃO >>>
 
@@ -483,4 +484,5 @@ case 'como-baixar-app': break;
     
     initializeApp();
 });
+
 
