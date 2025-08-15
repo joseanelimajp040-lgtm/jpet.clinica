@@ -412,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.body.classList.remove('body-has-decorations');
         }
-        
         switch (pageName) {
             case 'home':
                 initSlider();
@@ -457,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // O código de animação antigo foi removido daqui para evitar conflitos.
     }
 }
-
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
         await Promise.all([
@@ -528,6 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
 
 
 
