@@ -254,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCalendar();
             });
         }
-    }
     // --- COLE A NOVA FUNÇÃO AQUI ---
     function initScrollAnimations() {
         const appSection = document.getElementById('app-section');
@@ -507,4 +506,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
 
