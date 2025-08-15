@@ -1386,3 +1386,83 @@ input[type='number'] {
     }
 }
 /* ========== FIM: ELEMENTOS DECORATIVOS LATERAIS ========== */
+
+/* ========== INÍCIO: ÍCONES DECORATIVOS LATERAIS ========== */
+
+/* Estilo base para os ícones */
+.side-icon {
+    position: fixed;
+    color: rgba(40, 40, 40, 0.08); /* Cor cinza bem sutil */
+    font-size: 2rem;
+    z-index: -1; /* Garante que fiquem atrás do conteúdo, mas sobre as luzes */
+    opacity: 0; /* Começam invisíveis para uma transição suave */
+    transition: opacity 0.5s ease-in-out;
+    will-change: transform;
+    display: none; /* Escondido por padrão */
+}
+
+/* Mostra os ícones apenas em telas grandes e quando a classe está no body */
+@media (min-width: 1024px) {
+    .body-has-decorations .side-icon {
+        display: block; /* Mostra os ícones */
+        opacity: 1; /* Faz os ícones aparecerem */
+    }
+}
+
+/* Animação sutil de flutuação */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Posições e ícones específicos */
+.side-icon.icon-1 {
+    top: 15%;
+    left: 8%;
+    font-size: 2.5rem;
+    transform: rotate(-15deg);
+    animation: float 4s ease-in-out infinite;
+}
+
+.side-icon.icon-2 {
+    top: 45%;
+    left: 3%;
+    font-size: 3rem;
+    transform: rotate(10deg);
+    animation: float 5s ease-in-out infinite reverse;
+}
+
+.side-icon.icon-3 {
+    bottom: 10%;
+    left: 6%;
+    font-size: 2rem;
+    transform: rotate(5deg);
+    animation: float 3.5s ease-in-out infinite;
+}
+
+.side-icon.icon-4 {
+    top: 20%;
+    right: 5%;
+    font-size: 2.2rem;
+    transform: rotate(15deg);
+    animation: float 4.2s ease-in-out infinite reverse;
+}
+
+.side-icon.icon-5 {
+    top: 55%;
+    right: 8%;
+    font-size: 2.8rem;
+    transform: rotate(-10deg);
+    animation: float 3.8s ease-in-out infinite;
+}
+
+.side-icon.icon-6 {
+    bottom: 15%;
+    right: 3%;
+    font-size: 3.2rem;
+    transform: rotate(8deg);
+    animation: float 5.5s ease-in-out infinite reverse;
+}
+
+/* ========== FIM: ÍCONES DECORATIVOS LATERAIS ========== */
