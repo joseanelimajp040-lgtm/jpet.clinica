@@ -255,7 +255,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    
+    // --- COLE A NOVA FUNÇÃO AQUI ---
+    function initScrollAnimations() {
+        const appSection = document.getElementById('app-section');
+        if (!appSection) return; // Se a seção não existir na página, não faz nada
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                // Se a seção está visível na tela
+                if (entry.isIntersecting) {
+                    const elementsToAnimate = entry.target.querySelectorAll('.animate-on-load');
+                    elementsToAnimate.forEach(el => {
+                        el.classList.add('animated');
+                    });
+                    // Uma vez que a animação foi acionada, paramos de "observar" para não repetir
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1 // Aciona quando 10% da seção estiver visível
+        });
+
+        observer.observe(appSection);
+    }
     // --- MANIPULADORES DE EVENTOS DE AUTENTICAÇÃO (FIREBASE) ---
     function handleCreateAccount(event) {
         event.preventDefault();
@@ -393,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             switch (pageName) {
-                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
+                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); initScrollAnimations(); break;
                 case 'cart': renderCart(); initCartPageListeners(); break;
                 case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
                 case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
@@ -413,15 +435,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
 
-            // Adiciona a animação apenas na página inicial
-            if (pageName === 'home') {
-                setTimeout(() => {
-                    document.querySelectorAll('.animate-on-load').forEach(el => {
-                        el.classList.add('animated');
-                    });
-                }, 100);
-            }
-        }
     }
 
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
@@ -494,3 +507,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
