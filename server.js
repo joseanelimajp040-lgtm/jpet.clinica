@@ -18,7 +18,7 @@ if (!process.env.GEMINI_API_KEY) {
 
 // Configuração do Google Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
 // O "cérebro" da Marrie: define a personalidade dela para o Gemini
 const marrieSystemPrompt = `
@@ -69,3 +69,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
