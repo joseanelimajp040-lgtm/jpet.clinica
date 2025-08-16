@@ -206,79 +206,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     function initBanhoTosaEventListeners() {
-    const pageContainer = document.getElementById('app-root');
-    if (!pageContainer) return;
-    pageContainer.addEventListener('click', e => {
-        const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
-        const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
-        const availableSlot = e.target.closest('.time-slot.available');
-        if (availableSlot) {
-            if (state.loggedInUser) {
-                const bookingModal = document.getElementById('booking-modal');
-                const day = availableSlot.dataset.day;
-                const time = availableSlot.dataset.time;
-                document.getElementById('booking-info').textContent = `${day} às ${time}`;
-                document.getElementById('booking-day').value = day;
-                document.getElementById('booking-time').value = time;
-                openModal(bookingModal);
-            } else {
-                openModal(document.getElementById('login-required-modal'));
+        const pageContainer = document.getElementById('app-root');
+        if (!pageContainer) return;
+        pageContainer.addEventListener('click', e => {
+            const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
+            const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
+            const availableSlot = e.target.closest('.time-slot.available');
+            if (availableSlot) {
+                if (state.loggedInUser) {
+                    const bookingModal = document.getElementById('booking-modal');
+                    const day = availableSlot.dataset.day;
+                    const time = availableSlot.dataset.time;
+                    document.getElementById('booking-info').textContent = `${day} às ${time}`;
+                    document.getElementById('booking-day').value = day;
+                    document.getElementById('booking-time').value = time;
+                    openModal(bookingModal);
+                } else {
+                    openModal(document.getElementById('login-required-modal'));
+                }
             }
-        }
-        const bookedSlot = e.target.closest('.time-slot.booked');
-        if (bookedSlot) {
-            const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
-            document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
-            document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
-            document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
-            openModal(document.getElementById('appointment-details-modal'));
-        }
-        if (e.target.closest('#redirect-to-login-btn')) {
-            closeModal(document.getElementById('login-required-modal'));
-            loadPage('login');
-        }
-    });
-    const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const newAppointment = {
-                day: document.getElementById('booking-day').value, time: document.getElementById('booking-time').value,
-                tutorName: document.getElementById('booking-tutor-name').value, petName: document.getElementById('booking-pet-name').value,
-                phoneNumber: document.getElementById('booking-phone-number').value
-            };
-            state.appointments.push(newAppointment);
-            save.appointments();
-            document.getElementById('booking-modal').style.display = 'none';
-            showAnimation('success-animation-overlay', 1500);
-            renderCalendar();
+            const bookedSlot = e.target.closest('.time-slot.booked');
+            if (bookedSlot) {
+                const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
+                document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
+                document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
+                document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
+                openModal(document.getElementById('appointment-details-modal'));
+            }
+            if (e.target.closest('#redirect-to-login-btn')) {
+                closeModal(document.getElementById('login-required-modal'));
+                loadPage('login');
+            }
         });
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const newAppointment = {
+                    day: document.getElementById('booking-day').value, time: document.getElementById('booking-time').value,
+                    tutorName: document.getElementById('booking-tutor-name').value, petName: document.getElementById('booking-pet-name').value,
+                    phoneNumber: document.getElementById('booking-phone-number').value
+                };
+                state.appointments.push(newAppointment);
+                save.appointments();
+                document.getElementById('booking-modal').style.display = 'none';
+                showAnimation('success-animation-overlay', 1500);
+                renderCalendar();
+            });
+        }
     }
-} // <-- AQUI TERMINA a função initBanhoTosaEventListeners
-
-// --- A NOVA FUNÇÃO DEVE FICAR AQUI FORA, SEPARADA ---
-function initScrollAnimations() {
-    const appSection = document.getElementById('app-section');
-    if (!appSection) return; // Se a seção não existir na página, não faz nada
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            // Se a seção está visível na tela
-            if (entry.isIntersecting) {
-                const elementsToAnimate = entry.target.querySelectorAll('.animate-on-load');
-                elementsToAnimate.forEach(el => {
-                    el.classList.add('animated');
-                });
-                // Uma vez que a animação foi acionada, paramos de "observar" para não repetir
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1 // Aciona quando 10% da seção estiver visível
-    });
-
-    observer.observe(appSection);
-}
+    
     // --- MANIPULADORES DE EVENTOS DE AUTENTICAÇÃO (FIREBASE) ---
     function handleCreateAccount(event) {
         event.preventDefault();
@@ -385,79 +362,68 @@ function initScrollAnimations() {
     }
 
     async function loadPage(pageName) {
-    loadingOverlay.style.display = 'flex';
-    try {
-        const response = await fetch(`pages/${pageName}.html`);
-        if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
-        appRoot.innerHTML = await response.text();
+        loadingOverlay.style.display = 'flex';
+        try {
+            const response = await fetch(`pages/${pageName}.html`);
+            if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
+            appRoot.innerHTML = await response.text();
 
-        const topBanner = document.getElementById('top-banner');
-        if (topBanner) {
-            if (pageName === 'home') {
-                topBanner.classList.remove('hidden');
+            const topBanner = document.getElementById('top-banner');
+            if (topBanner) {
+                if (pageName === 'home') {
+                    topBanner.classList.remove('hidden');
+                } else {
+                    topBanner.classList.add('hidden');
+                }
+            }
+            
+            const mainNavBar = document.getElementById('main-nav-bar');
+            if (mainNavBar) {
+                if (pageName === 'home') {
+                    mainNavBar.classList.remove('hidden');
+                } else {
+                    mainNavBar.classList.add('hidden');
+                }
+            }
+            
+            if (pageName === 'instalar-ios') {
+                document.body.classList.add('body-has-decorations');
             } else {
-                topBanner.classList.add('hidden');
+                document.body.classList.remove('body-has-decorations');
+            }
+            
+            switch (pageName) {
+                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
+                case 'cart': renderCart(); initCartPageListeners(); break;
+                case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
+                case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
+                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
+                case 'adocao-caes': break; 
+                case 'adocao-gatos': break;
+                case 'como-baixar-app': break;
+                case 'instalar-ios': break;
+            }
+
+            initPageModals();
+            updateLoginStatus();
+        } catch (error) {
+            console.error('Falha ao carregar a página:', error);
+            appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
+        } finally {
+            setTimeout(() => loadingOverlay.style.display = 'none', 300);
+            window.scrollTo(0, 0);
+
+            // Adiciona a animação apenas na página inicial
+            if (pageName === 'home') {
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100);
             }
         }
-        
-        const mainNavBar = document.getElementById('main-nav-bar');
-        if (mainNavBar) {
-            if (pageName === 'home') {
-                mainNavBar.classList.remove('hidden');
-            } else {
-                mainNavBar.classList.add('hidden');
-            }
-        }
-        
-        if (pageName === 'instalar-ios') {
-            document.body.classList.add('body-has-decorations');
-        } else {
-            document.body.classList.remove('body-has-decorations');
-        }
-        switch (pageName) {
-            case 'home':
-                initSlider();
-                initComparisonSlider();
-                updateAllHeartIcons();
-                initScrollAnimations(); // Chamada da função de animação
-                break;
-            case 'cart':
-                renderCart();
-                initCartPageListeners();
-                break;
-            case 'checkout':
-                renderCheckoutSummary();
-                initCheckoutPageListeners();
-                break;
-            case 'favorites':
-                renderFavoritesPage();
-                updateAllHeartIcons();
-                break;
-            case 'banho-e-tosa':
-                renderCalendar();
-                initBanhoTosaEventListeners();
-                break;
-            case 'adocao-caes':
-                break;
-            case 'adocao-gatos':
-                break;
-            case 'como-baixar-app':
-                break;
-            case 'instalar-ios':
-                break;
-        }
-
-        initPageModals();
-        updateLoginStatus();
-    } catch (error) {
-        console.error('Falha ao carregar a página:', error);
-        appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
-    } finally {
-        setTimeout(() => loadingOverlay.style.display = 'none', 300);
-        window.scrollTo(0, 0);
-        // O código de animação antigo foi removido daqui para evitar conflitos.
     }
-}
+
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
         await Promise.all([
@@ -528,8 +494,3 @@ function initScrollAnimations() {
     
     initializeApp();
 });
-
-
-
-
-
