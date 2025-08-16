@@ -487,10 +487,39 @@ document.addEventListener('DOMContentLoaded', () => {
             if (shippingModal) shippingModal.style.display = 'none';
             updateTotals();
         });
+// ========== INÍCIO: Lógica do Chat da Marrie ==========
+const marrieButton = document.getElementById('marrie-chat-button');
+const marrieWindow = document.getElementById('marrie-chat-window');
+const marrieCloseButton = document.getElementById('marrie-chat-close');
 
+if (marrieButton && marrieWindow && marrieCloseButton) {
+    marrieButton.addEventListener('click', () => {
+        // Alterna a classe 'active' para mostrar/esconder a janela com animação
+        marrieWindow.classList.toggle('active');
+        
+        // Remove a classe 'hidden' para garantir que a animação de saída funcione
+        if (marrieWindow.classList.contains('active')) {
+            marrieWindow.classList.remove('hidden');
+        } else {
+            // Adiciona um pequeno atraso antes de esconder para a animação de saída completar
+            setTimeout(() => {
+                marrieWindow.classList.add('hidden');
+            }, 500); // Deve corresponder à duração da transição no CSS
+        }
+    });
+
+    marrieCloseButton.addEventListener('click', () => {
+        marrieWindow.classList.remove('active');
+        setTimeout(() => {
+            marrieWindow.classList.add('hidden');
+        }, 500);
+    });
+}
+// ========== FIM: Lógica do Chat da Marrie ==========
         updateCounters();
         await loadPage('home');
     }
     
     initializeApp();
 });
+
