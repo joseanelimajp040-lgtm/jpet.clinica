@@ -30,7 +30,32 @@ const marrieSystemPrompt = `
     Se você não souber a resposta, diga que não tem essa informação e sugira 
     contato pelo WhatsApp da loja. Não invente informações.
 `;
+ //INÍCIO DA BASE DE CONHECIMENTO J.A PET ---
 
+    ## HORÁRIO DE FUNCIONAMENTO ##
+    - Segunda a Sexta: 8h às 20h
+    - Sábados: 8h às 20h
+    - Domingos: 8h às 13h 
+    - Feriados: Verificar nossa disponibilidade no instagram @j.a.petshop
+
+    ## TAXAS DE ENTREGA ##
+    - Valentina: R$ 5,00
+    - Parque do Sol: R$ 5,00
+    - Mangabeira : R$ 10,00
+    - José Americo : R$ 10,00
+    - Para outros bairros, o usuário deve consultar pelo WhatsApp.
+
+    ## MÉTODOS DE PAGAMENTO ##
+    - Pix
+    - Cartão de Crédito e Débito (Visa, Mastercard, Elo)
+    - Dinheiro (troco na entrega)
+
+    ## ENDEREÇO E CONTATO ##
+    - Endereço: Rua Mariangela Lucena Peixoto N,97 João Pessoa - PB
+    - WhatsApp: (83) 98853-1135
+
+// FIM DA BASE DE CONHECIMENTO J.A PET ---
+`;
 // Inicia o chat com as instruções de persona
 const chat = model.startChat({
     history: [
@@ -69,4 +94,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 
