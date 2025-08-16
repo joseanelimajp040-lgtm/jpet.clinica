@@ -1506,7 +1506,18 @@ input[type='number'] {
 .delay-3.animated {
   animation-delay: 0.6s;
 }
-
+.delay-4.animated {
+  animation-delay: 0.8s;
+}
+.delay-5.animated {
+  animation-delay: 1.0s;
+}
+.delay-6.animated {
+  animation-delay: 1.2s;
+}
+.delay-7.animated {
+  animation-delay: 1.4s;
+}
 /* Animação para o botão "Veja como baixar" */
 .nav-link[data-page="como-baixar-app"]:hover {
   transform: scale(1.05);
@@ -1518,3 +1529,4 @@ input[type='number'] {
 }
 
 /* ========== FIM: ANIMAÇÕES DA SEÇÃO APP ========== */
+
