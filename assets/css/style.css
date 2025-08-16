@@ -1530,3 +1530,41 @@ input[type='number'] {
 
 /* ========== FIM: ANIMAÇÕES DA SEÇÃO APP ========== */
 
+/* ========== INÍCIO: Estilos do Chat da Marrie ========== */
+
+/* Estilo do botão flutuante da Marrie */
+#marrie-chat-button {
+    border: 3px solid #FF6B00; /* Borda laranja forte */
+}
+
+/* Animação de entrada e saída da janela de chat */
+#marrie-chat-window {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+}
+
+#marrie-chat-window.active {
+    display: flex; /* Sobrescreve o 'hidden' do Tailwind */
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* Melhora a barra de rolagem no corpo do chat */
+#marrie-chat-window .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+#marrie-chat-window .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#marrie-chat-window .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #00A8A8; /* Cor secundária */
+    border-radius: 6px;
+}
+
+#marrie-chat-window .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #007f7f;
+}
+
+/* ========== FIM: Estilos do Chat da Marrie ========== */
