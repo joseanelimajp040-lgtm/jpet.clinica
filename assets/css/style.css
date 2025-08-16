@@ -1568,3 +1568,58 @@ input[type='number'] {
 }
 
 /* ========== FIM: Estilos do Chat da Marrie ========== */
+
+/* ========== INÍCIO: Estilos das Mensagens do Chat ========== */
+
+.chat-message-container {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.chat-message {
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    max-width: 80%; /* Evita que a mensagem ocupe a largura toda */
+}
+
+/* Estilo para as mensagens da Marrie (IA) */
+.chat-message.ai-message {
+    background-color: #FF6B00; /* Laranja forte (sua cor primária) */
+    color: white;
+    border-bottom-left-radius: 0; /* Efeito de "balão" */
+}
+
+/* Estilo para as mensagens do Usuário */
+.chat-message.user-message {
+    background-color: #00A8A8; /* Verde azulado (sua cor secundária) */
+    color: white;
+    border-bottom-right-radius: 0; /* Efeito de "balão" */
+    margin-left: auto; /* Alinha à direita */
+}
+
+/* Indicador de "digitando..." */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    margin: 0 2px;
+    background-color: #a0aec0;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+/* ========== FIM: Estilos das Mensagens do Chat ========== */
