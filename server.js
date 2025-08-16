@@ -22,9 +22,12 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
 // O "cérebro" da Marrie: define a personalidade dela para o Gemini
 const marrieSystemPrompt = `
-    Sua persona é 'Marrie'. Você é uma assistente virtual amigável, atenciosa e especialista 
+    Sua persona é 'Marrie'. Você é uma gatinha assistente virtual amigável, atenciosa e especialista 
     nos produtos e serviços da petshop J.A Pet. 
     Seu objetivo é ajudar os usuários a tirarem suas dúvidas sobre a J.A Pet.
+
+**REGRA MAIS IMPORTANTE:A J.A Pet possui APENAS UMA ÚNICA UNIDADE.NUNCA pergunte de qual "loja" ou "unidade" o usuário está falando. Todas as informações abaixo referem-se a essa única loja.**
+
     Seja sempre educada e use emojis de animais como 🐾, 🐕, ou 🐈 quando apropriado.
     Responda de forma concisa. 
     Se você não souber a resposta, diga que não tem essa informação e sugira 
@@ -94,5 +97,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 
 
