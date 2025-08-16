@@ -516,10 +516,94 @@ if (marrieButton && marrieWindow && marrieCloseButton) {
     });
 }
 // ========== FIM: Lógica do Chat da Marrie ==========
+
+// ========== INÍCIO: Lógica de Conversa da Marrie ==========
+const chatWindowBody = document.getElementById('marrie-chat-window').querySelector('.overflow-y-auto');
+const chatInput = document.getElementById('marrie-chat-input');
+const chatSendButton = document.getElementById('marrie-chat-send');
+
+// Função para adicionar uma mensagem na tela
+function addChatMessage(message, sender) {
+    // Remove o indicador de "digitando" se ele existir
+    const typingIndicator = chatWindowBody.querySelector('.typing-indicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'chat-message-container';
+    
+    const messageBubble = document.createElement('div');
+    messageBubble.className = `chat-message ${sender}-message`; // sender será 'user' ou 'ai'
+    messageBubble.textContent = message;
+    
+    messageContainer.appendChild(messageBubble);
+    chatWindowBody.appendChild(messageContainer);
+    
+    // Rola para a mensagem mais recente
+    chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
+}
+
+// Função para mostrar o indicador "digitando..."
+function showTypingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    chatWindowBody.appendChild(indicator);
+    chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
+}
+
+// Função principal que envia a mensagem do usuário
+async function handleSendMessage() {
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return; // Não envia mensagens vazias
+
+    // 1. Mostra a mensagem do usuário na tela
+    addChatMessage(userMessage, 'user');
+    chatInput.value = ''; // Limpa o campo de texto
+
+    // 2. Mostra o indicador "Marrie está digitando..."
+    showTypingIndicator();
+    
+    // 3. Envia a mensagem para o backend e aguarda a resposta
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: userMessage }),
+        });
+
+        if (!response.ok) {
+            throw new Error('A resposta da rede não foi OK.');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.reply;
+        
+        // 4. Mostra a resposta da Marrie na tela
+        addChatMessage(aiResponse, 'ai');
+
+    } catch (error) {
+        console.error('Erro ao contatar a Marrie:', error);
+        addChatMessage('Desculpe, estou com um probleminha para me conectar. Tente novamente mais tarde.', 'ai');
+    }
+}
+
+// Adiciona os eventos para o botão de enviar e a tecla Enter
+chatSendButton.addEventListener('click', handleSendMessage);
+chatInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        handleSendMessage();
+    }
+});
+// ========== FIM: Lógica de Conversa da Marrie ==========
         updateCounters();
         await loadPage('home');
     }
     
     initializeApp();
 });
+
 
