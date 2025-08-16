@@ -567,7 +567,7 @@ async function handleSendMessage() {
     
     // 3. Envia a mensagem para o backend e aguarda a resposta
     try {
-        const response = await fetch(https://'jpet-clinica.onrender.com/api/chat', {
+        const response = await fetch('https://jpet-clinica.onrender.com/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -605,6 +605,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
