@@ -487,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (shippingModal) shippingModal.style.display = 'none';
             updateTotals();
         });
+
 // ========== INÍCIO: Lógica do Chat da Marrie ==========
 const marrieButton = document.getElementById('marrie-chat-button');
 const marrieWindow = document.getElementById('marrie-chat-window');
@@ -605,6 +606,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
