@@ -492,28 +492,6 @@ const marrieButton = document.getElementById('marrie-chat-button');
 const marrieWindow = document.getElementById('marrie-chat-window');
 const marrieCloseButton = document.getElementById('marrie-chat-close');
 
-// ========== INÍCIO: Lógica da Plaquinha da Marrie ==========
-const marriePlaque = document.getElementById('marrie-plaque');
-
-if (marriePlaque) {
-    // Esconde a plaquinha depois de 20 segundos
-    const plaqueTimer = setTimeout(() => {
-        marriePlaque.classList.add('hiding');
-    }, 20000); // 20000 milissegundos = 20 segundos
-
-    // Também esconde a plaquinha se o usuário clicar no botão antes do tempo
-    const marrieButtonForPlaque = document.getElementById('marrie-chat-button');
-    if (marrieButtonForPlaque) {
-        marrieButtonForPlaque.addEventListener('click', () => {
-            clearTimeout(plaqueTimer); // Cancela o timer de 20 segundos para não rodar duas vezes
-            if (!marriePlaque.classList.contains('hiding')) {
-                 marriePlaque.classList.add('hiding');
-            }
-        }, { once: true }); // Este evento só vai acontecer uma vez, na primeira vez que o usuário clicar
-    }
-}
-// ========== FIM: Lógica da Plaquinha da Marrie ==========
-
 if (marrieButton && marrieWindow && marrieCloseButton) {
     marrieButton.addEventListener('click', () => {
         // Alterna a classe 'active' para mostrar/esconder a janela com animação
@@ -627,6 +605,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
