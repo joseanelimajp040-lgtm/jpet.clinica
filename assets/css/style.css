@@ -1630,3 +1630,46 @@ input[type='number'] {
 }
 
 /* ========== FIM: Estilos das Mensagens do Chat ========== */
+
+/* ========== INÍCIO: Estilos da Plaquinha da Marrie (Versão 3) ========== */
+
+#marrie-plaque-container {
+    /* Esconde o que sair dos limites, essencial para o efeito de deslizar */
+    overflow: hidden;
+    /* Começa sem largura, para a placa ficar escondida */
+    width: 0;
+    /* Transição suave para a largura */
+    transition: width 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+#marrie-plaque-v3 {
+    /* Começa deslocado para a direita, dentro do container escondido */
+    transform: translateX(100%);
+    /* Transição suave para a posição final */
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Classe que o JavaScript vai usar para ATIVAR a placa */
+#marrie-plaque-container.active {
+    /* Expande o container para revelar a placa */
+    width: 200px; /* Ajuste a largura conforme necessário */
+}
+
+#marrie-plaque-container.active #marrie-plaque-v3 {
+    /* Traz a placa para a posição visível */
+    transform: translateX(0);
+    /* Inicia a animação de pulsar DEPOIS que ela aparece */
+    animation: plaque-subtle-pulse 2s ease-in-out infinite 1s;
+}
+
+/* Animação sutil de pulsar */
+@keyframes plaque-subtle-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+/* ========== FIM: Estilos da Plaquinha da Marrie (Versão 3) ========== */
