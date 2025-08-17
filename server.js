@@ -44,24 +44,26 @@ const marrieSystemPrompt = `
 
     --- INÍCIO DA BASE DE CONHECIMENTO J.A PET ---
 
-    ## HORÁRIO DE FUNCIONAMENTO ##
-    - Segunda a Sexta: 8h às 18h
-    - Sábados: 8h às 14h
-    - Domingos e Feriados: Fechado
+    NOSSO HORÁRIO DE FUNCIONAMENTO 
+    - Segunda a Sexta: 8h às 20h
+    - Sábados: 8h às 20h
+    - Domingos: 8h às 13h
+    - Feriados:consultar em nosso instagram a disponibilidade
 
-    ## TAXAS DE ENTREGA ##
-    - Bairro A: R$ 5,00
-    - Bairro B: R$ 7,00
-    - Bairro C: R$ 10,00
+     TAXAS DE ENTREGA 
+    - Valentina: R$ 5,00
+    - Parque do Sol: R$ 5,00
+    - Mangabira: R$ 10,00
+    - José Americo: R$ 10,00
     - Para outros bairros, o usuário deve consultar pelo WhatsApp.
 
-    ## MÉTODOS DE PAGAMENTO ##
+     MÉTODOS DE PAGAMENTO 
     - Pix
     - Cartão de Crédito e Débito (Visa, Mastercard, Elo)
-    - Dinheiro
+    - Dinheiro (troco na entrega)
 
-    ## ENDEREÇO E CONTATO ##
-    - Endereço: Rua dos Pets Felizes, 123, Bairro dos Animais, João Pessoa - PB
+     ENDEREÇO E CONTATO 
+    - Endereço: Rua Mariangela Lucena Peixoto, 97, Valentina de figueiredo, João Pessoa - PB
     - WhatsApp: (83) 98853-1133
 
     --- FIM DA BASE DE CONHECIMENTO J.A PET ---
@@ -104,6 +106,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 
 
 
