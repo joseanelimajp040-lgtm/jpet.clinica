@@ -1631,9 +1631,15 @@ input[type='number'] {
 
 /* ========== FIM: Estilos das Mensagens do Chat ========== */
 
-/* ========== INÍCIO: Estilos da Plaquinha da Marrie (Versão 3) ========== */
+/* ========== INÍCIO: Estilos da Plaquinha da Marrie (Versão Final Refinada) ========== */
 
 #marrie-plaque-container {
+    /* MUDANÇA AQUI: Alinhamento vertical perfeito com o botão */
+    /* A altura do botão é 4rem (h-16), então centralizamos a placa nesse eixo */
+    display: flex;
+    align-items: center;
+    height: 4rem; /* h-16 */
+
     /* Esconde o que sair dos limites, essencial para o efeito de deslizar */
     overflow: hidden;
     /* Começa sem largura, para a placa ficar escondida */
@@ -1643,6 +1649,9 @@ input[type='number'] {
 }
 
 #marrie-plaque-v3 {
+    /* MUDANÇA AQUI: Adiciona um espaçamento à direita */
+    margin-right: 8px; /* Cria o espaço entre a placa e o botão */
+
     /* Começa deslocado para a direita, dentro do container escondido */
     transform: translateX(100%);
     /* Transição suave para a posição final */
@@ -1672,4 +1681,4 @@ input[type='number'] {
     }
 }
 
-/* ========== FIM: Estilos da Plaquinha da Marrie (Versão 3) ========== */
+/* ========== FIM: Estilos da Plaquinha da Marrie (Versão Final Refinada) ========== */
