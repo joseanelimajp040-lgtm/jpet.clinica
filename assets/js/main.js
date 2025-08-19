@@ -92,33 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.loggedInUser) {
                 const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
                 const firstName = fullName.split(' ')[0]; 
-                                <div class="user-menu-container">
-placeholder.innerHTML = `
-    <div class="user-menu-container">
-        <div class="flex items-center justify-between bg-secondary text-white rounded-full pl-3 pr-1 py-1 cursor-pointer">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-user-check"></i>
-                <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
-            </div>
-            <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 ml-2 z-20">Sair</button>
-        </div>
-        <div class="user-menu-dropdown">
-            <a href="#" class="user-menu-item">
-                <i class="fas fa-receipt"></i>
-                <span>Meus Pedidos</span>
-            </a>
-            <a href="#" class="user-menu-item">
-                <i class="fas fa-truck-fast"></i>
-                <span>Acompanhe sua entrega</span>
-            </a>
-            <a href="#" class="user-menu-item">
-                <i class="fas fa-history"></i>
-                <span>Últimos itens vistos</span>
-            </a>
-        </div>
-    </div>`; // <-- O erro principal estava aqui! Faltava este acento grave para fechar.
-                        </div>
-                    </div>`;
+
                 placeholder.innerHTML = `
                     <div class="flex items-center justify-between bg-secondary text-white rounded-full pl-3 pr-1 py-1">
                         <div class="flex items-center space-x-2">
@@ -718,9 +692,6 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
-
-
-
 
 
 
