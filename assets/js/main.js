@@ -319,6 +319,7 @@ Aguardamos vocês! 🐾
                 };
                 state.appointments.push(newAppointment);
                 save.appointments();
+                sendWhatsAppNotifications(newAppointment, state.loggedInUser.email);
                 document.getElementById('booking-modal').style.display = 'none';
                 showAnimation('success-animation-overlay', 1500);
                 renderCalendar();
@@ -762,6 +763,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
