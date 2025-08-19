@@ -131,8 +131,9 @@ if (state.loggedInUser) {
             <i class="fas fa-user"></i>
             <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
         </a>`;
+     }
+ });
 }
-
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -714,6 +715,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
