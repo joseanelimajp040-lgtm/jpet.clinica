@@ -257,7 +257,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- MANIPULADORES DE EVENTOS DE AUTENTICAÇÃO (FIREBASE) ---
-    function handleCreateAccount(event) {
+  
+function handleSocialLogin(providerName) {
+    const errorEl = document.getElementById('login-error');
+    if (errorEl) errorEl.classList.add('hidden');
+
+    let provider;
+    if (providerName === 'google') {
+        provider = new firebase.auth.GoogleAuthProvider();
+    } else if (providerName === 'apple') {
+        provider = new firebase.auth.OAuthProvider('apple.com');
+        provider.addScope('email');
+        provider.addScope('name');
+    } else {
+        console.error('Provider não suportado:', providerName);
+        return;
+    }
+
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            const additionalUserInfo = result.additionalUserInfo;
+
+            // Se for um novo usuário, cria o documento no Firestore
+            if (additionalUserInfo.isNewUser) {
+                console.log('Novo usuário via login social, criando registro no Firestore...');
+                return db.collection('users').doc(user.uid).set({
+                    name: user.displayName,
+                    email: user.email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    loadPage('home'); // Redireciona para home após criar o registro
+                });
+            } else {
+                console.log('Usuário existente logado via login social.');
+                loadPage('home'); // Redireciona para home para usuários existentes
+            }
+        })
+        .catch((error) => {
+            console.error("Erro no login social:", error);
+            const currentErrorEl = document.getElementById('login-error');
+            if (!currentErrorEl) return; // Se saiu da página de login, não faz nada
+
+            let errorMessage = "Ocorreu um erro ao tentar entrar. Tente novamente.";
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                errorMessage = "Já existe uma conta com este e-mail. Tente entrar com o método original.";
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                // Não mostra erro se o usuário simplesmente fechou a janela
+                return; 
+            }
+            currentErrorEl.textContent = errorMessage;
+            currentErrorEl.classList.remove('hidden');
+        });
+}
+ function handleCreateAccount(event) {
         event.preventDefault();
         const name = document.getElementById('signup-name').value;
         const email = document.getElementById('signup-email').value;
@@ -637,6 +690,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
