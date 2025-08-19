@@ -89,27 +89,49 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholders.forEach(placeholder => {
             if (!placeholder) return;
 
-            if (state.loggedInUser) {
-                const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-                const firstName = fullName.split(' ')[0]; 
+            // Localize esta parte na função updateLoginStatus() e substitua
+if (state.loggedInUser) {
+    const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    const firstName = fullName.split(' ')[0];
 
-                placeholder.innerHTML = `
-                    <div class="flex items-center justify-between bg-secondary text-white rounded-full pl-3 pr-1 py-1">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-user-check"></i>
-                            <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
-                        </div>
-                        <button class="logout-btn text-xs bg-red-500 hover:bg-red-600 text-white rounded-full px-2 py-1 ml-2">Sair</button>
-                    </div>`;
-            } else {
-                placeholder.innerHTML = `
-                    <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
-                        <i class="fas fa-user"></i>
-                        <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
-                    </a>`;
-            }
-        });
-    }
+    placeholder.innerHTML = `
+        <div class="relative user-menu-container">
+            <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-check"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
+                    <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos">
+                    <i class="fas fa-box-open"></i>
+                    <span>Meus Pedidos</span>
+                </a>
+                <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega">
+                    <i class="fas fa-truck"></i>
+                    <span>Acompanhe sua Entrega</span>
+                </a>
+                <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos">
+                    <i class="fas fa-history"></i>
+                    <span>Últimos Itens Vistos</span>
+                </a>
+                <div class="border-t border-gray-100"></div>
+                <button class="logout-btn user-menu-item text-red-500 w-full text-left">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </div>`;
+
+} else { // O bloco 'else' permanece o mesmo
+    placeholder.innerHTML = `
+        <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
+            <i class="fas fa-user"></i>
+            <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
+        </a>`;
+}
 
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -692,6 +714,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
