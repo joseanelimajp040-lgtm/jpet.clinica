@@ -228,6 +228,53 @@ if (state.loggedInUser) {
             }
         });
     }
+/**
+ * Envia notificações de agendamento via WhatsApp para a clínica e para o cliente.
+ * @param {object} appointmentDetails - Objeto com os detalhes do agendamento.
+ * @param {string} userEmail - O e-mail do usuário logado.
+ */
+function sendWhatsAppNotifications(appointmentDetails, userEmail) {
+    const clinicPhoneNumber = "5583987310195"; // Número da J.A Pet Clínica com código do país
+
+    // Limpa o número de telefone do cliente, removendo caracteres não numéricos
+    const customerPhoneNumber = "55" + appointmentDetails.phoneNumber.replace(/\D/g, '');
+
+    // --- Mensagem para a Clínica ---
+    const messageToClinic = `
+🐾 *Novo Agendamento (Site)!* 🐾
+
+*Cliente:* ${appointmentDetails.tutorName}
+*Pet:* ${appointmentDetails.petName}
+*Data:* ${appointmentDetails.day}
+*Hora:* ${appointmentDetails.time}
+*Contato:* ${appointmentDetails.phoneNumber}
+*E-mail:* ${userEmail}
+    `.trim();
+
+    // --- Mensagem para o Cliente ---
+    const messageToCustomer = `
+Olá, ${appointmentDetails.tutorName}! 👋
+
+Seu agendamento de banho e tosa para o pet *${appointmentDetails.petName}* na J.A Pet Clínica foi pré-confirmado com sucesso! ✅
+
+*Data:* ${appointmentDetails.day}
+*Hora:* ${appointmentDetails.time}
+
+Aguardamos vocês! 🐾
+    `.trim();
+
+    // Codifica as mensagens para serem usadas em uma URL
+    const encodedMessageToClinic = encodeURIComponent(messageToClinic);
+    const encodedMessageToCustomer = encodeURIComponent(messageToCustomer);
+
+    // Cria as URLs do WhatsApp
+    const urlClinic = `https://wa.me/${clinicPhoneNumber}?text=${encodedMessageToClinic}`;
+    const urlCustomer = `https://wa.me/${customerPhoneNumber}?text=${encodedMessageToCustomer}`;
+
+    // Abre as janelas do WhatsApp (aqui o usuário precisa confirmar o envio)
+    window.open(urlClinic, '_blank');
+    window.open(urlCustomer, '_blank');
+}
     function initBanhoTosaEventListeners() {
         const pageContainer = document.getElementById('app-root');
         if (!pageContainer) return;
@@ -715,6 +762,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
