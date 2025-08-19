@@ -487,6 +487,8 @@ function handleSocialLogin(providerName) {
         document.body.addEventListener('click', (e) => {
             if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
             if (e.target.closest('.logout-btn')) handleLogout();
+            if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
+            if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
             if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
             if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
             if (e.target.closest('.remove-from-cart')) {
@@ -690,6 +692,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
