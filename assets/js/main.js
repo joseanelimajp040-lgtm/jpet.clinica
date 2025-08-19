@@ -487,217 +487,203 @@ function handleSocialLogin(providerName) {
     }
 
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-    async function initializeApp() {
-        await Promise.all([
-            loadComponent('components/header.html', 'header-placeholder'),
-            loadComponent('components/footer.html', 'footer-placeholder')
-        ]);
+async function initializeApp() {
+    await Promise.all([
+        loadComponent('components/header.html', 'header-placeholder'),
+        loadComponent('components/footer.html', 'footer-placeholder')
+    ]);
+    
+    document.body.addEventListener('click', (e) => {
+        if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
+        if (e.target.closest('.logout-btn')) handleLogout();
         
-        document.body.addEventListener('click', (e) => {
-            if (e.target.closest('.nav-link')?.dataset.page) { e.preventDefault(); loadPage(e.target.closest('.nav-link').dataset.page); }
-            if (e.target.closest('.logout-btn')) handleLogout();
-            if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
-            if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
-            if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
-            if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
-            if (e.target.closest('.remove-from-cart')) {
-                const productId = e.target.closest('.remove-from-cart').dataset.id;
-                state.cart = state.cart.filter(item => item.id !== productId);
+        if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
+        if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
+
+        if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
+        if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
+        if (e.target.closest('.remove-from-cart')) {
+            const productId = e.target.closest('.remove-from-cart').dataset.id;
+            state.cart = state.cart.filter(item => item.id !== productId);
+            save.cart(); updateCounters(); renderCart();
+        }
+        if (e.target.closest('.quantity-change')) {
+            const btn = e.target.closest('.quantity-change');
+            const productId = btn.dataset.id;
+            const change = parseInt(btn.dataset.change);
+            const item = state.cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity < 1) item.quantity = 1;
                 save.cart(); updateCounters(); renderCart();
             }
-            if (e.target.closest('.quantity-change')) {
-                const btn = e.target.closest('.quantity-change');
-                const productId = btn.dataset.id;
-                const change = parseInt(btn.dataset.change);
-                const item = state.cart.find(item => item.id === productId);
-                if (item) {
-                    item.quantity += change;
-                    if (item.quantity < 1) item.quantity = 1;
-                    save.cart(); updateCounters(); renderCart();
-                }
+        }
+        if (e.target.closest('#clear-cart-btn')) {
+            if (confirm('Tem certeza?')) { showAnimation('clear-cart-animation-overlay', 5800, () => { state.cart = []; save.cart(); updateCounters(); renderCart(); });}
+        }
+        if (e.target.closest('#clear-favorites-btn')) {
+            if (confirm('Tem certeza?')) { showAnimation('unfavorite-animation-overlay', 1500, () => { state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage(); });}
+        }
+        if (e.target.closest('#checkout-btn')) {
+            e.preventDefault();
+            if(state.cart.length === 0) return alert("Seu carrinho está vazio.");
+            if(!state.shipping.neighborhood) {
+                alert("Por favor, selecione uma taxa de entrega.");
+                const shippingModal = document.getElementById('shipping-modal');
+                if (shippingModal) shippingModal.style.display = 'flex';
+                return;
             }
-            if (e.target.closest('#clear-cart-btn')) {
-                if (confirm('Tem certeza?')) { showAnimation('clear-cart-animation-overlay', 5800, () => { state.cart = []; save.cart(); updateCounters(); renderCart(); });}
-            }
-            if (e.target.closest('#clear-favorites-btn')) {
-                if (confirm('Tem certeza?')) { showAnimation('unfavorite-animation-overlay', 1500, () => { state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage(); });}
-            }
-            if (e.target.closest('#checkout-btn')) {
-                e.preventDefault();
-                if(state.cart.length === 0) return alert("Seu carrinho está vazio.");
-                if(!state.shipping.neighborhood) {
-                    alert("Por favor, selecione uma taxa de entrega.");
-                    const shippingModal = document.getElementById('shipping-modal');
-                    if (shippingModal) shippingModal.style.display = 'flex';
-                    return;
-                }
-                loadPage('checkout');
-            }
-            if (e.target.closest('#confirm-purchase-btn')) {
-                alert('Compra confirmada com sucesso! Obrigado.');
-                state.cart = []; state.shipping = { fee: 0, neighborhood: ''};
-                save.cart(); updateCounters(); loadPage('home');
-            }
-        });
+            loadPage('checkout');
+        }
+        if (e.target.closest('#confirm-purchase-btn')) {
+            alert('Compra confirmada com sucesso! Obrigado.');
+            state.cart = []; state.shipping = { fee: 0, neighborhood: ''};
+            save.cart(); updateCounters(); loadPage('home');
+        }
+    });
 
-        document.body.addEventListener('submit', e => {
-            if (e.target.id === 'login-form') handleLogin(e);
-            if (e.target.id === 'create-account-form') handleCreateAccount(e);
-        });
-        
-        document.addEventListener('shippingSelected', (e) => {
-            state.shipping = e.detail;
-            const shippingModal = document.getElementById('shipping-modal');
-            if (shippingModal) shippingModal.style.display = 'none';
-            updateTotals();
-        });
-// ========== INÍCIO: Lógica do Chat da Marrie ==========
-const marrieButton = document.getElementById('marrie-chat-button');
-const marrieWindow = document.getElementById('marrie-chat-window');
-const marrieCloseButton = document.getElementById('marrie-chat-close');
+    document.body.addEventListener('submit', e => {
+        if (e.target.id === 'login-form') handleLogin(e);
+        if (e.target.id === 'create-account-form') handleCreateAccount(e);
+    });
+    
+    document.addEventListener('shippingSelected', (e) => {
+        state.shipping = e.detail;
+        const shippingModal = document.getElementById('shipping-modal');
+        if (shippingModal) shippingModal.style.display = 'none';
+        updateTotals();
+    });
 
-// ========== INÍCIO: Lógica da Plaquinha da Marrie (V3) ==========
-const plaqueContainer = document.getElementById('marrie-plaque-container');
-const marrieButtonForPlaque = document.getElementById('marrie-chat-button');
+    // ========== INÍCIO: Lógica do Chat da Marrie ==========
+    const marrieButton = document.getElementById('marrie-chat-button');
+    const marrieWindow = document.getElementById('marrie-chat-window');
+    const marrieCloseButton = document.getElementById('marrie-chat-close');
 
-if (plaqueContainer && marrieButtonForPlaque) {
-    let plaqueTimer;
+    // ========== INÍCIO: Lógica da Plaquinha da Marrie (V3) ==========
+    const plaqueContainer = document.getElementById('marrie-plaque-container');
+    const marrieButtonForPlaque = document.getElementById('marrie-chat-button');
 
-    // Função para mostrar a placa
-    const showPlaque = () => {
-        plaqueContainer.classList.add('active');
-        // Agenda o desaparecimento automático
-        plaqueTimer = setTimeout(() => {
+    if (plaqueContainer && marrieButtonForPlaque) {
+        let plaqueTimer;
+
+        const showPlaque = () => {
+            plaqueContainer.classList.add('active');
+            plaqueTimer = setTimeout(() => {
+                plaqueContainer.classList.remove('active');
+            }, 20000); 
+        };
+
+        setTimeout(showPlaque, 2000);
+
+        const hidePlaque = () => {
+            clearTimeout(plaqueTimer); 
             plaqueContainer.classList.remove('active');
-        }, 20000); // 20 segundos
-    };
+            marrieButtonForPlaque.removeEventListener('click', hidePlaque);
+        };
 
-    // Mostra a placa 2 segundos depois que a página carrega
-    setTimeout(showPlaque, 2000);
+        marrieButtonForPlaque.addEventListener('click', hidePlaque);
+    }
+    // ========== FIM: Lógica da Plaquinha da Marrie (V3) ==========
 
-    // Função para esconder a placa (se o usuário interagir)
-    const hidePlaque = () => {
-        clearTimeout(plaqueTimer); // Cancela o timer de desaparecimento
-        plaqueContainer.classList.remove('active');
-        // Remove o "ouvinte" para não rodar de novo desnecessariamente
-        marrieButtonForPlaque.removeEventListener('click', hidePlaque);
-    };
+    if (marrieButton && marrieWindow && marrieCloseButton) {
+        marrieButton.addEventListener('click', () => {
+            marrieWindow.classList.toggle('active');
+            
+            if (marrieWindow.classList.contains('active')) {
+                marrieWindow.classList.remove('hidden');
+            } else {
+                setTimeout(() => {
+                    marrieWindow.classList.add('hidden');
+                }, 500); 
+            }
+        });
 
-    // Adiciona o "ouvinte" que esconde a placa ao clicar no botão
-    marrieButtonForPlaque.addEventListener('click', hidePlaque);
-}
-// ========== FIM: Lógica da Plaquinha da Marrie (V3) ==========
-
-if (marrieButton && marrieWindow && marrieCloseButton) {
-    marrieButton.addEventListener('click', () => {
-        // Alterna a classe 'active' para mostrar/esconder a janela com animação
-        marrieWindow.classList.toggle('active');
-        
-        // Remove a classe 'hidden' para garantir que a animação de saída funcione
-        if (marrieWindow.classList.contains('active')) {
-            marrieWindow.classList.remove('hidden');
-        } else {
-            // Adiciona um pequeno atraso antes de esconder para a animação de saída completar
+        marrieCloseButton.addEventListener('click', () => {
+            marrieWindow.classList.remove('active');
             setTimeout(() => {
                 marrieWindow.classList.add('hidden');
-            }, 500); // Deve corresponder à duração da transição no CSS
-        }
-    });
-
-    marrieCloseButton.addEventListener('click', () => {
-        marrieWindow.classList.remove('active');
-        setTimeout(() => {
-            marrieWindow.classList.add('hidden');
-        }, 500);
-    });
-}
-// ========== FIM: Lógica do Chat da Marrie ==========
-
-// ========== INÍCIO: Lógica de Conversa da Marrie ==========
-const chatWindowBody = document.getElementById('marrie-chat-window').querySelector('.overflow-y-auto');
-const chatInput = document.getElementById('marrie-chat-input');
-const chatSendButton = document.getElementById('marrie-chat-send');
-
-// Função para adicionar uma mensagem na tela
-function addChatMessage(message, sender) {
-    // Remove o indicador de "digitando" se ele existir
-    const typingIndicator = chatWindowBody.querySelector('.typing-indicator');
-    if (typingIndicator) {
-        typingIndicator.remove();
-    }
-
-    const messageContainer = document.createElement('div');
-    messageContainer.className = 'chat-message-container';
-    
-    const messageBubble = document.createElement('div');
-    messageBubble.className = `chat-message ${sender}-message`; // sender será 'user' ou 'ai'
-    messageBubble.textContent = message;
-    
-    messageContainer.appendChild(messageBubble);
-    chatWindowBody.appendChild(messageContainer);
-    
-    // Rola para a mensagem mais recente
-    chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
-}
-
-// Função para mostrar o indicador "digitando..."
-function showTypingIndicator() {
-    const indicator = document.createElement('div');
-    indicator.className = 'typing-indicator';
-    indicator.innerHTML = '<span></span><span></span><span></span>';
-    chatWindowBody.appendChild(indicator);
-    chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
-}
-
-// Função principal que envia a mensagem do usuário
-async function handleSendMessage() {
-    const userMessage = chatInput.value.trim();
-    if (!userMessage) return; // Não envia mensagens vazias
-
-    // 1. Mostra a mensagem do usuário na tela
-    addChatMessage(userMessage, 'user');
-    chatInput.value = ''; // Limpa o campo de texto
-
-    // 2. Mostra o indicador "Marrie está digitando..."
-    showTypingIndicator();
-    
-    // 3. Envia a mensagem para o backend e aguarda a resposta
-    try {
-        const response = await fetch('https://jpet-clinica.onrender.com/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: userMessage }),
+            }, 500);
         });
+    }
+    // ========== FIM: Lógica do Chat da Marrie ==========
 
-        if (!response.ok) {
-            throw new Error('A resposta da rede não foi OK.');
+    // ========== INÍCIO: Lógica de Conversa da Marrie ==========
+    const chatWindowBody = document.getElementById('marrie-chat-window').querySelector('.overflow-y-auto');
+    const chatInput = document.getElementById('marrie-chat-input');
+    const chatSendButton = document.getElementById('marrie-chat-send');
+
+    function addChatMessage(message, sender) {
+        const typingIndicator = chatWindowBody.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
         }
 
-        const data = await response.json();
-        const aiResponse = data.reply;
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'chat-message-container';
         
-        // 4. Mostra a resposta da Marrie na tela
-        addChatMessage(aiResponse, 'ai');
-
-    } catch (error) {
-        console.error('Erro ao contatar a Marrie:', error);
-        addChatMessage('Desculpe, estou com um probleminha para me conectar. Tente novamente mais tarde.', 'ai');
+        const messageBubble = document.createElement('div');
+        messageBubble.className = `chat-message ${sender}-message`;
+        messageBubble.textContent = message;
+        
+        messageContainer.appendChild(messageBubble);
+        chatWindowBody.appendChild(messageContainer);
+        
+        chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
     }
+
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.innerHTML = '<span></span><span></span><span></span>';
+        chatWindowBody.appendChild(indicator);
+        chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
+    }
+
+    async function handleSendMessage() {
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        addChatMessage(userMessage, 'user');
+        chatInput.value = '';
+
+        showTypingIndicator();
+        
+        try {
+            const response = await fetch('https://jpet-clinica.onrender.com/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            });
+
+            if (!response.ok) {
+                throw new Error('A resposta da rede não foi OK.');
+            }
+
+            const data = await response.json();
+            const aiResponse = data.reply;
+            
+            addChatMessage(aiResponse, 'ai');
+
+        } catch (error) {
+            console.error('Erro ao contatar a Marrie:', error);
+            addChatMessage('Desculpe, estou com um probleminha para me conectar. Tente novamente mais tarde.', 'ai');
+        }
+    }
+
+    chatSendButton.addEventListener('click', handleSendMessage);
+    chatInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            handleSendMessage();
+        }
+    });
+    // ========== FIM: Lógica de Conversa da Marrie ==========
+    
+    updateCounters();
+    await loadPage('home');
 }
 
-// Adiciona os eventos para o botão de enviar e a tecla Enter
-chatSendButton.addEventListener('click', handleSendMessage);
-chatInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        handleSendMessage();
-    }
-});
-// ========== FIM: Lógica de Conversa da Marrie ==========
-        updateCounters();
-        await loadPage('home');
-    }
-    
-    initializeApp();
+initializeApp();
+
 });
