@@ -439,11 +439,11 @@ function handleSocialLogin(providerName) {
                 }
             }
             
-            if (pageName === 'instalar-ios') {
-                document.body.classList.add('body-has-decorations');
-            } else {
-                document.body.classList.remove('body-has-decorations');
-            }
+           if (pageName === 'instalar-ios' || pageName === 'login') {
+               document.body.classList.add('body-has-decorations');
+           } else {
+               document.body.classList.remove('body-has-decorations');
+           }
             
             switch (pageName) {
                 case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
@@ -692,6 +692,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
