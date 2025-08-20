@@ -1751,3 +1751,115 @@ input[type='number'] {
 }
 
 /* ========== FIM: Menu Dropdown do Usuário ========== */
+
+/* ========== INÍCIO: Estilos do Carrinho Vazio ========== */
+
+.empty-cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: #fdfdfd;
+    border-radius: 0.75rem;
+    border: 2px dashed #e5e7eb; /* gray-200 */
+    width: 100%;
+}
+
+.empty-cart-animation-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 1.5rem;
+}
+
+.empty-cart-main-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 5rem; /* 80px */
+    color: #d1d5db; /* gray-300 */
+    animation: cart-float 3s ease-in-out infinite;
+}
+
+.empty-cart-floating-icon {
+    position: absolute;
+    font-size: 1.5rem; /* 24px */
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+}
+
+.floating-1 {
+    top: 10%;
+    left: 0%;
+    color: #FF6B00; /* text-primary */
+    animation: float-around-1 6s ease-in-out infinite 0s;
+}
+
+.floating-2 {
+    top: 60%;
+    left: 10%;
+    color: #00A8A8; /* text-secondary */
+    animation: float-around-2 7s ease-in-out infinite 0.5s;
+}
+
+.floating-3 {
+    top: 20%;
+    right: 0%;
+    color: #f59e0b; /* amber-500 */
+    animation: float-around-3 5s ease-in-out infinite 1s;
+}
+
+.floating-4 {
+    bottom: 0%;
+    right: 15%;
+    color: #ef4444; /* red-500 */
+    animation: float-around-4 8s ease-in-out infinite 1.5s;
+}
+
+@keyframes cart-float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-12px); }
+}
+
+@keyframes float-around-1 {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25%  { transform: translate(10px, -20px) rotate(15deg) scale(1.1); }
+    50%  { transform: translate(30px, 10px) rotate(0deg) scale(1); }
+    75%  { transform: translate(-10px, 20px) rotate(-15deg) scale(0.9); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+@keyframes float-around-2 {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25%  { transform: translate(-20px, -15px) rotate(-10deg) scale(0.9); }
+    50%  { transform: translate(10px, 25px) rotate(20deg) scale(1.1); }
+    75%  { transform: translate(15px, -10px) rotate(0deg) scale(1); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+@keyframes float-around-3 {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25%  { transform: translate(15px, 25px) rotate(-20deg) scale(1.1); }
+    50%  { transform: translate(-20px, -10px) rotate(5deg) scale(1); }
+    75%  { transform: translate(5px, 0px) rotate(15deg) scale(0.95); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+@keyframes float-around-4 {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25%  { transform: translate(-15px, 10px) rotate(10deg) scale(0.9); }
+    50%  { transform: translate(25px, -15px) rotate(-5deg) scale(1); }
+    75%  { transform: translate(-5px, 5px) rotate(20deg) scale(1.1); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+/* ========== FIM: Estilos do Carrinho Vazio ========== */
