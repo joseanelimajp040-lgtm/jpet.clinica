@@ -479,7 +479,8 @@ function handleSocialLogin(providerName) {
         } catch (error) { console.error(error); }
     }
 
-    async function loadPage(pageName) {
+   async function loadPage(pageName) {
+        managePageStyles(pageName); // <-- ADIÇÃO 1
         loadingOverlay.style.display = 'flex';
         try {
             const response = await fetch(`pages/${pageName}.html`);
@@ -505,9 +506,9 @@ function handleSocialLogin(providerName) {
             }
             
            if (pageName === 'instalar-ios' || pageName === 'login') {
-               document.body.classList.add('body-has-decorations');
+                document.body.classList.add('body-has-decorations');
            } else {
-               document.body.classList.remove('body-has-decorations');
+                document.body.classList.remove('body-has-decorations');
            }
             
             switch (pageName) {
@@ -520,6 +521,7 @@ function handleSocialLogin(providerName) {
                 case 'adocao-gatos': break;
                 case 'como-baixar-app': break;
                 case 'instalar-ios': break;
+                case 'farmacia': break; // <-- ADIÇÃO 2
             }
 
             initPageModals();
@@ -757,6 +759,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
