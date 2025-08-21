@@ -148,35 +148,47 @@ if (state.loggedInUser) {
         updateElementText('checkout-total', formatCurrency(total));
     }
     function renderCart() {
-        const container = document.getElementById('cart-items-container');
-        if (!container) return;
-        container.innerHTML = '';
-       if (state.cart.length === 0) {
-    container.innerHTML = `
-        <div class="empty-cart-container">
-            <div class="empty-cart-animation-wrapper">
-                <i class="fas fa-shopping-cart empty-cart-main-icon"></i>
-                <div class="empty-cart-floating-icon floating-1">
-                    <i class="fas fa-bone"></i>
+    const container = document.getElementById('cart-items-container');
+    if (!container) return;
+    container.innerHTML = ''; // Limpa o container antes de renderizar
+
+    if (state.cart.length === 0) {
+        // --- NOVO CÓDIGO PARA CARRINHO VAZIO ---
+        container.innerHTML = `
+            <div class="empty-cart-container">
+                <div class="empty-cart-animation-wrapper">
+                    <i class="fas fa-shopping-cart empty-cart-main-icon"></i>
+                    <div class="empty-cart-floating-icon floating-1">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                    <div class="empty-cart-floating-icon floating-2">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <div class="empty-cart-floating-icon floating-3">
+                        <i class="fas fa-cat"></i>
+                    </div>
+                     <div class="empty-cart-floating-icon floating-4">
+                        <i class="fas fa-heart"></i>
+                    </div>
                 </div>
-                <div class="empty-cart-floating-icon floating-2">
-                    <i class="fas fa-fish"></i>
-                </div>
-                <div class="empty-cart-floating-icon floating-3">
-                    <i class="fas fa-cat"></i>
-                </div>
-                 <div class="empty-cart-floating-icon floating-4">
-                    <i class="fas fa-heart"></i>
-                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Seu carrinho está vazio!</h2>
+                <p class="text-gray-600 mb-6">Parece que você ainda não adicionou nada. Que tal explorar nossos produtos?</p>
+                <button class="nav-link w-full md:w-auto bg-primary hover:bg-orange-700 text-white py-3 px-8 rounded-lg font-bold transition duration-300 flex items-center justify-center" data-page="home">
+                    <i class="fas fa-search mr-2"></i>
+                    Buscar Produtos
+                </button>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Seu carrinho está vazio!</h2>
-            <p class="text-gray-600 mb-6">Parece que você ainda não adicionou nada. Que tal explorar nossos produtos?</p>
-            <button class="nav-link w-full md:w-auto bg-primary hover:bg-orange-700 text-white py-3 px-8 rounded-lg font-bold transition duration-300 flex items-center justify-center" data-page="home">
-                <i class="fas fa-search mr-2"></i>
-                Buscar Produtos
-            </button>
-        </div>
-    `;
+        `;
+        document.getElementById('clear-cart-btn')?.classList.add('hidden');
+    } else {
+        // --- CÓDIGO ORIGINAL RESTAURADO PARA EXIBIR OS PRODUTOS ---
+        document.getElementById('clear-cart-btn')?.classList.remove('hidden');
+        state.cart.forEach(item => {
+            container.insertAdjacentHTML('beforeend', `<div class="flex flex-col md:flex-row items-center bg-white p-4 rounded-lg shadow-sm gap-4"><img src="${item.image}" alt="${item.name}" class="w-24 h-24 object-contain rounded-md"><div class="flex-1"><h3 class="font-bold text-gray-800">${item.name}</h3><p class="text-sm text-gray-500">Preço: ${formatCurrency(item.price)}</p></div><div class="flex items-center gap-2 border border-black rounded-full px-2"><button class="quantity-change text-lg font-bold text-primary" data-id="${item.id}" data-change="-1">-</button><input type="number" value="${item.quantity}" readonly class="w-12 text-center font-bold bg-transparent"><button class="quantity-change text-lg font-bold text-primary" data-id="${item.id}" data-change="1">+</button></div><div class="font-bold text-gray-800 w-24 text-center">${formatCurrency(item.price * item.quantity)}</div><button class="remove-from-cart text-red-500" data-id="${item.id}"><i class="fas fa-trash-alt"></i></button></div>`);
+        });
+    }
+    updateTotals();
+}
             document.getElementById('clear-cart-btn')?.classList.remove('hidden');
             state.cart.forEach(item => {
                 container.insertAdjacentHTML('beforeend', `<div class="flex flex-col md:flex-row items-center bg-white p-4 rounded-lg shadow-sm gap-4"><img src="${item.image}" alt="${item.name}" class="w-24 h-24 object-contain rounded-md"><div class="flex-1"><h3 class="font-bold text-gray-800">${item.name}</h3><p class="text-sm text-gray-500">Preço: ${formatCurrency(item.price)}</p></div><div class="flex items-center gap-2 border border-black rounded-full px-2"><button class="quantity-change text-lg font-bold text-primary" data-id="${item.id}" data-change="-1">-</button><input type="number" value="${item.quantity}" readonly class="w-12 text-center font-bold bg-transparent"><button class="quantity-change text-lg font-bold text-primary" data-id="${item.id}" data-change="1">+</button></div><div class="font-bold text-gray-800 w-24 text-center">${formatCurrency(item.price * item.quantity)}</div><button class="remove-from-cart text-red-500" data-id="${item.id}"><i class="fas fa-trash-alt"></i></button></div>`);
@@ -737,6 +749,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
