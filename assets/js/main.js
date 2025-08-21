@@ -64,7 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const end = str.substring(str.length - 2);
         return `${start}${'*'.repeat(str.length - 4)}${end}`;
     }
-
+// --- FUNÇÕES DE GERENCIAMENTO DE ESTILO DE PÁGINA (VERSÃO SIMPLES) ---
+function managePageStyles(pageName) {
+    // Adiciona ou remove a classe para a página ocupar a tela inteira
+    if (pageName === 'farmacia') {
+        document.body.classList.add('is-fullpage');
+    } else {
+        document.body.classList.remove('is-fullpage');
+    }
+}
     // --- FUNÇÕES DE RENDERIZAÇÃO E ATUALIZAÇÃO DA UI ---
     function updateCounters() {
         const cartCountEl = document.getElementById('cart-count');
@@ -749,6 +757,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
