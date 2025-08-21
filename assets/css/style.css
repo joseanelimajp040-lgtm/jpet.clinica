@@ -1863,3 +1863,217 @@ input[type='number'] {
 }
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
+
+/* pages-css/farmacia.css */
+
+/* Remove qualquer padding/margin do container principal nesta página */
+#app-root {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+}
+
+.cena-farmacia {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Ocupa 100% da altura do #app-root */
+    background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- Elementos do Cenário --- */
+.chao {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30%;
+    z-index: 1;
+}
+
+.estacionamento {
+    height: 80%;
+    background-color: #777;
+    border-top: 10px solid #666;
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+    padding-top: 20px;
+}
+
+.vaga {
+    width: 150px;
+    height: 90%;
+    border-left: 8px dashed rgba(255, 223, 0, 0.8);
+    border-right: 8px dashed rgba(255, 223, 0, 0.8);
+}
+
+.grama {
+    height: 20%;
+    background-color: #2E8B57;
+}
+
+/* --- O Prédio da Farmácia --- */
+.predio-farmacia {
+    position: relative;
+    width: 550px;
+    height: 420px;
+    background-color: #f8f9fa;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 10px 0px 25px rgba(0,0,0,0.2);
+    z-index: 10;
+    margin-bottom: calc(30% - 15px); /* Alinha com o chão */
+    display: flex;
+    flex-direction: column;
+}
+
+.letreiro {
+    background-color: #FF6B00; /* Cor primária do seu site */
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.letreiro h1 {
+    margin: 0;
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+.cruz-veterinaria {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.entrada {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    gap: 30px;
+    flex-grow: 1;
+}
+
+.porta {
+    width: 120px;
+    height: 200px;
+    background-color: #8B4513;
+    border: 8px solid #654321;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+.porta-conteudo {
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+.porta-conteudo i {
+    font-size: 1.5rem;
+    margin-top: 10px;
+}
+
+.porta:hover {
+    background-color: #A0522D;
+    transform: scale(1.03);
+}
+
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 5px #fff; }
+    50% { text-shadow: 0 0 20px #fff, 0 0 30px #FFD700; }
+}
+
+.janela {
+    width: 130px;
+    height: 130px;
+    background: linear-gradient(45deg, #cce7ff, #e6f2ff);
+    border: 8px solid #f8f9fa;
+    box-shadow: 0 0 0 5px #654321;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.janela-icon {
+    font-size: 4rem;
+    color: #00A8A8;
+    opacity: 0.7;
+}
+
+/* --- Árvores com CSS --- */
+.arvore {
+    position: absolute;
+    z-index: 15;
+    bottom: calc(30% - 15px);
+    transition: transform 0.3s ease;
+}
+.arvore:hover {
+    transform: rotate(2deg);
+}
+
+.arvore-esquerda { left: 18%; }
+.arvore-direita { right: 18%; }
+
+.tronco {
+    width: 30px;
+    height: 120px;
+    background-color: #8B4513;
+    margin: 0 auto;
+    border-radius: 5px 5px 0 0;
+}
+
+.copa {
+    width: 150px;
+    height: 150px;
+    background-color: #228B22;
+    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+    position: relative;
+    bottom: 60px;
+    box-shadow: inset 0 -10px 15px rgba(0,0,0,0.3);
+}
+
+/* --- Nuvens Sutis --- */
+.nuvem {
+    background: white;
+    border-radius: 50px;
+    position: absolute;
+    opacity: 0.9;
+    animation: move-clouds 60s linear infinite;
+}
+.nuvem:before, .nuvem:after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+}
+.nuvem1 { top: 15%; width: 200px; height: 60px; animation-duration: 70s; }
+.nuvem1:before { top: -30px; left: 30px; width: 100px; height: 80px; }
+.nuvem1:after { top: -20px; right: 40px; width: 120px; height: 60px; }
+
+.nuvem2 { top: 25%; width: 150px; height: 45px; animation-duration: 50s; animation-delay: -10s; }
+.nuvem2:before { top: -25px; left: 20px; width: 80px; height: 60px; }
+
+.nuvem3 { top: 10%; width: 250px; height: 70px; animation-duration: 85s; animation-delay: -20s; }
+.nuvem3:after { top: -35px; right: 50px; width: 130px; height: 70px; }
+
+@keyframes move-clouds {
+    from { transform: translateX(-300px); }
+    to { transform: translateX(100vw); }
+}
