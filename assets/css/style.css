@@ -1864,7 +1864,7 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* pages-css/farmacia.css (VERSÃO REALISTA) */
+/* pages-css/farmacia.css (VERSÃO BALCÃO INTERATIVO) */
 
 #app-root {
     padding: 0 !important;
@@ -1872,222 +1872,206 @@ input[type='number'] {
     max-width: 100% !important;
 }
 
-.cena-farmacia-realista {
+.cena-balcao {
     position: relative;
     width: 100%;
     height: 100%;
-    /* CÉU: Gradiente de pôr do sol / anoitecer */
-    background: linear-gradient(to bottom, #0f172a, #312e81, #f59e0b);
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    overflow: hidden;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* EFEITO DE ESTRELAS PISCANDO */
-.estrelas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%; /* Apenas na parte de cima */
-    background: transparent;
-    /* Múltiplas sombras para criar as estrelas */
-    box-shadow: 
-        50px 50px #FFF, 100px 80px #FFF, 200px 30px #FFF, 
-        300px 100px #FFF, 400px 20px #FFF, 500px 90px #FFF,
-        600px 40px #FFF, 700px 120px #FFF, 800px 60px #FFF,
-        900px 20px #FFF, 1000px 70px #FFF, 1100px 100px #FFF,
-        1200px 30px #FFF, 1300px 80px #FFF, 1400px 50px #FFF;
-    animation: piscar 5s infinite ease-in-out;
-}
-@keyframes piscar {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 0.2; }
-}
-
-/* SILHUETA DE CIDADE AO FUNDO */
-.skyline {
-    position: absolute;
-    bottom: 25%; /* Alinhado com o horizonte */
-    width: 100%;
-    height: 20%;
-    background-image: url('https://www.transparentpng.com/thumb/city-skyline/gray-city-skyline-vector-png-3.png');
-    background-size: contain;
-    background-repeat: repeat-x;
-    opacity: 0.3;
-    filter: brightness(0.2);
-}
-
-
-/* PRÉDIO E ESTRUTURA PRINCIPAL */
-.predio-farmacia {
-    position: relative;
-    width: 600px;
-    height: 400px;
-    background-color: #f8fafc; /* Branco um pouco acinzentado */
-    z-index: 10;
-    margin-bottom: 25%; /* Alinhado com o chão */
+    background-color: #f1f5f9; /* Cor de fundo cinza bem clara */
     display: flex;
     flex-direction: column;
-    border-top: 15px solid #e2e8f0;
-}
-
-/* LETREIRO COM EFEITO NEON */
-.letreiro {
-    background-color: #1e293b; /* Fundo escuro para o letreiro */
-    padding: 10px;
-    text-align: center;
-}
-.letreiro h1 {
-    margin: 0;
-    font-size: 2.5em;
-    font-weight: 700;
-    color: #fff;
-    /* Múltiplas sombras para criar o brilho neon */
-    text-shadow: 
-        0 0 5px #ff6b00, 
-        0 0 10px #ff6b00, 
-        0 0 20px #ff6b00, 
-        0 0 40px #ff6b00, 
-        0 0 60px #ff6b00;
-    animation: pulsar-neon 3s infinite ease-in-out;
-}
-@keyframes pulsar-neon {
-    0%, 100% { text-shadow: 0 0 5px #ff6b00, 0 0 10px #ff6b00, 0 0 20px #ff6b00, 0 0 40px #ff6b00; }
-    50% { text-shadow: 0 0 10px #ff6b00, 0 0 20px #ff6b00, 0 0 40px #ff6b00, 0 0 80px #ff6b00; }
-}
-
-.entrada {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px;
-    gap: 30px;
-    flex-grow: 1;
-}
-
-/* JANELAS COM ILUMINAÇÃO INTERNA */
-.janela {
-    width: 200px;
-    height: 250px;
-    border: 10px solid #cbd5e1; /* Moldura da janela */
-    background: linear-gradient(to top, #fef08a, #fde047); /* Gradiente de luz interna */
-    position: relative;
+    justify-content: flex-end; /* Alinha tudo para baixo */
     overflow: hidden;
-    box-shadow: inset 0 0 40px rgba(251, 191, 36, 0.7); /* Brilho interno */
+    font-family: 'Poppins', sans-serif;
+    perspective: 1500px; /* Adiciona perspectiva para o efeito 3D do balcão */
 }
-/* Silhueta de prateleiras dentro da janela */
-.janela::before {
-    content: '';
+
+/* PAREDE E ELEMENTOS DECORATIVOS */
+.parede {
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background: 
-        linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px), /* Linhas horizontais */
-        repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(0,0,0,0.3) 80px, rgba(0,0,0,0.3) 82px);
-}
-
-/* PORTA DE VIDRO */
-.porta {
-    width: 120px;
-    height: 250px;
-    background: rgba(15, 23, 42, 0.7); /* Vidro escuro */
-    border: 10px solid #94a3b8;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
+    height: 75%;
+    background-color: #ffffff;
+    border-bottom: 5px solid #e2e8f0;
     display: flex;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(2px);
-}
-.porta:hover {
-    background: rgba(15, 23, 42, 0.5);
-}
-.porta-conteudo {
-    color: white;
-    font-weight: bold;
-    font-size: 1.2rem;
-    border: 2px solid white;
-    padding: 10px 15px;
+    padding: 0 5%;
 }
 
-/* CHÃO, CALÇADA E ESTACIONAMENTO */
-.chao {
+.logo-parede {
+    font-size: 5rem;
+    font-weight: 700;
+    color: #e2e8f0; /* Cor da sua logo bem clara no fundo */
+    user-select: none;
+}
+
+/* ANIMAÇÃO DOS TEXTOS DINÂMICOS */
+.texto-dinamico-wrapper {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30%;
+    text-align: center;
+}
+.texto-esquerda { left: 5%; }
+.texto-direita { right: 5%; }
+
+.texto-dinamico {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    animation: fadeInOut 9s infinite;
+}
+/* Atraso (delay) para cada palavra não aparecer junto */
+.texto-dinamico:nth-child(1) { animation-delay: 0s; }
+.texto-dinamico:nth-child(2) { animation-delay: 3s; }
+.texto-dinamico:nth-child(3) { animation-delay: 6s; }
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(20px); }
+    15% { opacity: 1; transform: translateY(0); }
+    33% { opacity: 1; transform: translateY(0); }
+    48% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 0; }
+}
+
+
+/* BALCÃO COM EFEITO 3D SUTIL */
+.balcao {
+    position: relative;
+    z-index: 10;
+    height: 40%;
+    width: 100%;
+}
+.frente-balcao {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-top: 2px solid #e2e8f0;
+    /* Faixa laranja com a cor primária do site */
+    border-bottom: 20px solid #FF6B00; 
+    transform: rotateX(15deg);
+    transform-origin: top;
+}
+.topo-balcao {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #e2e8f0;
+    border-bottom: 5px solid #cbd5e1;
+    transform: rotateX(75deg);
+    transform-origin: top;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 150px;
+}
+
+
+/* COMPUTADORES ESTILIZADOS */
+.computador {
+    position: relative;
+    width: 250px;
+    height: 180px;
+    transform: rotateX(-75deg); /* Compensa a rotação do balcão */
+    transform-origin: top;
+    margin-top: -100px; /* Puxa para cima */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tela {
+    width: 100%;
+    height: 160px;
+    background-color: #f8fafc;
+    border: 10px solid #334155; /* Cinza escuro */
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.computador:hover .tela {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.base-monitor {
+    width: 100px;
+    height: 15px;
+    background-color: #475569;
+    position: relative;
+    top: -5px;
+    z-index: -1;
+}
+.base-monitor::after { /* Pé da base */
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #334155;
+}
+
+.teclado {
+    width: 220px;
+    height: 10px;
+    background-color: #94a3b8;
+    border-radius: 3px;
+    position: absolute;
+    bottom: -30px; /* Ajusta a posição em frente ao monitor */
+}
+
+
+/* CONTEÚDO INTERATIVO DA TELA */
+.tela-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #00A8A8; /* Cor secundária do site */
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.tela-link:hover {
+    background-color: #007f7f; /* Tom mais escuro no hover */
+}
+.tela-link i {
+    font-size: 3rem;
+    margin-bottom: 5px;
+}
+.tela-link span {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.tela-link small {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+
+/* CHÃO DA CLÍNICA */
+.chao-clinica {
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 25%;
+    /* Gradiente sutil para dar profundidade */
+    background: linear-gradient(to top, #d1d5db, #e5e7eb);
     z-index: 5;
-}
-.calçada {
-    height: 15%;
-    background-color: #78716c; /* Cor de calçada */
-    border-top: 4px solid #a8a29e;
-    /* Efeito de luz derramando do prédio */
-    position: relative;
-}
-.calçada::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 700px;
-    height: 100px;
-    background: radial-gradient(ellipse at center, rgba(253, 224, 71, 0.3) 0%, rgba(253, 224, 71, 0) 70%);
-}
-
-.estacionamento {
-    height: 85%;
-    background-color: #333;
-    display: flex;
-    justify-content: center;
-    gap: 100px;
-    padding-top: 20px;
-}
-.vaga {
-    width: 150px;
-    height: 90%;
-    border-left: 10px solid rgba(255, 223, 0, 0.7);
-    border-right: 10px solid rgba(255, 223, 0, 0.7);
-}
-
-
-/* POSTES DE LUZ */
-.poste-luz {
-    position: absolute;
-    bottom: 25%;
-    width: 15px;
-    height: 250px;
-    background: linear-gradient(to right, #475569, #1e293b);
-    z-index: 20;
-}
-.poste-esquerda { left: 15%; }
-.poste-direita { right: 15%; }
-/* Lâmpada do poste */
-.poste-luz::before {
-    content: '';
-    position: absolute;
-    top: -15px;
-    left: -12px;
-    width: 40px;
-    height: 25px;
-    border-radius: 5px 5px 0 0;
-    background-color: #fde047;
-    box-shadow: 0 0 25px 10px #fde047;
-}
-/* Luz projetada no chão */
-.poste-luz .luz {
-    position: absolute;
-    bottom: -250px;
-    left: 50%;
-    transform: translateX(-50%) perspective(70px) rotateX(20deg);
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(ellipse at center, rgba(253, 224, 71, 0.4) 0%, rgba(253, 224, 71, 0) 70%);
 }
