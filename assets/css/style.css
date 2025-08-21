@@ -1864,9 +1864,9 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* pages-css/farmacia.css */
+/* pages-css/farmacia.css (VERSÃO APRIMORADA) */
 
-/* Remove qualquer padding/margin do container principal nesta página */
+/* Reseta o container principal para a cena (igual antes) */
 #app-root {
     padding: 0 !important;
     margin: 0 !important;
@@ -1876,8 +1876,9 @@ input[type='number'] {
 .cena-farmacia {
     position: relative;
     width: 100%;
-    height: 100%; /* Ocupa 100% da altura do #app-root */
-    background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 100%);
+    height: 100%;
+    /* MELHORIA: Gradiente no céu para dar profundidade */
+    background: linear-gradient(to bottom, #87CEEB 0%, #d1eefc 100%);
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -1885,7 +1886,35 @@ input[type='number'] {
     font-family: 'Poppins', sans-serif;
 }
 
-/* --- Elementos do Cenário --- */
+/* --- MELHORIA: Nuvens mais realistas e animadas --- */
+.ceu .nuvem {
+    position: absolute;
+    background: #fff;
+    border-radius: 100px;
+    opacity: 0.9;
+    animation: moverNuvens 80s linear infinite;
+}
+.ceu .nuvem:before, .ceu .nuvem:after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    width: 100px;
+    height: 80px;
+    border-radius: 50%;
+}
+.ceu .nuvem:before { top: -45px; left: 15px; }
+.ceu .nuvem:after { top: -25px; right: 25px; width: 120px; height: 70px; }
+
+.nuvem1 { top: 15%; left: -250px; width: 200px; height: 60px; animation-duration: 75s; }
+.nuvem2 { top: 25%; left: -350px; width: 150px; height: 45px; animation-duration: 90s; animation-delay: -15s; }
+.nuvem3 { top: 10%; left: -450px; width: 250px; height: 70px; animation-duration: 60s; animation-delay: -25s; }
+
+@keyframes moverNuvens {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 500px)); }
+}
+
+/* --- Chão e Estacionamento com mais detalhes --- */
 .chao {
     position: absolute;
     bottom: 0;
@@ -1896,8 +1925,10 @@ input[type='number'] {
 
 .estacionamento {
     height: 80%;
-    background-color: #777;
-    border-top: 10px solid #666;
+    /* MELHORIA: Textura sutil de asfalto */
+    background-color: #4a4a4a;
+    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%237a7a7a' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+    border-top: 10px solid #333;
     display: flex;
     justify-content: center;
     gap: 100px;
@@ -1907,51 +1938,74 @@ input[type='number'] {
 .vaga {
     width: 150px;
     height: 90%;
-    border-left: 8px dashed rgba(255, 223, 0, 0.8);
-    border-right: 8px dashed rgba(255, 223, 0, 0.8);
+    border-left: 10px solid rgba(255, 223, 0, 0.9);
+    border-right: 10px solid rgba(255, 223, 0, 0.9);
 }
 
 .grama {
     height: 20%;
-    background-color: #2E8B57;
+    /* MELHORIA: Gradiente sutil na grama */
+    background: linear-gradient(to bottom, #3CB371, #2E8B57);
 }
 
-/* --- O Prédio da Farmácia --- */
+
+/* --- Prédio da Farmácia com mais detalhes e profundidade --- */
 .predio-farmacia {
     position: relative;
     width: 550px;
     height: 420px;
     background-color: #f8f9fa;
     border-radius: 10px 10px 0 0;
-    box-shadow: 10px 0px 25px rgba(0,0,0,0.2);
+    /* MELHORIA: Sombra mais suave para efeito de profundidade */
+    box-shadow: 10px 0px 35px rgba(0,0,0,0.25);
     z-index: 10;
-    margin-bottom: calc(30% - 15px); /* Alinha com o chão */
+    margin-bottom: calc(30% - 15px);
     display: flex;
     flex-direction: column;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    transition: transform 0.3s ease;
+}
+.predio-farmacia:hover {
+    transform: translateY(-5px);
 }
 
 .letreiro {
-    background-color: #FF6B00; /* Cor primária do seu site */
+    background-color: #FF6B00;
     color: white;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
-    border-radius: 10px 10px 0 0;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-
-.letreiro h1 {
-    margin: 0;
-    font-size: 2.2em;
+    border-radius: 8px 8px 0 0;
+    /* MELHORIA: Sombra no texto para destaque */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.25);
     font-weight: 700;
+    font-size: 1.2em;
+    position: relative;
+    border-bottom: 5px solid #d95c00;
 }
 
 .cruz-veterinaria {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: 10px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    color: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.8em;
     font-weight: bold;
-    color: white;
+    box-shadow: 0 0 15px #22c55e;
+    /* MELHORIA: Animação de pulsação na cruz */
+    animation: pulsarCruz 2.5s infinite ease-in-out;
+}
+
+@keyframes pulsarCruz {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #22c55e; }
+    50% { transform: scale(1.1); box-shadow: 0 0 25px #22c55e; }
 }
 
 .entrada {
@@ -1963,117 +2017,129 @@ input[type='number'] {
     flex-grow: 1;
 }
 
+/* --- MELHORIA: Porta com mais detalhes --- */
 .porta {
     width: 120px;
     height: 200px;
-    background-color: #8B4513;
+    background: linear-gradient(to right, #8B4513, #a05a2c);
     border: 8px solid #654321;
     border-radius: 5px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    position: relative; /* Para a maçaneta */
 }
 .porta-conteudo {
     color: white;
     font-weight: bold;
     font-size: 1.2rem;
     text-align: center;
-    animation: pulse-glow 2s infinite ease-in-out;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    transition: text-shadow 0.3s ease;
 }
-.porta-conteudo i {
-    font-size: 1.5rem;
-    margin-top: 10px;
-}
-
+.porta-conteudo i { font-size: 1.5rem; margin-top: 10px; }
 .porta:hover {
-    background-color: #A0522D;
+    background: linear-gradient(to right, #a05a2c, #b36b3f);
     transform: scale(1.03);
 }
-
-@keyframes pulse-glow {
-    0%, 100% { text-shadow: 0 0 5px #fff; }
-    50% { text-shadow: 0 0 20px #fff, 0 0 30px #FFD700; }
+.porta:hover .porta-conteudo {
+    text-shadow: 0 0 15px #fff, 0 0 20px #FFD700;
+}
+/* MELHORIA: Maçaneta na porta */
+.porta::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 95px;
+    width: 10px;
+    height: 10px;
+    background-color: #FFD700;
+    border-radius: 50%;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
+/* --- MELHORIA: Janelas com Toldos e reflexo --- */
 .janela {
     width: 130px;
     height: 130px;
-    background: linear-gradient(45deg, #cce7ff, #e6f2ff);
+    background-color: #e0f7fa;
     border: 8px solid #f8f9fa;
-    box-shadow: 0 0 0 5px #654321;
+    box-shadow: 0 0 0 5px #654321, inset 0 0 15px rgba(0,0,0,0.1);
     border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; /* Para o Toldo */
+    overflow: hidden; /* Para o reflexo */
+}
+/* Efeito de reflexo de vidro */
+.janela::before {
+    content: '';
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    width: 400%;
+    height: 400%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.3), rgba(255,255,255,0) 50%);
+    transform: rotate(45deg);
+}
+/* Toldo acima da janela */
+.janela::after {
+    content: '';
+    position: absolute;
+    top: -13px;
+    left: -13px;
+    width: calc(100% + 26px);
+    height: 30px;
+    background: repeating-linear-gradient(45deg, #FF6B00, #FF6B00 15px, white 15px, white 30px);
+    border-bottom: 5px solid #d95c00;
+    border-radius: 5px 5px 0 0;
 }
 .janela-icon {
     font-size: 4rem;
     color: #00A8A8;
-    opacity: 0.7;
+    z-index: 5; /* Para ficar acima do reflexo */
+    transition: transform 0.3s ease;
+}
+.janela:hover .janela-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
-/* --- Árvores com CSS --- */
+/* --- Árvores com mais detalhes e animação --- */
 .arvore {
     position: absolute;
     z-index: 15;
     bottom: calc(30% - 15px);
-    transition: transform 0.3s ease;
 }
-.arvore:hover {
-    transform: rotate(2deg);
-}
-
 .arvore-esquerda { left: 18%; }
 .arvore-direita { right: 18%; }
-
 .tronco {
     width: 30px;
     height: 120px;
-    background-color: #8B4513;
+    background: linear-gradient(to right, #8B4513, #733a10);
     margin: 0 auto;
     border-radius: 5px 5px 0 0;
 }
-
 .copa {
     width: 150px;
     height: 150px;
-    background-color: #228B22;
-    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+    background: #2E8B57;
+    border-radius: 50%;
     position: relative;
     bottom: 60px;
-    box-shadow: inset 0 -10px 15px rgba(0,0,0,0.3);
+    box-shadow: inset 0 -15px 20px rgba(0,0,0,0.3);
+    transition: transform 0.5s ease;
+    /* MELHORIA: Animação de vento sutil */
+    animation: balancoVento 10s infinite ease-in-out;
 }
-
-/* --- Nuvens Sutis --- */
-.nuvem {
-    background: white;
-    border-radius: 50px;
-    position: absolute;
-    opacity: 0.9;
-    animation: move-clouds 60s linear infinite;
+.arvore-direita .copa {
+    animation-delay: -5s; /* Para não balançarem em sincronia */
 }
-.nuvem:before, .nuvem:after {
-    content: '';
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-}
-.nuvem1 { top: 15%; width: 200px; height: 60px; animation-duration: 70s; }
-.nuvem1:before { top: -30px; left: 30px; width: 100px; height: 80px; }
-.nuvem1:after { top: -20px; right: 40px; width: 120px; height: 60px; }
-
-.nuvem2 { top: 25%; width: 150px; height: 45px; animation-duration: 50s; animation-delay: -10s; }
-.nuvem2:before { top: -25px; left: 20px; width: 80px; height: 60px; }
-
-.nuvem3 { top: 10%; width: 250px; height: 70px; animation-duration: 85s; animation-delay: -20s; }
-.nuvem3:after { top: -35px; right: 50px; width: 130px; height: 70px; }
-
-@keyframes move-clouds {
-    from { transform: translateX(-300px); }
-    to { transform: translateX(100vw); }
+@keyframes balancoVento {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(2deg); }
 }
