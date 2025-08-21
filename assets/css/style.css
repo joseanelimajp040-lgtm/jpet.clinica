@@ -1864,21 +1864,20 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* pages-css/farmacia.css (VERSÃO APRIMORADA) */
+/* pages-css/farmacia.css (VERSÃO REALISTA) */
 
-/* Reseta o container principal para a cena (igual antes) */
 #app-root {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
 }
 
-.cena-farmacia {
+.cena-farmacia-realista {
     position: relative;
     width: 100%;
     height: 100%;
-    /* MELHORIA: Gradiente no céu para dar profundidade */
-    background: linear-gradient(to bottom, #87CEEB 0%, #d1eefc 100%);
+    /* CÉU: Gradiente de pôr do sol / anoitecer */
+    background: linear-gradient(to bottom, #0f172a, #312e81, #f59e0b);
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -1886,260 +1885,209 @@ input[type='number'] {
     font-family: 'Poppins', sans-serif;
 }
 
-/* --- MELHORIA: Nuvens mais realistas e animadas --- */
-.ceu .nuvem {
+/* EFEITO DE ESTRELAS PISCANDO */
+.estrelas {
     position: absolute;
-    background: #fff;
-    border-radius: 100px;
-    opacity: 0.9;
-    animation: moverNuvens 80s linear infinite;
-}
-.ceu .nuvem:before, .ceu .nuvem:after {
-    content: '';
-    position: absolute;
-    background: #fff;
-    width: 100px;
-    height: 80px;
-    border-radius: 50%;
-}
-.ceu .nuvem:before { top: -45px; left: 15px; }
-.ceu .nuvem:after { top: -25px; right: 25px; width: 120px; height: 70px; }
-
-.nuvem1 { top: 15%; left: -250px; width: 200px; height: 60px; animation-duration: 75s; }
-.nuvem2 { top: 25%; left: -350px; width: 150px; height: 45px; animation-duration: 90s; animation-delay: -15s; }
-.nuvem3 { top: 10%; left: -450px; width: 250px; height: 70px; animation-duration: 60s; animation-delay: -25s; }
-
-@keyframes moverNuvens {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(100vw + 500px)); }
-}
-
-/* --- Chão e Estacionamento com mais detalhes --- */
-.chao {
-    position: absolute;
-    bottom: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 30%;
-    z-index: 1;
+    height: 50%; /* Apenas na parte de cima */
+    background: transparent;
+    /* Múltiplas sombras para criar as estrelas */
+    box-shadow: 
+        50px 50px #FFF, 100px 80px #FFF, 200px 30px #FFF, 
+        300px 100px #FFF, 400px 20px #FFF, 500px 90px #FFF,
+        600px 40px #FFF, 700px 120px #FFF, 800px 60px #FFF,
+        900px 20px #FFF, 1000px 70px #FFF, 1100px 100px #FFF,
+        1200px 30px #FFF, 1300px 80px #FFF, 1400px 50px #FFF;
+    animation: piscar 5s infinite ease-in-out;
+}
+@keyframes piscar {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0.2; }
 }
 
-.estacionamento {
-    height: 80%;
-    /* MELHORIA: Textura sutil de asfalto */
-    background-color: #4a4a4a;
-    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%237a7a7a' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
-    border-top: 10px solid #333;
-    display: flex;
-    justify-content: center;
-    gap: 100px;
-    padding-top: 20px;
-}
-
-.vaga {
-    width: 150px;
-    height: 90%;
-    border-left: 10px solid rgba(255, 223, 0, 0.9);
-    border-right: 10px solid rgba(255, 223, 0, 0.9);
-}
-
-.grama {
+/* SILHUETA DE CIDADE AO FUNDO */
+.skyline {
+    position: absolute;
+    bottom: 25%; /* Alinhado com o horizonte */
+    width: 100%;
     height: 20%;
-    /* MELHORIA: Gradiente sutil na grama */
-    background: linear-gradient(to bottom, #3CB371, #2E8B57);
+    background-image: url('https://www.transparentpng.com/thumb/city-skyline/gray-city-skyline-vector-png-3.png');
+    background-size: contain;
+    background-repeat: repeat-x;
+    opacity: 0.3;
+    filter: brightness(0.2);
 }
 
 
-/* --- Prédio da Farmácia com mais detalhes e profundidade --- */
+/* PRÉDIO E ESTRUTURA PRINCIPAL */
 .predio-farmacia {
     position: relative;
-    width: 550px;
-    height: 420px;
-    background-color: #f8f9fa;
-    border-radius: 10px 10px 0 0;
-    /* MELHORIA: Sombra mais suave para efeito de profundidade */
-    box-shadow: 10px 0px 35px rgba(0,0,0,0.25);
+    width: 600px;
+    height: 400px;
+    background-color: #f8fafc; /* Branco um pouco acinzentado */
     z-index: 10;
-    margin-bottom: calc(30% - 15px);
+    margin-bottom: 25%; /* Alinhado com o chão */
     display: flex;
     flex-direction: column;
-    border: 1px solid #ddd;
-    border-bottom: none;
-    transition: transform 0.3s ease;
-}
-.predio-farmacia:hover {
-    transform: translateY(-5px);
+    border-top: 15px solid #e2e8f0;
 }
 
+/* LETREIRO COM EFEITO NEON */
 .letreiro {
-    background-color: #FF6B00;
-    color: white;
-    padding: 15px;
+    background-color: #1e293b; /* Fundo escuro para o letreiro */
+    padding: 10px;
     text-align: center;
-    border-radius: 8px 8px 0 0;
-    /* MELHORIA: Sombra no texto para destaque */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+}
+.letreiro h1 {
+    margin: 0;
+    font-size: 2.5em;
     font-weight: 700;
-    font-size: 1.2em;
-    position: relative;
-    border-bottom: 5px solid #d95c00;
+    color: #fff;
+    /* Múltiplas sombras para criar o brilho neon */
+    text-shadow: 
+        0 0 5px #ff6b00, 
+        0 0 10px #ff6b00, 
+        0 0 20px #ff6b00, 
+        0 0 40px #ff6b00, 
+        0 0 60px #ff6b00;
+    animation: pulsar-neon 3s infinite ease-in-out;
 }
-
-.cruz-veterinaria {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
-    background: white;
-    color: #22c55e;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8em;
-    font-weight: bold;
-    box-shadow: 0 0 15px #22c55e;
-    /* MELHORIA: Animação de pulsação na cruz */
-    animation: pulsarCruz 2.5s infinite ease-in-out;
-}
-
-@keyframes pulsarCruz {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #22c55e; }
-    50% { transform: scale(1.1); box-shadow: 0 0 25px #22c55e; }
+@keyframes pulsar-neon {
+    0%, 100% { text-shadow: 0 0 5px #ff6b00, 0 0 10px #ff6b00, 0 0 20px #ff6b00, 0 0 40px #ff6b00; }
+    50% { text-shadow: 0 0 10px #ff6b00, 0 0 20px #ff6b00, 0 0 40px #ff6b00, 0 0 80px #ff6b00; }
 }
 
 .entrada {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 30px;
     gap: 30px;
     flex-grow: 1;
 }
 
-/* --- MELHORIA: Porta com mais detalhes --- */
+/* JANELAS COM ILUMINAÇÃO INTERNA */
+.janela {
+    width: 200px;
+    height: 250px;
+    border: 10px solid #cbd5e1; /* Moldura da janela */
+    background: linear-gradient(to top, #fef08a, #fde047); /* Gradiente de luz interna */
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(251, 191, 36, 0.7); /* Brilho interno */
+}
+/* Silhueta de prateleiras dentro da janela */
+.janela::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px), /* Linhas horizontais */
+        repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(0,0,0,0.3) 80px, rgba(0,0,0,0.3) 82px);
+}
+
+/* PORTA DE VIDRO */
 .porta {
     width: 120px;
-    height: 200px;
-    background: linear-gradient(to right, #8B4513, #a05a2c);
-    border: 8px solid #654321;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 250px;
+    background: rgba(15, 23, 42, 0.7); /* Vidro escuro */
+    border: 10px solid #94a3b8;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-    position: relative; /* Para a maçaneta */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+.porta:hover {
+    background: rgba(15, 23, 42, 0.5);
 }
 .porta-conteudo {
     color: white;
     font-weight: bold;
     font-size: 1.2rem;
-    text-align: center;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    transition: text-shadow 0.3s ease;
-}
-.porta-conteudo i { font-size: 1.5rem; margin-top: 10px; }
-.porta:hover {
-    background: linear-gradient(to right, #a05a2c, #b36b3f);
-    transform: scale(1.03);
-}
-.porta:hover .porta-conteudo {
-    text-shadow: 0 0 15px #fff, 0 0 20px #FFD700;
-}
-/* MELHORIA: Maçaneta na porta */
-.porta::after {
-    content: '';
-    position: absolute;
-    right: 10px;
-    top: 95px;
-    width: 10px;
-    height: 10px;
-    background-color: #FFD700;
-    border-radius: 50%;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    border: 2px solid white;
+    padding: 10px 15px;
 }
 
-/* --- MELHORIA: Janelas com Toldos e reflexo --- */
-.janela {
-    width: 130px;
-    height: 130px;
-    background-color: #e0f7fa;
-    border: 8px solid #f8f9fa;
-    box-shadow: 0 0 0 5px #654321, inset 0 0 15px rgba(0,0,0,0.1);
-    border-radius: 5px;
+/* CHÃO, CALÇADA E ESTACIONAMENTO */
+.chao {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 25%;
+    z-index: 5;
+}
+.calçada {
+    height: 15%;
+    background-color: #78716c; /* Cor de calçada */
+    border-top: 4px solid #a8a29e;
+    /* Efeito de luz derramando do prédio */
+    position: relative;
+}
+.calçada::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 100px;
+    background: radial-gradient(ellipse at center, rgba(253, 224, 71, 0.3) 0%, rgba(253, 224, 71, 0) 70%);
+}
+
+.estacionamento {
+    height: 85%;
+    background-color: #333;
     display: flex;
-    align-items: center;
     justify-content: center;
-    position: relative; /* Para o Toldo */
-    overflow: hidden; /* Para o reflexo */
+    gap: 100px;
+    padding-top: 20px;
 }
-/* Efeito de reflexo de vidro */
-.janela::before {
-    content: '';
-    position: absolute;
-    top: -150%;
-    left: -150%;
-    width: 400%;
-    height: 400%;
-    background: linear-gradient(to bottom right, rgba(255,255,255,0.3), rgba(255,255,255,0) 50%);
-    transform: rotate(45deg);
-}
-/* Toldo acima da janela */
-.janela::after {
-    content: '';
-    position: absolute;
-    top: -13px;
-    left: -13px;
-    width: calc(100% + 26px);
-    height: 30px;
-    background: repeating-linear-gradient(45deg, #FF6B00, #FF6B00 15px, white 15px, white 30px);
-    border-bottom: 5px solid #d95c00;
-    border-radius: 5px 5px 0 0;
-}
-.janela-icon {
-    font-size: 4rem;
-    color: #00A8A8;
-    z-index: 5; /* Para ficar acima do reflexo */
-    transition: transform 0.3s ease;
-}
-.janela:hover .janela-icon {
-    transform: scale(1.1) rotate(5deg);
+.vaga {
+    width: 150px;
+    height: 90%;
+    border-left: 10px solid rgba(255, 223, 0, 0.7);
+    border-right: 10px solid rgba(255, 223, 0, 0.7);
 }
 
-/* --- Árvores com mais detalhes e animação --- */
-.arvore {
+
+/* POSTES DE LUZ */
+.poste-luz {
     position: absolute;
-    z-index: 15;
-    bottom: calc(30% - 15px);
+    bottom: 25%;
+    width: 15px;
+    height: 250px;
+    background: linear-gradient(to right, #475569, #1e293b);
+    z-index: 20;
 }
-.arvore-esquerda { left: 18%; }
-.arvore-direita { right: 18%; }
-.tronco {
-    width: 30px;
-    height: 120px;
-    background: linear-gradient(to right, #8B4513, #733a10);
-    margin: 0 auto;
+.poste-esquerda { left: 15%; }
+.poste-direita { right: 15%; }
+/* Lâmpada do poste */
+.poste-luz::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -12px;
+    width: 40px;
+    height: 25px;
     border-radius: 5px 5px 0 0;
+    background-color: #fde047;
+    box-shadow: 0 0 25px 10px #fde047;
 }
-.copa {
+/* Luz projetada no chão */
+.poste-luz .luz {
+    position: absolute;
+    bottom: -250px;
+    left: 50%;
+    transform: translateX(-50%) perspective(70px) rotateX(20deg);
     width: 150px;
     height: 150px;
-    background: #2E8B57;
-    border-radius: 50%;
-    position: relative;
-    bottom: 60px;
-    box-shadow: inset 0 -15px 20px rgba(0,0,0,0.3);
-    transition: transform 0.5s ease;
-    /* MELHORIA: Animação de vento sutil */
-    animation: balancoVento 10s infinite ease-in-out;
-}
-.arvore-direita .copa {
-    animation-delay: -5s; /* Para não balançarem em sincronia */
-}
-@keyframes balancoVento {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(2deg); }
+    background: radial-gradient(ellipse at center, rgba(253, 224, 71, 0.4) 0%, rgba(253, 224, 71, 0) 70%);
 }
