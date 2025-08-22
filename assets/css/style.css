@@ -1864,50 +1864,47 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* farmacia.css (VERSÃO FARMÁCIA DIGITAL - TEMA CLARO) */
+/* farmacia.css (VERSÃO COM ESCOPO CORRIGIDO E DEFINITIVO) */
 :root {
-    /* Paleta de Cores (Invertida para Tema Claro) */
+    /* Paleta de Cores (Tema Claro) */
     --primary-color: #FF6B00;
     --secondary-color: #00A8A8;
-    --light-bg: #f8fafc;      /* Fundo principal branco/cinza claro */
-    --card-bg: #ffffff;       /* Fundo dos cards branco */
-    --border-color: #e2e8f0;   /* Cor da borda cinza claro */
-    --text-primary: #1e293b;   /* Texto principal preto/cinza escuro */
-    --text-secondary: #64748b; /* Texto secundário cinza médio */
+    --light-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
 }
 
-/* --- Container Principal (JÁ CORRIGIDO PARA NÃO AFETAR OUTRAS PÁGINAS) --- */
+/* --- Container Principal --- */
 .farmacia-digital-container {
     background-color: var(--light-bg);
     padding: 60px 20px;
     font-family: 'Poppins', sans-serif;
     color: var(--text-primary);
     animation: fadeIn 1s ease-out;
-    min-height: 90vh; /* Garante que a página tenha uma altura mínima */
+    min-height: 90vh;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* --- Seções --- */
-section {
+/* --- Seções (AGORA COM ESCOPO CORRETO) --- */
+.farmacia-digital-container section {
     max-width: 1200px;
     margin: 0 auto 80px auto;
 }
 
 /* --- 1. Cabeçalho --- */
-.farmacia-header {
+.farmacia-digital-container .farmacia-header {
     text-align: center;
     margin-bottom: 60px;
 }
-.farmacia-header h1 {
+.farmacia-digital-container .farmacia-header h1 {
     font-size: 2.8rem;
     font-weight: 700;
-    color: var(--text-primary); /* Cor sólida para melhor leitura no fundo branco */
+    color: var(--text-primary);
     margin-bottom: 1rem;
 }
-.farmacia-header h1 span { /* Destaque com a cor primária */
-    color: var(--primary-color);
-}
-.farmacia-header p {
+.farmacia-digital-container .farmacia-header p {
     font-size: 1.1rem;
     color: var(--text-secondary);
     max-width: 700px;
@@ -1915,12 +1912,12 @@ section {
 }
 
 /* --- 2. Painéis Informativos --- */
-.info-grid {
+.farmacia-digital-container .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
 }
-.info-card {
+.farmacia-digital-container .info-card {
     background-color: var(--card-bg);
     padding: 30px;
     border-radius: 15px;
@@ -1929,28 +1926,28 @@ section {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-.info-card:hover {
+.farmacia-digital-container .info-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.07);
 }
-.info-card i {
+.farmacia-digital-container .info-card i {
     font-size: 2.5rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
 }
-.info-card h3 {
+.farmacia-digital-container .info-card h3 {
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
 }
-.info-card p {
+.farmacia-digital-container .info-card p {
     color: var(--text-secondary);
     font-size: 0.9rem;
     line-height: 1.6;
 }
 
 /* --- 3. Produto em Destaque --- */
-.produto-destaque {
+.farmacia-digital-container .produto-destaque {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
@@ -1961,22 +1958,19 @@ section {
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-.destaque-imagem {
+.farmacia-digital-container .destaque-imagem {
     position: relative;
     background-color: white;
     border-radius: 15px;
     overflow: hidden;
     padding: 20px;
 }
-.destaque-imagem img {
+.farmacia-digital-container .destaque-imagem img {
     width: 100%;
     height: auto;
     display: block;
-    /* mix-blend-mode é para fundos escuros, removemos para o branco */
 }
-.scanline { display: none; } /* Scanline não faz sentido no tema claro */
-
-.destaque-tag {
+.farmacia-digital-container .destaque-tag {
     display: inline-block;
     background-color: var(--secondary-color);
     color: white;
@@ -1986,19 +1980,19 @@ section {
     font-weight: 600;
     margin-bottom: 1rem;
 }
-.destaque-info h2 {
+.farmacia-digital-container .destaque-info h2 {
     font-size: 2.2rem;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 1rem;
 }
-.destaque-info p {
+.farmacia-digital-container .destaque-info p {
     font-size: 1rem;
     color: var(--text-secondary);
     line-height: 1.8;
     margin-bottom: 2rem;
 }
-.destaque-botao {
+.farmacia-digital-container .destaque-botao {
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -2012,14 +2006,14 @@ section {
     text-decoration: none;
     transition: all 0.3s ease;
 }
-.destaque-botao:hover {
+.farmacia-digital-container .destaque-botao:hover {
     background-color: var(--text-primary);
     color: white;
     transform: scale(1.05);
 }
 
-/* --- 4. Seção "Navegue por Categorias" (TEMA CLARO) --- */
-.categories-title {
+/* --- 4. Seção "Navegue por Categorias" --- */
+.farmacia-digital-container .categories-title {
     text-align: center;
     font-size: 28px;
     color: var(--text-primary);
@@ -2029,9 +2023,9 @@ section {
     justify-content: center;
     gap: 10px;
 }
-.categories-title i { color: var(--primary-color); }
-.categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.medicine-card {
+.farmacia-digital-container .categories-title i { color: var(--primary-color); }
+.farmacia-digital-container .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.farmacia-digital-container .medicine-card {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
@@ -2043,19 +2037,19 @@ section {
     color: var(--text-secondary);
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-.medicine-card:hover {
+.farmacia-digital-container .medicine-card:hover {
     transform: translateY(-8px) scale(1.01);
     border-color: var(--primary-color);
     box-shadow: 0 15px 30px rgba(0,0,0,0.08);
 }
-.card-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: var(--light-bg); border-radius: 50%; border: 1px solid var(--border-color); }
-.card-icon i { font-size: 24px; color: var(--secondary-color); transition: all 0.3s ease; }
-.medicine-card:hover .card-icon { background: var(--secondary-color); border-color: var(--secondary-color); }
-.medicine-card:hover .card-icon i { color: white; transform: scale(1.1) rotate(5deg); }
-.medicine-card h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 8px; }
-.card-description { font-size: 12px; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
-.card-button {
+.farmacia-digital-container .card-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.farmacia-digital-container .card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: var(--light-bg); border-radius: 50%; border: 1px solid var(--border-color); }
+.farmacia-digital-container .card-icon i { font-size: 24px; color: var(--secondary-color); transition: all 0.3s ease; }
+.farmacia-digital-container .medicine-card:hover .card-icon { background: var(--secondary-color); border-color: var(--secondary-color); }
+.farmacia-digital-container .medicine-card:hover .card-icon i { color: white; transform: scale(1.1) rotate(5deg); }
+.farmacia-digital-container .medicine-card h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 8px; }
+.farmacia-digital-container .card-description { font-size: 12px; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
+.farmacia-digital-container .card-button {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -2068,16 +2062,16 @@ section {
     transition: all 0.3s ease;
     font-size: 0.9em;
 }
-.card-button i { transition: transform 0.3s ease; }
-.medicine-card:hover .card-button { background-color: var(--text-primary); color: white; }
-.medicine-card:hover .card-button i { transform: translateX(5px); }
+.farmacia-digital-container .card-button i { transition: transform 0.3s ease; }
+.farmacia-digital-container .medicine-card:hover .card-button { background-color: var(--text-primary); color: white; }
+.farmacia-digital-container .medicine-card:hover .card-button i { transform: translateX(5px); }
 
 /* --- Responsividade para Telas Menores --- */
 @media (max-width: 900px) {
-    .info-grid { grid-template-columns: 1fr; }
-    .produto-destaque { grid-template-columns: 1fr; }
-    .categories-grid { grid-template-columns: 1fr; }
+    .farmacia-digital-container .info-grid { grid-template-columns: 1fr; }
+    .farmacia-digital-container .produto-destaque { grid-template-columns: 1fr; }
+    .farmacia-digital-container .categories-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
-    .farmacia-header h1 { font-size: 2rem; }
+    .farmacia-digital-container .farmacia-header h1 { font-size: 2rem; }
 }
