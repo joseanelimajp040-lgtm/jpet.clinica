@@ -1874,13 +1874,6 @@ input[type='number'] {
     --text-primary: #f0f6fc;
     --text-secondary: #8b949e;
 }
-
-#app-root {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-}
-
 /* --- Container Principal --- */
 .farmacia-digital-container {
     background-color: var(--dark-bg);
@@ -2093,3 +2086,4 @@ section {
 @media (max-width: 600px) {
     .farmacia-header h1 { font-size: 2rem; }
 }
+
