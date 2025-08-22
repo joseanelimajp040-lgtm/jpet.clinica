@@ -1864,23 +1864,26 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* farmacia.css (VERSÃO FARMÁCIA DIGITAL) */
+/* farmacia.css (VERSÃO FARMÁCIA DIGITAL - TEMA CLARO) */
 :root {
+    /* Paleta de Cores (Invertida para Tema Claro) */
     --primary-color: #FF6B00;
     --secondary-color: #00A8A8;
-    --dark-bg: #0d1117;
-    --card-bg: #161b22;
-    --border-color: #30363d;
-    --text-primary: #f0f6fc;
-    --text-secondary: #8b949e;
+    --light-bg: #f8fafc;      /* Fundo principal branco/cinza claro */
+    --card-bg: #ffffff;       /* Fundo dos cards branco */
+    --border-color: #e2e8f0;   /* Cor da borda cinza claro */
+    --text-primary: #1e293b;   /* Texto principal preto/cinza escuro */
+    --text-secondary: #64748b; /* Texto secundário cinza médio */
 }
-/* --- Container Principal --- */
+
+/* --- Container Principal (JÁ CORRIGIDO PARA NÃO AFETAR OUTRAS PÁGINAS) --- */
 .farmacia-digital-container {
-    background-color: var(--dark-bg);
+    background-color: var(--light-bg);
     padding: 60px 20px;
     font-family: 'Poppins', sans-serif;
     color: var(--text-primary);
     animation: fadeIn 1s ease-out;
+    min-height: 90vh; /* Garante que a página tenha uma altura mínima */
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -1898,10 +1901,11 @@ section {
 .farmacia-header h1 {
     font-size: 2.8rem;
     font-weight: 700;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary); /* Cor sólida para melhor leitura no fundo branco */
     margin-bottom: 1rem;
+}
+.farmacia-header h1 span { /* Destaque com a cor primária */
+    color: var(--primary-color);
 }
 .farmacia-header p {
     font-size: 1.1rem;
@@ -1923,10 +1927,11 @@ section {
     border: 1px solid var(--border-color);
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 .info-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.07);
 }
 .info-card i {
     font-size: 2.5rem;
@@ -1954,6 +1959,7 @@ section {
     border-radius: 20px;
     padding: 40px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 .destaque-imagem {
     position: relative;
@@ -1966,23 +1972,10 @@ section {
     width: 100%;
     height: auto;
     display: block;
-    mix-blend-mode: multiply; /* Remove o fundo branco da imagem */
+    /* mix-blend-mode é para fundos escuros, removemos para o branco */
 }
-.scanline {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: var(--secondary-color);
-    opacity: 0.5;
-    box-shadow: 0 0 10px var(--secondary-color);
-    animation: scan 4s linear infinite;
-}
-@keyframes scan {
-    0% { transform: translateY(-20px); }
-    100% { transform: translateY(calc(100% + 20px)); }
-}
+.scanline { display: none; } /* Scanline não faz sentido no tema claro */
+
 .destaque-tag {
     display: inline-block;
     background-color: var(--secondary-color);
@@ -1996,6 +1989,7 @@ section {
 .destaque-info h2 {
     font-size: 2.2rem;
     font-weight: 700;
+    color: var(--text-primary);
     margin-bottom: 1rem;
 }
 .destaque-info p {
@@ -2019,16 +2013,16 @@ section {
     transition: all 0.3s ease;
 }
 .destaque-botao:hover {
-    background-color: #fff;
-    color: var(--primary-color);
+    background-color: var(--text-primary);
+    color: white;
     transform: scale(1.05);
 }
 
-/* --- 4. Seção "Navegue por Categorias" (Estilo Mantido) --- */
+/* --- 4. Seção "Navegue por Categorias" (TEMA CLARO) --- */
 .categories-title {
     text-align: center;
     font-size: 28px;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 30px;
     display: flex;
     align-items: center;
@@ -2038,7 +2032,7 @@ section {
 .categories-title i { color: var(--primary-color); }
 .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .medicine-card {
-    background: linear-gradient(135deg, var(--card-bg), var(--dark-bg));
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
     border: 1px solid var(--border-color);
@@ -2047,18 +2041,19 @@ section {
     transition: all 0.3s ease;
     text-decoration: none;
     color: var(--text-secondary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 .medicine-card:hover {
     transform: translateY(-8px) scale(1.01);
     border-color: var(--primary-color);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
 }
 .card-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%; border: 1px solid var(--border-color); }
+.card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: var(--light-bg); border-radius: 50%; border: 1px solid var(--border-color); }
 .card-icon i { font-size: 24px; color: var(--secondary-color); transition: all 0.3s ease; }
 .medicine-card:hover .card-icon { background: var(--secondary-color); border-color: var(--secondary-color); }
 .medicine-card:hover .card-icon i { color: white; transform: scale(1.1) rotate(5deg); }
-.medicine-card h3 { font-size: 18px; color: white; margin-bottom: 8px; }
+.medicine-card h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 8px; }
 .card-description { font-size: 12px; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
 .card-button {
     display: inline-flex;
@@ -2074,7 +2069,7 @@ section {
     font-size: 0.9em;
 }
 .card-button i { transition: transform 0.3s ease; }
-.medicine-card:hover .card-button { background-color: #fff; color: var(--primary-color); }
+.medicine-card:hover .card-button { background-color: var(--text-primary); color: white; }
 .medicine-card:hover .card-button i { transform: translateX(5px); }
 
 /* --- Responsividade para Telas Menores --- */
@@ -2086,4 +2081,3 @@ section {
 @media (max-width: 600px) {
     .farmacia-header h1 { font-size: 2rem; }
 }
-
