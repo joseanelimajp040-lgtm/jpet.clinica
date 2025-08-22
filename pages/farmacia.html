@@ -1,150 +1,74 @@
-<div class="farmacia-container" id="farmacia-scene">
-    <div class="mouse-spotlight"></div>
+<div class="farmacia-digital-container">
 
-    <div class="pharmacy-room">
-        <div class="back-shelves">
-            <div class="shelf-unit left-shelf">
-                <div class="shelf"><div class="medicine-box b1"></div><div class="medicine-bottle b2"></div><div class="medicine-box b3"></div></div>
-                <div class="shelf"><div class="medicine-bottle b4"></div><div class="medicine-bottle b5"></div><div class="medicine-box b6"></div></div>
-                <div class="shelf"><div class="medicine-box b7"></div><div class="medicine-bottle b8"></div></div>
-            </div>
-            <div class="shelf-unit right-shelf">
-                <div class="shelf"><div class="medicine-bottle b9"></div><div class="medicine-box b10"></div><div class="medicine-bottle b11"></div></div>
-                <div class="shelf"><div class="medicine-box b12"></div><div class="medicine-box b13"></div><div class="medicine-box b14"></div></div>
-                <div class="shelf"><div class="medicine-bottle b15"></div><div class="medicine-bottle b16"></div></div>
-            </div>
+    <section class="farmacia-header">
+        <h1>Sua Farmácia Digital para o Cuidado Completo</h1>
+        <p>Encontre medicamentos, suplementos e produtos de higiene com a qualidade e confiança da J.A Pet.</p>
+    </section>
+
+    <section class="info-grid">
+        <div class="info-card">
+            <i class="fas fa-truck-fast"></i>
+            <h3>Entrega Rápida</h3>
+            <p>Receba seus produtos em casa com agilidade e segurança.</p>
         </div>
-
-        <div class="pharmacy-counter">
-            <div class="counter-top">
-                <div class="computer computer-left">
-                    <div class="monitor">
-                        <div class="screen">
-                            <div class="screen-content">
-                                <div class="system-header"><i class="fas fa-pills"></i><span>Sistema de Pedidos</span></div>
-                                <div class="order-list">
-                                    <div class="order-item"><span>#001</span><span class="order-status processing">Processando</span></div>
-                                    <div class="order-item"><span>#002</span><span class="order-status ready">Pronto</span></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="monitor-stand"></div><div class="monitor-base"></div>
-                    </div>
-                    <div class="keyboard"></div>
-                </div>
-
-                <div class="central-display">
-                    <div class="welcome-sign">
-                        <h2 class="dynamic-typing-text" id="dynamic-text">Farmácia Veterinária JA Pet</h2>
-                    </div>
-                    <div class="info-panels">
-                        <div class="info-panel"><i class="fas fa-clock"></i><div class="panel-content"><span class="panel-title">Horário</span><span class="panel-value" id="current-time">--:--:--</span></div></div>
-                        <div class="info-panel"><i class="fas fa-temperature-high"></i><div class="panel-content"><span class="panel-title">Temp.</span><span class="panel-value">22°C</span></div></div>
-                        <div class="info-panel"><i class="fas fa-box-open"></i><div class="panel-content"><span class="panel-title">Estoque</span><span class="panel-value">1,247</span></div></div>
-                    </div>
-                </div>
-
-                <div class="computer computer-right">
-                    <div class="monitor">
-                        <div class="screen">
-                            <div class="screen-content">
-                                <div class="system-header"><i class="fas fa-warehouse"></i><span>Controle de Estoque</span></div>
-                                <div class="stock-chart">
-                                    <div class="bar" style="height: 70%"></div><div class="bar" style="height: 85%"></div>
-                                    <div class="bar" style="height: 60%"></div><div class="bar" style="height: 90%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="monitor-stand"></div><div class="monitor-base"></div>
-                    </div>
-                    <div class="keyboard"></div>
-                </div>
-            </div>
-            <div class="counter-front">
-                 <div class="logo-front"><img src="https://jpetclinica.com.br/wp-content/uploads/2024/05/logo-jpet-clinica-branca.png" alt="Logo J.A Pet"></div>
-            </div>
+        <div class="info-card">
+            <i class="fas fa-certificate"></i>
+            <h3>Produtos Verificados</h3>
+            <p>Trabalhamos apenas com laboratórios e marcas de confiança.</p>
         </div>
-    </div>
+        <div class="info-card">
+            <i class="fas fa-headset"></i>
+            <h3>Atendimento Especializado</h3>
+            <p>Nossa equipe está pronta para tirar suas dúvidas.</p>
+        </div>
+    </section>
 
-    <div class="medicine-categories">
-        <h2 class="categories-title"><i class="fas fa-capsules"></i>Navegue por Categorias</h2>
+    <section class="produto-destaque">
+        <div class="destaque-imagem">
+            <div class="scanline"></div>
+            <img src="https://www.petz.com.br/fotos/1658428198944.jpg" alt="Produto em Destaque">
+        </div>
+        <div class="destaque-info">
+            <span class="destaque-tag">Produto em Destaque</span>
+            <h2>Antipulgas e Carrapatos Simparic</h2>
+            <p>Proteção que dura 35 dias! Um dos comprimidos mais recomendados por veterinários para a segurança e conforto do seu cão.</p>
+            <a href="#" class="nav-link destaque-botao" data-page="produto-simparic">
+                <span>Ver Detalhes</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <section class="medicine-categories">
+        <h2 class="categories-title">
+            <i class="fas fa-capsules"></i>
+            Navegue por Categorias
+        </h2>
         <div class="categories-grid">
             <a href="#" class="nav-link medicine-card antibiotics" data-page="antibioticos">
                 <div class="card-content">
                     <div class="card-icon"><i class="fas fa-virus-slash"></i></div>
-                    <h3>Antibióticos</h3><p class="card-description">Para combater infecções bacterianas.</p>
+                    <h3>Antibióticos</h3>
+                    <p class="card-description">Para combater infecções bacterianas.</p>
                     <button class="card-button"><span>Ver Produtos</span><i class="fas fa-arrow-right"></i></button>
                 </div>
             </a>
             <a href="#" class="nav-link medicine-card anti-inflammatory" data-page="anti-inflamatorios">
                 <div class="card-content">
                     <div class="card-icon"><i class="fas fa-fire-extinguisher"></i></div>
-                    <h3>Anti-inflamatórios</h3><p class="card-description">Alívio da dor e inflamações.</p>
+                    <h3>Anti-inflamatórios</h3>
+                    <p class="card-description">Alívio da dor e inflamações.</p>
                     <button class="card-button"><span>Ver Produtos</span><i class="fas fa-arrow-right"></i></button>
                 </div>
             </a>
             <a href="#" class="nav-link medicine-card antiparasitic" data-page="antiparasitarios">
                 <div class="card-content">
                     <div class="card-icon"><i class="fas fa-shield-virus"></i></div>
-                    <h3>Antiparasitários</h3><p class="card-description">Proteção contra pulgas e carrapatos.</p>
+                    <h3>Antiparasitários</h3>
+                    <p class="card-description">Proteção contra pulgas e carrapatos.</p>
                     <button class="card-button"><span>Ver Produtos</span><i class="fas fa-arrow-right"></i></button>
                 </div>
             </a>
         </div>
-    </div>
+    </section>
 </div>
-
-<script>
-    // Garante que o script só rode quando a página da farmácia estiver visível
-    const initPharmacyScripts = () => {
-        // 1. Relógio Funcional
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            setInterval(() => {
-                const now = new Date();
-                timeElement.textContent = now.toLocaleTimeString('pt-BR');
-            }, 1000);
-        }
-
-        // 2. Efeito de Texto Digitado
-        const typingElement = document.getElementById('dynamic-text');
-        if (typingElement) {
-            const texts = ["Cuidado e Carinho para seu Pet.", "Qualidade e Confiança.", "Tudo para a Saúde Animal."];
-            let textIndex = 0;
-            let charIndex = 0;
-
-            const type = () => {
-                if (charIndex < texts[textIndex].length) {
-                    typingElement.textContent += texts[textIndex].charAt(charIndex);
-                    charIndex++;
-                    setTimeout(type, 80);
-                } else {
-                    setTimeout(erase, 2000);
-                }
-            };
-
-            const erase = () => {
-                if (charIndex > 0) {
-                    typingElement.textContent = texts[textIndex].substring(0, charIndex - 1);
-                    charIndex--;
-                    setTimeout(erase, 40);
-                } else {
-                    textIndex = (textIndex + 1) % texts.length;
-                    setTimeout(type, 500);
-                }
-            };
-            setTimeout(type, 500);
-        }
-
-        // 3. Efeito de Spotlight seguindo o mouse
-        const scene = document.getElementById('farmacia-scene');
-        if (scene) {
-            scene.addEventListener('mousemove', (e) => {
-                scene.style.setProperty('--mouse-x', e.clientX + 'px');
-                scene.style.setProperty('--mouse-y', e.clientY + 'px');
-            });
-        }
-    };
-    // Inicializa os scripts
-    initPharmacyScripts();
-</script>
