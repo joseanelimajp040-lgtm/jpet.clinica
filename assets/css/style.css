@@ -1864,147 +1864,222 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* pages-css/farmacia.css (VERSÃO CORRIGIDA E ELEGANTE) */
+/* farmacia.css (VERSÃO REFINADA) */
+:root {
+    --primary-color: #FF6B00;
+    --secondary-color: #00A8A8;
+}
 
 #app-root {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
-    /* Garante que o container tenha altura para a cena */
-    height: calc(100vh - 100px); /* Ajuste a altura do seu header se necessário */
 }
 
-.cena-farmacia-fachada {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background-color: #f0f4f8; /* Um fundo neutro para a página */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Poppins', sans-serif;
+.farmacia-container {
+    min-height: 100vh;
+    background: #0d1117; /* Fundo escuro, mais profissional */
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 20px 20px;
+    padding: 40px 20px;
     overflow: hidden;
-}
-
-/* O INTERIOR DA LOJA, VISTO DE FORA */
-.fundo-loja {
-    width: 80%;
-    height: 90%;
-    background: linear-gradient(to top, #e2e8f0, #f8fafc);
-    border-radius: 10px;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
     position: relative;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* EFEITO DE LUZ INTERATIVA (SPOTLIGHT) */
+.mouse-spotlight {
+    position: fixed;
+    top: var(--mouse-y, 50%);
+    left: var(--mouse-x, 50%);
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 107, 0, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    transition: top 0.2s ease-out, left 0.2s ease-out;
+}
+
+.pharmacy-room, .medicine-categories {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* PRATELEIRAS COM ILUMINAÇÃO */
+.back-shelves {
+    position: absolute;
+    width: 100%;
+    height: 300px;
+    top: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    filter: blur(2px) brightness(0.8); /* Foco no balcão */
+    opacity: 0.7;
 }
-
-.balcao-fundo {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 30%;
-    background-color: #fff;
-    border-top: 10px solid #FF6B00; /* Laranja do seu logo */
-}
-
-/* ANIMAÇÃO DE TEXTO NO FUNDO */
-.texto-dinamico-wrapper {
-    position: absolute;
-    width: 100%;
-    height: 60%;
-    top: 5%;
-    text-align: center;
-}
-.texto-dinamico {
-    position: absolute;
-    width: 100%;
-    opacity: 0;
-    font-size: 3rem;
-    font-weight: 600;
-    color: #cbd5e1;
-    animation: fadeInOut 12s infinite;
-}
-.texto-dinamico:nth-child(1) { animation-delay: 0s; }
-.texto-dinamico:nth-child(2) { animation-delay: 3s; }
-.texto-dinamico:nth-child(3) { animation-delay: 6s; }
-.texto-dinamico:nth-child(4) { animation-delay: 9s; }
-
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: scale(0.95); }
-    15% { opacity: 1; transform: scale(1); }
-    25% { opacity: 1; transform: scale(1); }
-    40% { opacity: 0; transform: scale(1.05); }
-    100% { opacity: 0; }
-}
-
-/* A FACHADA DE VIDRO QUE FICA NA FRENTE DE TUDO */
-.fachada-vidro {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    /* Efeito de vidro com gradiente e borda */
-    background: linear-gradient(to top left, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(3px); /* Desfoque sutil do fundo */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* LOGO APLICADO NO "VIDRO" */
-.logo-vidro {
-    position: absolute;
-    top: 5%;
-    opacity: 0.8;
-}
-.logo-vidro img {
-    width: 150px;
-    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
-}
-
-/* COMPUTADORES INTERATIVOS EM CIMA DO BALCÃO */
-.computador {
-    position: absolute;
-    bottom: 22%; /* Posição em cima do balcão do fundo */
-    width: 280px;
-    height: 180px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: all 0.3s ease-in-out;
-}
-.computador:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.pc-1 { transform: translateX(-200px); }
-.pc-2 { transform: translateX(200px); }
-
-.tela-link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    text-decoration: none;
-    color: white;
-    background-color: #00A8A8; /* Verde água do seu site */
-    border-radius: 15px;
+.shelf-unit {
+    width: 35%;
+    background: #161b22;
+    border-radius: 10px;
     padding: 20px;
-    text-align: center;
-    transition: background-color 0.3s ease;
 }
-.tela-link:hover {
-    background-color: #007f7f;
+.shelf {
+    height: 80px;
+    background: #0d1117;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+    gap: 15px;
+    border-radius: 5px;
 }
-.tela-link i {
-    font-size: 4rem;
-    margin-bottom: 10px;
+.medicine-box, .medicine-bottle {
+    opacity: 0.6;
+    border-radius: 3px;
 }
-.tela-link span {
-    font-size: 1.3rem;
+.medicine-box { height: 50px; flex-grow: 1; }
+.medicine-bottle { height: 60px; width: 35px; border-radius: 5px 5px 0 0; }
+.b1, .b3, .b7, .b10, .b12, .b14 { background-color: var(--primary-color); }
+.b2, .b4, .b5, .b6, .b8, .b9, .b11, .b15, .b16 { background-color: var(--secondary-color); }
+
+/* BALCÃO PRINCIPAL */
+.pharmacy-counter {
+    position: relative;
+    z-index: 10;
+    margin-top: 150px;
+    perspective: 2000px;
+}
+.counter-top {
+    background: #f8fafc; /* Tampo branco limpo */
+    border-radius: 20px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    transform: rotateX(10deg);
+    min-height: 250px;
+}
+.counter-front {
+    height: 150px;
+    background: #161b22;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    margin-top: -20px; /* Sobrepõe levemente */
+    transform: rotateX(10deg) translateZ(-20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.logo-front img {
+    width: 150px;
+    opacity: 0.7;
+}
+
+/* COMPUTADORES */
+.computer { width: 22%; display: flex; flex-direction: column; align-items: center; }
+.monitor { position: relative; width: 100%; }
+.screen {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #010409;
+    border: 10px solid #21262d;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--secondary-color);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+}
+.screen-content { animation: screen-boot 1s ease-out; }
+@keyframes screen-boot { from { opacity: 0; } to { opacity: 1; } }
+.system-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #30363d; padding-bottom: 5px; margin-bottom: 8px; color: white; }
+.order-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.order-status.processing { color: var(--primary-color); animation: blink 1.5s infinite; }
+.order-status.ready { color: #2e7d32; }
+@keyframes blink { 50% { opacity: 0.6; } }
+.stock-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 10px; }
+.bar { flex: 1; background-color: var(--secondary-color); border-radius: 2px; animation: bar-grow 1s ease-out; animation-fill-mode: backwards; }
+.bar:nth-child(2) { animation-delay: 0.1s; } .bar:nth-child(3) { animation-delay: 0.2s; } .bar:nth-child(4) { animation-delay: 0.3s; }
+@keyframes bar-grow { from { height: 0 !important; } }
+.monitor-stand { width: 40%; height: 15px; background: #21262d; position: relative; top: -5px; }
+.monitor-base { width: 70%; height: 8px; background: #21262d; border-radius: 4px; }
+.keyboard { width: 80%; height: 5px; background: #30363d; margin-top: 10px; border-radius: 2px; }
+
+/* ÁREA CENTRAL */
+.central-display { flex: 1; padding: 0 25px; text-align: center; }
+.welcome-sign { background: transparent; }
+.dynamic-typing-text {
+    font-size: 24px;
+    font-weight: 500;
+    color: #f0f6fc;
+    height: 60px;
+    border-right: 3px solid var(--primary-color);
+    animation: typing-cursor 0.7s step-end infinite;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+}
+@keyframes typing-cursor { from, to { border-color: transparent } 50% { border-color: var(--primary-color); } }
+.info-panels { display: flex; gap: 15px; margin-top: 20px; }
+.info-panel {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+}
+.info-panel i { font-size: 20px; color: var(--secondary-color); }
+.panel-content { display: flex; flex-direction: column; align-items: flex-start; }
+.panel-title { font-size: 10px; color: #8b949e; }
+.panel-value { font-size: 16px; font-weight: 600; color: #f0f6fc; }
+
+/* CARDS DE CATEGORIAS */
+.medicine-categories { margin: 100px auto 40px; }
+.categories-title { text-align: center; font-size: 32px; color: white; margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+.categories-title i { color: var(--primary-color); }
+.categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.medicine-card {
+    background: linear-gradient(135deg, #161b22, #0d1117);
+    border-radius: 15px;
+    padding: 30px;
+    border: 1px solid #30363d;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #c9d1d9;
+}
+.medicine-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--primary-color);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+.card-icon { width: 60px; height: 60px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%; border: 1px solid #30363d; }
+.card-icon i { font-size: 28px; color: var(--secondary-color); transition: all 0.3s ease; }
+.medicine-card:hover .card-icon { background: var(--secondary-color); border-color: var(--secondary-color); }
+.medicine-card:hover .card-icon i { color: white; transform: scale(1.1) rotate(5deg); }
+.medicine-card h3 { font-size: 20px; color: white; margin-bottom: 10px; }
+.card-description { font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+.card-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
     font-weight: 600;
+    transition: all 0.3s ease;
 }
+.card-button i { transition: transform 0.3s ease; }
+.medicine-card:hover .card-button { background-color: #fff; color: var(--primary-color); }
+.medicine-card:hover .card-button i { transform: translateX(5px); }
