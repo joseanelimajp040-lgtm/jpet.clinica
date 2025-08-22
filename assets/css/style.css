@@ -1864,10 +1864,15 @@ input[type='number'] {
 
 /* ========== FIM: Estilos do Carrinho Vazio ========== */
 
-/* farmacia.css (VERSÃO REFINADA - COMPUTADORES CORRIGIDOS) */
+/* farmacia.css (VERSÃO FARMÁCIA DIGITAL) */
 :root {
     --primary-color: #FF6B00;
     --secondary-color: #00A8A8;
+    --dark-bg: #0d1117;
+    --card-bg: #161b22;
+    --border-color: #30363d;
+    --text-primary: #f0f6fc;
+    --text-secondary: #8b949e;
 }
 
 #app-root {
@@ -1876,211 +1881,215 @@ input[type='number'] {
     max-width: 100% !important;
 }
 
-.farmacia-container {
-    min-height: 100vh;
-    background: #0d1117; /* Fundo escuro, mais profissional */
-    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-    background-size: 20px 20px;
-    padding: 40px 20px;
-    overflow: hidden;
-    position: relative;
+/* --- Container Principal --- */
+.farmacia-digital-container {
+    background-color: var(--dark-bg);
+    padding: 60px 20px;
     font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+    animation: fadeIn 1s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- Seções --- */
+section {
+    max-width: 1200px;
+    margin: 0 auto 80px auto;
 }
 
-/* EFEITO DE LUZ INTERATIVA (SPOTLIGHT) */
-.mouse-spotlight {
-    position: fixed;
-    top: var(--mouse-y, 50%);
-    left: var(--mouse-x, 50%);
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(255, 107, 0, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    transition: top 0.2s ease-out, left 0.2s ease-out;
+/* --- 1. Cabeçalho --- */
+.farmacia-header {
+    text-align: center;
+    margin-bottom: 60px;
 }
-
-.pharmacy-room, .medicine-categories {
-    max-width: 1400px;
+.farmacia-header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+.farmacia-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 700px;
     margin: 0 auto;
-    position: relative;
-    z-index: 1;
 }
 
-/* PRATELEIRAS COM ILUMINAÇÃO */
-.back-shelves {
-    position: absolute;
-    width: 100%;
-    height: 300px;
-    top: 0;
-    display: flex;
-    justify-content: space-between;
-    filter: blur(2px) brightness(0.8); /* Foco no balcão */
-    opacity: 0.7;
+/* --- 2. Painéis Informativos --- */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
 }
-.shelf-unit {
-    width: 35%;
-    background: #161b22;
-    border-radius: 10px;
+.info-card {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+.info-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+.info-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+.info-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* --- 3. Produto em Destaque --- */
+.produto-destaque {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 50px;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid var(--border-color);
+}
+.destaque-imagem {
+    position: relative;
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
     padding: 20px;
 }
-.shelf {
-    height: 80px;
-    background: #0d1117;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: flex-end;
-    padding: 10px;
-    gap: 15px;
-    border-radius: 5px;
+.destaque-imagem img {
+    width: 100%;
+    height: auto;
+    display: block;
+    mix-blend-mode: multiply; /* Remove o fundo branco da imagem */
 }
-.medicine-box, .medicine-bottle {
-    opacity: 0.6;
-    border-radius: 3px;
+.scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--secondary-color);
+    opacity: 0.5;
+    box-shadow: 0 0 10px var(--secondary-color);
+    animation: scan 4s linear infinite;
 }
-.medicine-box { height: 50px; flex-grow: 1; }
-.medicine-bottle { height: 60px; width: 35px; border-radius: 5px 5px 0 0; }
-.b1, .b3, .b7, .b10, .b12, .b14 { background-color: var(--primary-color); }
-.b2, .b4, .b5, .b6, .b8, .b9, .b11, .b15, .b16 { background-color: var(--secondary-color); }
-
-/* BALCÃO PRINCIPAL */
-.pharmacy-counter {
-    position: relative;
-    z-index: 10;
-    margin-top: 150px;
-    perspective: 2000px;
+@keyframes scan {
+    0% { transform: translateY(-20px); }
+    100% { transform: translateY(calc(100% + 20px)); }
 }
-.counter-top {
-    background: #f8fafc; /* Tampo branco limpo */
-    border-radius: 20px;
-    padding: 25px;
-    display: flex;
-    justify-content: space-between;
+.destaque-tag {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.destaque-info h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+.destaque-info p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+.destaque-botao {
+    display: inline-flex;
     align-items: center;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-    transform: rotateX(5deg); /* Rotação bem menor */
-    min-height: 250px;
+    gap: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
-.counter-front {
-    height: 150px;
-    background: #161b22;
-    border-radius: 0 0 20px 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    margin-top: -20px; /* Sobrepõe levemente */
-    transform: rotateX(5deg) translateZ(-20px); /* Rotação menor aqui também */
+.destaque-botao:hover {
+    background-color: #fff;
+    color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* --- 4. Seção "Navegue por Categorias" (Estilo Mantido) --- */
+.categories-title {
+    text-align: center;
+    font-size: 28px;
+    color: white;
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    gap: 10px;
 }
-.logo-front img {
-    width: 150px;
-    opacity: 0.7;
-}
-
-/* COMPUTADORES */
-.computer { width: 22%; display: flex; flex-direction: column; align-items: center; }
-.monitor { position: relative; width: 100%; }
-.screen {
-    width: 100%;
-    aspect-ratio: 1.6/1; /* Tela mais larga */
-    background: #010409;
-    border: 8px solid #21262d; /* Borda um pouco menor */
-    border-radius: 8px; /* Bordas mais suaves */
-    padding: 8px; /* Padding menor */
-    font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 10px; /* Fonte um pouco menor */
-    color: var(--secondary-color);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Sombra interna menor */
-}
-.screen-content { animation: screen-boot 1s ease-out; }
-@keyframes screen-boot { from { opacity: 0; } to { opacity: 1; } }
-.system-header { display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #30363d; padding-bottom: 3px; margin-bottom: 5px; color: white; font-size: 0.9em; }
-.order-item { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 0.8em; }
-.order-status.processing { color: var(--primary-color); animation: blink 1.5s infinite; }
-.order-status.ready { color: #2e7d32; }
-@keyframes blink { 50% { opacity: 0.6; } }
-.stock-chart { display: flex; align-items: flex-end; gap: 3px; height: 50px; margin-top: 8px; } /* Altura menor do gráfico */
-.bar { flex: 1; background-color: var(--secondary-color); border-radius: 1px; animation: bar-grow 1s ease-out; animation-fill-mode: backwards; }
-.bar:nth-child(2) { animation-delay: 0.1s; } .bar:nth-child(3) { animation-delay: 0.2s; } .bar:nth-child(4) { animation-delay: 0.3s; }
-@keyframes bar-grow { from { height: 0 !important; } }
-.monitor-stand { width: 50%; height: 20px; background: linear-gradient(to bottom, #21262d, #161b22); position: relative; top: -8px; border-radius: 0 0 3px 3px; } /* Base mais alta e com gradiente */
-.monitor-base { width: 80%; height: 10px; background: #21262d; border-radius: 5px; margin-top: 2px; } /* Base mais larga */
-.keyboard { width: 70%; height: 4px; background: #30363d; margin-top: 8px; border-radius: 2px; } /* Teclado mais fino */
-
-/* ÁREA CENTRAL */
-.central-display { flex: 1; padding: 0 25px; text-align: center; }
-.welcome-sign { background: transparent; }
-.dynamic-typing-text {
-    font-size: 22px; /* Fonte um pouco menor */
-    font-weight: 500;
-    color: #f0f6fc;
-    height: 50px; /* Altura ajustada */
-    border-right: 2px solid var(--primary-color); /* Borda mais fina */
-    animation: typing-cursor 0.7s step-end infinite;
-    white-space: nowrap;
-    overflow: hidden;
-    display: inline-block;
-}
-@keyframes typing-cursor { from, to { border-color: transparent } 50% { border-color: var(--primary-color); } }
-.info-panels { display: flex; gap: 10px; margin-top: 15px; } /* Espaçamento menor */
-.info-panel {
-    flex: 1;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px; /* Bordas mais suaves */
-    padding: 8px; /* Padding menor */
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Espaçamento menor */
-    border: 1px solid #30363d;
-    color: #c9d1d9;
-}
-.info-panel i { font-size: 18px; color: var(--secondary-color); } /* Ícones menores */
-.panel-content { display: flex; flex-direction: column; align-items: flex-start; }
-.panel-title { font-size: 0.7em; color: #8b949e; } /* Fonte menor */
-.panel-value { font-size: 1.1em; font-weight: 600; color: #f0f6fc; } /* Fonte menor */
-
-/* CARDS DE CATEGORIAS */
-.medicine-categories { margin: 80px auto 40px; }
-.categories-title { text-align: center; font-size: 28px; color: white; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; } /* Fonte menor */
 .categories-title i { color: var(--primary-color); }
-.categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; } /* Espaçamento menor */
+.categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .medicine-card {
-    background: linear-gradient(135deg, #161b22, #0d1117);
-    border-radius: 12px; /* Bordas mais suaves */
-    padding: 20px; /* Padding menor */
-    border: 1px solid #30363d;
+    background: linear-gradient(135deg, var(--card-bg), var(--dark-bg));
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
     text-decoration: none;
-    color: #c9d1d9;
+    color: var(--text-secondary);
 }
 .medicine-card:hover {
     transform: translateY(-8px) scale(1.01);
     border-color: var(--primary-color);
     box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
-.card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%; border: 1px solid #30363d; } /* Ícones menores */
-.card-icon i { font-size: 24px; color: var(--secondary-color); transition: all 0.3s ease; } /* Ícones menores */
+.card-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.card-icon { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 50%; border: 1px solid var(--border-color); }
+.card-icon i { font-size: 24px; color: var(--secondary-color); transition: all 0.3s ease; }
 .medicine-card:hover .card-icon { background: var(--secondary-color); border-color: var(--secondary-color); }
 .medicine-card:hover .card-icon i { color: white; transform: scale(1.1) rotate(5deg); }
-.medicine-card h3 { font-size: 18px; color: white; margin-bottom: 8px; } /* Fonte menor */
-.card-description { font-size: 12px; margin-bottom: 15px; line-height: 1.4; } /* Fonte menor */
+.medicine-card h3 { font-size: 18px; color: white; margin-bottom: 8px; }
+.card-description { font-size: 12px; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
 .card-button {
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Espaçamento menor */
+    gap: 8px;
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 8px 16px; /* Padding menor */
+    padding: 8px 16px;
     border-radius: 50px;
-    font-weight: 500; /* Peso da fonte menor */
+    font-weight: 500;
     transition: all 0.3s ease;
-    font-size: 0.9em; /* Fonte menor */
+    font-size: 0.9em;
 }
-.card-button i { font-size: 0.9em; transition: transform 0.3s ease; } /* Ícone menor */
+.card-button i { transition: transform 0.3s ease; }
 .medicine-card:hover .card-button { background-color: #fff; color: var(--primary-color); }
 .medicine-card:hover .card-button i { transform: translateX(5px); }
+
+/* --- Responsividade para Telas Menores --- */
+@media (max-width: 900px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .produto-destaque { grid-template-columns: 1fr; }
+    .categories-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+    .farmacia-header h1 { font-size: 2rem; }
+}
