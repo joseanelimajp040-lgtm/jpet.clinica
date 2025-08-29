@@ -2075,3 +2075,19 @@ input[type='number'] {
 @media (max-width: 600px) {
     .farmacia-digital-container .farmacia-header h1 { font-size: 2rem; }
 }
+
+/* ========== INÍCIO: Estilo do Botão Voltar ========== */
+.btn-voltar-inicio {
+  display: inline-block;
+  font-weight: 600;
+  color: #4b5563; /* text-gray-600 */
+  text-decoration: none;
+  margin-bottom: 1.5rem; /* 24px */
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-voltar-inicio:hover {
+  color: #FF6B00; /* Sua cor primária (laranja) */
+  transform: translateX(-4px); /* Efeito sutil de movimento */
+}
+/* ========== FIM: Estilo do Botão Voltar ========== */
