@@ -486,7 +486,16 @@ function handleSocialLogin(providerName) {
             const response = await fetch(`pages/${pageName}.html`);
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
-
+// Adiciona o botão "Voltar para o início" se a página não for a 'home'
+if (pageName !== 'home') {
+    const backButtonHTML = `
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <a href="#" class="nav-link btn-voltar-inicio" data-page="home">
+                &larr; Voltar para o início
+            </a>
+        </div>`;
+    appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
+}
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
@@ -759,6 +768,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
