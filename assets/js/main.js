@@ -487,18 +487,21 @@ function handleSocialLogin(providerName) {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 // Adiciona o botão "Voltar para o início" se a página não for a 'home'
-// Adiciona o botão "Voltar para o início" se a página não for a 'home'
 if (pageName !== 'home') {
-    // PRIMEIRO: Remove qualquer botão "Voltar" antigo para evitar duplicidade
+    // PRIMEIRO: Remove qualquer botão "Voltar" ANTIGO para evitar duplicidade
     const allLinks = appRoot.querySelectorAll('a');
     allLinks.forEach(link => {
-        if (link.textContent.includes('Voltar para o início')) {
-            // Remove o link e o container dele para uma limpeza completa
+        // Verifica se o link contém o texto E se NÃO É o nosso botão novo
+        const hasText = link.textContent.trim().includes('Voltar para o início');
+        const isOurNewButton = link.classList.contains('btn-voltar-inicio');
+
+        if (hasText && !isOurNewButton) {
+            // Se for um botão antigo, remove o elemento pai dele (geralmente um <div> ou <p>)
             link.parentElement.remove();
         }
     });
 
-    // SEGUNDO: Adiciona o novo botão, estilizado corretamente
+    // SEGUNDO: Adiciona o nosso novo botão, agora que a limpeza foi feita
     const backButtonHTML = `
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <a href="#" class="nav-link btn-voltar-inicio" data-page="home">
@@ -779,6 +782,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
