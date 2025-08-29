@@ -488,26 +488,28 @@ function handleSocialLogin(providerName) {
             appRoot.innerHTML = await response.text();
 // Adiciona o botão "Voltar para o início" se a página não for a 'home'
 if (pageName !== 'home') {
-    // ETAPA 1: LIMPEZA FORÇADA
-    // Remove o botão antigo que está escrito diretamente no arquivo HTML da página (ex: cart.html).
-    // Esta busca é feita dentro do conteúdo que acabou de ser carregado.
-    const allLinksInContent = appRoot.querySelectorAll('a');
-    allLinksInContent.forEach(link => {
-        if (link.textContent.trim().includes('Voltar para o início')) {
-            // Remove o container do link antigo para garantir uma limpeza completa.
-            link.parentElement.remove();
-        }
-    });
-
-    // ETAPA 2: ADIÇÃO DO BOTÃO CORRETO
-    // Agora que garantimos que a área está limpa, adicionamos o nosso botão dinâmico.
+    // ETAPA 1: Adiciona o nosso botão CORRETO primeiro.
     const backButtonHTML = `
-        <div id="dynamic-back-button-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-            <a href="#" class="nav-link btn-voltar-inicio" data-page="home">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
                 <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
             </a>
         </div>`;
     appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
+
+    // ETAPA 2: Remove o botão ANTIGO (hardcoded no cart.html, etc.)
+    // Agora procuramos por <button> também!
+    const allPossibleElements = appRoot.querySelectorAll('a, button');
+
+    allPossibleElements.forEach(element => {
+        const hasText = element.textContent.trim().includes('Voltar para o início');
+        const isOurButton = element.hasAttribute('data-dynamic-back-button');
+
+        if (hasText && !isOurButton) {
+            // CORREÇÃO FINAL: Remove APENAS o elemento antigo, e não o seu container.
+            element.remove();
+        }
+    });
 }
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
@@ -781,6 +783,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
