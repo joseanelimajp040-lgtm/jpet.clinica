@@ -1,0 +1,60 @@
+<div class="bg-gray-50">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:py-12 sm:px-8">
+        
+        <div id="product-breadcrumbs" class="text-sm text-gray-600 mb-6">
+            <a href="#" class="nav-link hover:text-primary" data-page="home">Início</a>
+            <span class="mx-2">/</span>
+            <span id="breadcrumb-category" class="font-medium text-primary">Categoria</span>
+        </div>
+
+        <div class="lg:grid lg:grid-cols-5 lg:gap-8">
+            <div class="lg:col-span-2">
+                <div class="w-full aspect-w-1 aspect-h-1 bg-white rounded-lg shadow-sm p-4 border">
+                    <img id="main-product-image" src="" alt="Imagem principal do produto" class="w-full h-full object-center object-contain">
+                </div>
+                <div id="product-thumbnails" class="mt-4 grid grid-cols-4 gap-4">
+                    </div>
+            </div>
+
+            <div class="lg:col-span-3 mt-10 lg:mt-0">
+                <h1 id="product-name" class="text-3xl font-bold tracking-tight text-gray-800">Carregando nome...</h1>
+                <p id="product-brand" class="text-md text-gray-500 mt-1">por <span class="font-semibold">Marca</span></p>
+
+                <div class="mt-6 flex items-center gap-4">
+                    <span id="product-price" class="text-4xl font-bold text-primary">R$ --,--</span>
+                    <div class="flex flex-col">
+                        <span id="product-original-price" class="text-lg text-gray-400 line-through">R$ --,--</span>
+                        <span id="product-discount-badge" class="hidden text-sm font-semibold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">-0%</span>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold text-gray-800">Sobre o produto</h3>
+                    <div id="product-description" class="mt-2 space-y-4 text-base text-gray-600">
+                        <p>Carregando descrição...</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-white rounded-lg border shadow-sm">
+                    <div class="sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantidade</label>
+                            <div class="mt-1 flex items-center border border-gray-300 rounded-md" style="width: 120px;">
+                                <button id="quantity-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-100">-</button>
+                                <input type="text" id="product-quantity" value="1" readonly class="w-full text-center border-l border-r">
+                                <button id="quantity-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 sm:mt-0 sm:flex-1 sm:ml-6">
+                           <button id="add-to-cart-product-page" type="button" class="w-full bg-secondary rounded-md py-3 px-8 flex items-center justify-center text-lg font-bold text-white hover:bg-teal-700 transition-colors">
+                                <i class="fas fa-shopping-cart mr-3"></i>
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
