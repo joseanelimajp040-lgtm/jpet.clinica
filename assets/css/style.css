@@ -2076,18 +2076,23 @@ input[type='number'] {
     .farmacia-digital-container .farmacia-header h1 { font-size: 2rem; }
 }
 
-/* ========== INÍCIO: Estilo do Botão Voltar ========== */
+/* ========== INÍCIO: Estilo do Botão Voltar (VERSÃO ATUALIZADA) ========== */
 .btn-voltar-inicio {
-  display: inline-block;
-  font-weight: 600;
-  color: #4b5563; /* text-gray-600 */
+  display: inline-flex; /* Usamos flex para alinhar o ícone e o texto */
+  align-items: center;
+  font-weight: 600; /* Letra em negrito */
+  font-size: 1.125rem; /* Aumenta um pouco a fonte para corresponder à imagem */
+  color: #00A8A8; /* Sua cor secundária (verde-azulado) */
   text-decoration: none;
   margin-bottom: 1.5rem; /* 24px */
-  transition: all 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out; /* Transição suave apenas na cor */
 }
 
 .btn-voltar-inicio:hover {
-  color: #FF6B00; /* Sua cor primária (laranja) */
-  transform: translateX(-4px); /* Efeito sutil de movimento */
+  color: #FF6B00; /* Sua cor primária (laranja forte) no hover */
+}
+
+.btn-voltar-inicio i {
+    font-size: 1rem; /* Ajusta o tamanho do ícone */
 }
 /* ========== FIM: Estilo do Botão Voltar ========== */
