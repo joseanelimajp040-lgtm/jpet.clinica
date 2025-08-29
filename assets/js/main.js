@@ -487,11 +487,22 @@ function handleSocialLogin(providerName) {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
 // Adiciona o botão "Voltar para o início" se a página não for a 'home'
+// Adiciona o botão "Voltar para o início" se a página não for a 'home'
 if (pageName !== 'home') {
+    // PRIMEIRO: Remove qualquer botão "Voltar" antigo para evitar duplicidade
+    const allLinks = appRoot.querySelectorAll('a');
+    allLinks.forEach(link => {
+        if (link.textContent.includes('Voltar para o início')) {
+            // Remove o link e o container dele para uma limpeza completa
+            link.parentElement.remove();
+        }
+    });
+
+    // SEGUNDO: Adiciona o novo botão, estilizado corretamente
     const backButtonHTML = `
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <a href="#" class="nav-link btn-voltar-inicio" data-page="home">
-                &larr; Voltar para o início
+                <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
             </a>
         </div>`;
     appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
@@ -768,6 +779,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
