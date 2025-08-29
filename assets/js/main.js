@@ -488,22 +488,21 @@ function handleSocialLogin(providerName) {
             appRoot.innerHTML = await response.text();
 // Adiciona o botão "Voltar para o início" se a página não for a 'home'
 if (pageName !== 'home') {
-    // PRIMEIRO: Remove qualquer botão "Voltar" ANTIGO para evitar duplicidade
-    const allLinks = appRoot.querySelectorAll('a');
-    allLinks.forEach(link => {
-        // Verifica se o link contém o texto E se NÃO É o nosso botão novo
-        const hasText = link.textContent.trim().includes('Voltar para o início');
-        const isOurNewButton = link.classList.contains('btn-voltar-inicio');
-
-        if (hasText && !isOurNewButton) {
-            // Se for um botão antigo, remove o elemento pai dele (geralmente um <div> ou <p>)
+    // ETAPA 1: LIMPEZA FORÇADA
+    // Remove o botão antigo que está escrito diretamente no arquivo HTML da página (ex: cart.html).
+    // Esta busca é feita dentro do conteúdo que acabou de ser carregado.
+    const allLinksInContent = appRoot.querySelectorAll('a');
+    allLinksInContent.forEach(link => {
+        if (link.textContent.trim().includes('Voltar para o início')) {
+            // Remove o container do link antigo para garantir uma limpeza completa.
             link.parentElement.remove();
         }
     });
 
-    // SEGUNDO: Adiciona o nosso novo botão, agora que a limpeza foi feita
+    // ETAPA 2: ADIÇÃO DO BOTÃO CORRETO
+    // Agora que garantimos que a área está limpa, adicionamos o nosso botão dinâmico.
     const backButtonHTML = `
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div id="dynamic-back-button-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <a href="#" class="nav-link btn-voltar-inicio" data-page="home">
                 <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
             </a>
@@ -782,6 +781,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
