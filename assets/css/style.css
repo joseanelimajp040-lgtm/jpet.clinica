@@ -2112,3 +2112,104 @@ input[type='number'] {
 }
 
 /* ========== FIM: Estilos da Página de Produto ========== */
+
+/* ... (todo o seu CSS existente até o final) ... */
+
+/* ========== INÍCIO: NOVOS ESTILOS PÁGINA DE PRODUTO ========== */
+
+/* 1. Efeito de Zoom na Imagem Principal */
+#main-image-container:hover #main-product-image {
+    transform: scale(1.5); /* Aumenta a imagem em 50% */
+}
+
+/* 2. Seletor de Quantidade Melhorado */
+.quantity-selector {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid #cbd5e1; /* gray-300 */
+    border-radius: 8px;
+    overflow: hidden;
+}
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    font-weight: 600;
+    color: #1f2937; /* gray-800 */
+    border: none;
+    padding: 0.5rem 0;
+    -moz-appearance: textfield;
+}
+.quantity-btn {
+    background-color: #f8fafc; /* gray-50 */
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #4b5563; /* gray-600 */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.quantity-btn:hover {
+    background-color: #f1f5f9; /* gray-100 */
+}
+.quantity-btn:first-child { border-right: 2px solid #cbd5e1; }
+.quantity-btn:last-child { border-left: 2px solid #cbd5e1; }
+
+
+/* 3. Estilos das Abas de Informação */
+.tab-btn {
+    padding-bottom: 1rem;
+    border-bottom: 4px solid transparent;
+    font-weight: 600;
+    color: #6b7280; /* gray-500 */
+    transition: all 0.2s ease-in-out;
+}
+.tab-btn:hover {
+    color: #1f2937; /* gray-800 */
+}
+.tab-btn.active {
+    color: var(--primary-color); /* #FF6B00 */
+    border-bottom-color: var(--primary-color);
+}
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+.tab-panel.active {
+    display: block;
+}
+
+/* 4. Estilos para Avaliação com Estrelas */
+.star-rating .fa-star,
+.star-rating .fa-star-half-alt,
+.star-rating .far.fa-star {
+    color: #f59e0b; /* amber-500 */
+}
+.star-rating .review-count {
+    color: #4b5563; /* gray-600 */
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+}
+
+/* 5. Estilos para Status de Estoque */
+.stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+}
+.stock-in {
+    background-color: #dcfce7; /* green-100 */
+    color: #166534; /* green-800 */
+}
+.stock-low {
+    background-color: #ffedd5; /* orange-100 */
+    color: #9a3412; /* orange-800 */
+}
+.stock-out {
+    background-color: #fee2e2; /* red-100 */
+    color: #991b1b; /* red-800 */
+}
+/* ========== FIM: NOVOS ESTILOS PÁGINA DE PRODUTO ========== */
