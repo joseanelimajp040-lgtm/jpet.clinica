@@ -704,7 +704,6 @@ function handleSocialLogin(providerName) {
             }
             
                 document.body.classList.add('body-has-decorations');
-           } else {
                 document.body.classList.remove('body-has-decorations');
            }
             
@@ -953,5 +952,6 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
