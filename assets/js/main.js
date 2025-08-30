@@ -68,10 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function managePageStyles(pageName) {
+        // Gerencia classe para páginas de tela cheia
         if (pageName === 'farmacia') {
             document.body.classList.add('is-fullpage');
         } else {
             document.body.classList.remove('is-fullpage');
+        }
+        // Gerencia decorações de fundo
+        if (pageName === 'instalar-ios' || pageName === 'login') {
+            document.body.classList.add('body-has-decorations');
+        } else {
+            document.body.classList.remove('body-has-decorations');
         }
     }
 
@@ -169,8 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div>
                     <span class="text-sm text-gray-400 line-through">${formatCurrency(originalPrice)}</span>
                     <span class="text-primary font-bold text-lg block">${formatCurrency(price)}</span>
-                </div>
-            `;
+                </div>`;
             const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
             discountBadgeHTML = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
         }
@@ -189,16 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="p-4 flex flex-col flex-grow">
                     <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${nome}</h3>
-                    <div class="mb-4">
-                        ${priceHTML}
-                    </div>
+                    <div class="mb-4">${priceHTML}</div>
                     <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
                         data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
                         <i class="fas fa-shopping-cart mr-2"></i> Adicionar
                     </button>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     function renderCart() {
@@ -252,13 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
             clearBtn.classList.remove('hidden');
             state.favorites.forEach(item => {
                 const productData = {
-                    nome: item.name,
-                    image: item.image,
-                    price: item.price,
-                    originalPrice: null // Favoritos não guardam preço original
+                    nome: item.name, image: item.image,
+                    price: item.price, originalPrice: null
                 };
-                const cardHTML = createProductCardHTML(productData, item.id);
-                container.insertAdjacentHTML('beforeend', cardHTML);
+                container.insertAdjacentHTML('beforeend', createProductCardHTML(productData, item.id));
             });
         }
     }
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
         
-        agendaGrid.insertAdjacentHTML('beforeend', '<div></div>'); // Canto superior esquerdo vazio
+        agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
         for (let i = 0; i < 7; i++) {
             const day = new Date(today);
             day.setDate(today.getDate() + i);
@@ -346,12 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 addToCartBtn.dataset.image = productData.image;
                 addToCartBtn.classList.add('add-to-cart-btn');
             } else {
-                console.error("Produto não encontrado no Firebase:", productId);
                 appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
             }
-        } catch (error) {
-            console.error("Erro ao buscar produto:", error);
-        }
+        } catch (error) { console.error("Erro ao buscar produto:", error); }
     }
 
     async function renderFeaturedProducts() {
@@ -361,16 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const snapshot = await db.collection('produtos').where('featured', '==', true).limit(8).get();
             if (snapshot.empty) {
                 container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhum produto em destaque no momento.</p>';
-                return;
+            } else {
+                container.innerHTML = '';
+                snapshot.forEach(doc => {
+                    container.insertAdjacentHTML('beforeend', createProductCardHTML(doc.data(), doc.id));
+                });
             }
-            container.innerHTML = '';
-            snapshot.forEach(doc => {
-                container.insertAdjacentHTML('beforeend', createProductCardHTML(doc.data(), doc.id));
-            });
-        } catch (error) {
-            console.error("Erro ao buscar produtos em destaque: ", error);
-            container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar os produtos.</p>';
-        }
+        } catch (error) { console.error("Erro ao buscar produtos em destaque: ", error); }
     }
 
     // --- INICIALIZAÇÃO DE EVENT LISTENERS DE PÁGINAS ---
@@ -452,8 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.appointments.push(newAppointment);
                 save.appointments();
                 document.getElementById('booking-modal').style.display = 'none';
-                showAnimation('success-animation-overlay', 1500);
-                renderCalendar();
+                showAnimation('success-animation-overlay', 1500, () => renderCalendar());
             });
         }
     }
@@ -464,41 +457,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (errorEl) errorEl.classList.add('hidden');
 
         let provider;
-        if (providerName === 'google') {
-            provider = new firebase.auth.GoogleAuthProvider();
-        } else if (providerName === 'apple') {
+        if (providerName === 'google') provider = new firebase.auth.GoogleAuthProvider();
+        else if (providerName === 'apple') {
             provider = new firebase.auth.OAuthProvider('apple.com');
-            provider.addScope('email');
-            provider.addScope('name');
-        } else {
-            console.error('Provider não suportado:', providerName);
-            return;
-        }
+            provider.addScope('email'); provider.addScope('name');
+        } 
+        else return console.error('Provider não suportado:', providerName);
 
         auth.signInWithPopup(provider).then((result) => {
-            const user = result.user;
             if (result.additionalUserInfo.isNewUser) {
-                console.log('Novo usuário, criando registro no Firestore...');
-                return db.collection('users').doc(user.uid).set({
-                    name: user.displayName,
-                    email: user.email,
+                return db.collection('users').doc(result.user.uid).set({
+                    name: result.user.displayName, email: result.user.email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => loadPage('home'));
             } else {
-                console.log('Usuário existente logado.');
                 loadPage('home');
             }
         }).catch((error) => {
             console.error("Erro no login social:", error);
             const currentErrorEl = document.getElementById('login-error');
             if (!currentErrorEl) return;
-            let errorMessage = "Ocorreu um erro ao tentar entrar. Tente novamente.";
-            if (error.code === 'auth/account-exists-with-different-credential') {
-                errorMessage = "Já existe uma conta com este e-mail. Tente entrar com o método original.";
-            } else if (error.code === 'auth/popup-closed-by-user') {
-                return; // Não mostra erro se o usuário fechou o popup
-            }
-            currentErrorEl.textContent = errorMessage;
+            let msg = "Ocorreu um erro ao tentar entrar. Tente novamente.";
+            if (error.code === 'auth/account-exists-with-different-credential') msg = "Já existe uma conta com este e-mail.";
+            else if (error.code === 'auth/popup-closed-by-user') return;
+            currentErrorEl.textContent = msg;
             currentErrorEl.classList.remove('hidden');
         });
     }
@@ -512,21 +494,16 @@ document.addEventListener('DOMContentLoaded', () => {
         errorEl.classList.add('hidden');
         
         auth.createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                const user = userCredential.user;
-                return user.updateProfile({ displayName: name })
-                    .then(() => db.collection('users').doc(user.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }));
-            })
+            .then(cred => cred.user.updateProfile({ displayName: name })
+                .then(() => db.collection('users').doc(cred.user.uid).set({
+                    name: name, email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }))
+            )
             .then(() => {
                 alert(`Conta para ${name} criada com sucesso! Por favor, faça o login.`);
                 loadPage('login');
             })
             .catch(error => {
-                console.error("Erro ao criar conta:", error);
                 errorEl.textContent = "Erro: " + error.message;
                 errorEl.classList.remove('hidden');
             });
@@ -540,16 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
         errorEl.classList.add('hidden');
         auth.signInWithEmailAndPassword(email, password)
             .then(() => loadPage('home'))
-            .catch(error => {
-                console.error("Erro ao fazer login:", error);
+            .catch(() => {
                 errorEl.textContent = "E-mail ou senha inválidos.";
                 errorEl.classList.remove('hidden');
             });
     }
 
-    function handleLogout() {
-        auth.signOut().catch(error => console.error("Erro ao fazer logout:", error));
-    }
+    function handleLogout() { auth.signOut().catch(error => console.error("Erro ao fazer logout:", error)); }
     
     auth.onAuthStateChanged(user => {
         state.loggedInUser = user ? { email: user.email, uid: user.uid, displayName: user.displayName } : null;
@@ -625,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const messageContainer = document.createElement('div');
         messageContainer.className = 'chat-message-container';
-        
         const messageBubble = document.createElement('div');
         messageBubble.className = `chat-message ${sender}-message`;
         messageBubble.textContent = message;
@@ -638,7 +611,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTypingIndicator() {
         const chatWindowBody = document.querySelector('#marrie-chat-window .overflow-y-auto');
         if (!chatWindowBody) return;
-
         const indicator = document.createElement('div');
         indicator.className = 'typing-indicator';
         indicator.innerHTML = '<span></span><span></span><span></span>';
@@ -662,11 +634,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ message: userMessage }),
             });
             if (!response.ok) throw new Error('A resposta da rede não foi OK.');
-            
             const data = await response.json();
             addChatMessage(data.reply, 'ai');
         } catch (error) {
-            console.error('Erro ao contatar a Marrie:', error);
             addChatMessage('Desculpe, estou com um probleminha para me conectar. Tente novamente mais tarde.', 'ai');
         }
     }
@@ -689,6 +659,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
         
+            // Lógica unificada para mostrar/esconder elementos do header
+            const topBanner = document.getElementById('top-banner');
+            if(topBanner) topBanner.style.display = pageName === 'home' ? '' : 'none';
+            const mainNavBar = document.getElementById('main-nav-bar');
+            if(mainNavBar) mainNavBar.style.display = pageName === 'home' ? '' : 'none';
+
             if (pageName !== 'home') {
                 const backButtonHTML = `
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -699,9 +675,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
                 
                 appRoot.querySelectorAll('a, button').forEach(element => {
-                    const hasText = element.textContent.trim().includes('Voltar para o início');
-                    if (hasText && !element.hasAttribute('data-dynamic-back-button')) {
-                        element.parentElement.remove();
+                    if (element.textContent.trim().includes('Voltar para o início') && !element.hasAttribute('data-dynamic-back-button')) {
+                        element.remove();
                     }
                 });
             }
@@ -720,17 +695,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (params.id) {
                         await renderProductPage(params.id);
                         initProductPageListeners();
-                    } else {
-                        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">ID do produto não fornecido.</p>`;
                     }
                     break;
                 case 'checkout':
                     renderCheckoutSummary();
                     initCheckoutPageListeners();
                     break;
-                case 'favorites':
-                    renderFavoritesPage();
-                    break;
+                case 'favorites': renderFavoritesPage(); break;
                 case 'banho-e-tosa':
                     renderCalendar();
                     initBanhoTosaEventListeners();
@@ -749,9 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollTo(0, 0);
         
             if (pageName === 'home') {
-                setTimeout(() => {
-                    document.querySelectorAll('.animate-on-load').forEach(el => el.classList.add('animated'));
-                }, 100);
+                setTimeout(() => document.querySelectorAll('.animate-on-load').forEach(el => el.classList.add('animated')), 100);
             }
         }
     }
@@ -763,10 +732,9 @@ document.addEventListener('DOMContentLoaded', () => {
             loadComponent('components/footer.html', 'footer-placeholder')
         ]);
         
-        // --- DELEGAÇÃO DE EVENTOS GLOBAIS ---
         document.body.addEventListener('click', (e) => {
             const navLink = e.target.closest('.nav-link');
-            if (navLink && navLink.dataset.page) {
+            if (navLink?.dataset.page) {
                 e.preventDefault();
                 loadPage(navLink.dataset.page, { id: navLink.dataset.id });
             }
@@ -780,9 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const removeFromCartBtn = e.target.closest('.remove-from-cart');
             if (removeFromCartBtn) {
                 state.cart = state.cart.filter(item => item.id !== removeFromCartBtn.dataset.id);
-                save.cart();
-                updateCounters();
-                renderCart();
+                save.cart(); updateCounters(); renderCart();
             }
 
             const quantityChangeBtn = e.target.closest('.quantity-change');
@@ -791,51 +757,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (item) {
                     item.quantity += parseInt(quantityChangeBtn.dataset.change);
                     if (item.quantity < 1) item.quantity = 1;
-                    save.cart();
-                    updateCounters();
-                    renderCart();
+                    save.cart(); updateCounters(); renderCart();
                 }
             }
 
             if (e.target.closest('#clear-cart-btn')) {
-                if (confirm('Tem certeza que deseja limpar o carrinho?')) {
-                    showAnimation('clear-cart-animation-overlay', 5800, () => {
-                        state.cart = [];
-                        save.cart();
-                        updateCounters();
-                        renderCart();
-                    });
-                }
+                if (confirm('Tem certeza?')) showAnimation('clear-cart-animation-overlay', 5800, () => {
+                    state.cart = []; save.cart(); updateCounters(); renderCart();
+                });
             }
             if (e.target.closest('#clear-favorites-btn')) {
-                if (confirm('Tem certeza que deseja limpar seus favoritos?')) {
-                    showAnimation('unfavorite-animation-overlay', 1500, () => {
-                        state.favorites = [];
-                        save.favorites();
-                        updateCounters();
-                        renderFavoritesPage();
-                    });
-                }
+                if (confirm('Tem certeza?')) showAnimation('unfavorite-animation-overlay', 1500, () => {
+                    state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
+                });
             }
-
             if (e.target.closest('#checkout-btn')) {
                 e.preventDefault();
                 if (state.cart.length === 0) return alert("Seu carrinho está vazio.");
                 if (!state.shipping.neighborhood) {
                     alert("Por favor, selecione uma taxa de entrega.");
-                    const shippingModal = document.getElementById('shipping-modal');
-                    if (shippingModal) shippingModal.style.display = 'flex';
+                    document.getElementById('shipping-modal')?.style.display = 'flex';
                     return;
                 }
                 loadPage('checkout');
             }
             if (e.target.closest('#confirm-purchase-btn')) {
                 alert('Compra confirmada com sucesso! Obrigado.');
-                state.cart = [];
-                state.shipping = { fee: 0, neighborhood: '' };
-                save.cart();
-                updateCounters();
-                loadPage('home');
+                state.cart = []; state.shipping = { fee: 0, neighborhood: '' };
+                save.cart(); updateCounters(); loadPage('home');
             }
         });
 
@@ -860,11 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (marrieButton && marrieWindow && marrieCloseButton) {
             marrieButton.addEventListener('click', () => {
                 marrieWindow.classList.toggle('active');
-                if (marrieWindow.classList.contains('active')) {
-                    marrieWindow.classList.remove('hidden');
-                } else {
-                    setTimeout(() => marrieWindow.classList.add('hidden'), 500);
-                }
+                marrieWindow.classList.toggle('hidden', !marrieWindow.classList.contains('active'));
             });
             marrieCloseButton.addEventListener('click', () => {
                 marrieWindow.classList.remove('active');
@@ -896,7 +841,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // --- CARGA INICIAL ---
         updateCounters();
         await loadPage('home');
     }
