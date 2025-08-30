@@ -522,7 +522,73 @@ function handleSocialLogin(providerName) {
         }
         updateLoginStatus();
     });
+function createProductCardHTML(productData, productId) {
+    const { nome, image, price, originalPrice } = productData;
+    const isFav = state.favorites.some(fav => fav.id === productId);
+    const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
 
+    let priceHTML = `<span class="text-primary font-bold text-lg">${formatCurrency(price)}</span>`;
+    let discountBadgeHTML = '';
+
+    if (originalPrice && originalPrice > price) {
+        priceHTML = `
+            <div>
+                <span class="text-sm text-gray-400 line-through">${formatCurrency(originalPrice)}</span>
+                <span class="text-primary font-bold text-lg block">${formatCurrency(price)}</span>
+            </div>
+        `;
+        const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
+        discountBadgeHTML = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
+    }
+
+    return `
+        <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+            <div class="relative">
+                ${discountBadgeHTML}
+                <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
+                    <i class="${favIconClass} fa-heart"></i>
+                </button>
+                <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
+                    <img src="${image}" alt="${nome}" class="w-full h-48 object-contain p-4">
+                </a>
+            </div>
+            <div class="p-4 flex flex-col flex-grow">
+                <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${nome}</h3>
+                <div class="mb-4">
+                    ${priceHTML}
+                </div>
+                <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
+                    data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
+                    <i class="fas fa-shopping-cart mr-2"></i> Adicionar
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+async function renderFeaturedProducts() {
+    const container = document.getElementById('featured-products-container');
+    if (!container) return; 
+
+    try {
+        const snapshot = await db.collection('produtos').where('featured', '==', true).limit(8).get();
+
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhum produto em destaque no momento.</p>';
+            return;
+        }
+
+        container.innerHTML = ''; 
+        snapshot.forEach(doc => {
+            const productCard = createProductCardHTML(doc.data(), doc.id);
+            container.insertAdjacentHTML('beforeend', productCard);
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar produtos em destaque: ", error);
+        container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar os produtos.</p>';
+    }
+}
     // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
     function handleAddToCart(event) {
     const button = event.target.closest('.add-to-cart-btn');
@@ -900,4 +966,5 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
