@@ -685,62 +685,6 @@ function handleSocialLogin(providerName) {
         }
     }
 }
-            const topBanner = document.getElementById('top-banner');
-            if (topBanner) {
-                if (pageName === 'home') {
-                    topBanner.classList.remove('hidden');
-                } else {
-                    topBanner.classList.add('hidden');
-                }
-            }
-            
-            const mainNavBar = document.getElementById('main-nav-bar');
-            if (mainNavBar) {
-                if (pageName === 'home') {
-                    mainNavBar.classList.remove('hidden');
-                } else {
-                    mainNavBar.classList.add('hidden');
-                }
-            }
-            
-           if (pageName === 'instalar-ios' || pageName === 'login') {
-                document.body.classList.add('body-has-decorations');
-           } else {
-                document.body.classList.remove('body-has-decorations');
-           }
-            
-            switch (pageName) {
-                case 'home': initSlider(); initComparisonSlider(); updateAllHeartIcons(); break;
-                case 'cart': renderCart(); initCartPageListeners(); break;
-                case 'checkout': renderCheckoutSummary(); initCheckoutPageListeners(); break;
-                case 'favorites': renderFavoritesPage(); updateAllHeartIcons(); break;
-                case 'banho-e-tosa': renderCalendar(); initBanhoTosaEventListeners(); break;
-                case 'adocao-caes': break; 
-                case 'adocao-gatos': break;
-                case 'como-baixar-app': break;
-                case 'instalar-ios': break;
-                case 'farmacia': break; // <-- ADIÇÃO 2
-            }
-
-            initPageModals();
-            updateLoginStatus();
-        } catch (error) {
-            console.error('Falha ao carregar a página:', error);
-            appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
-        } finally {
-            setTimeout(() => loadingOverlay.style.display = 'none', 300);
-            window.scrollTo(0, 0);
-
-            // Adiciona a animação apenas na página inicial
-            if (pageName === 'home') {
-    setTimeout(() => {
-        // A sintaxe correta do forEach é com "(el => { ... })"
-        document.querySelectorAll('.animate-on-load').forEach(el => {
-            el.classList.add('animated');
-        });
-    }, 100);
-}
-
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
         await Promise.all([
@@ -956,3 +900,4 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
