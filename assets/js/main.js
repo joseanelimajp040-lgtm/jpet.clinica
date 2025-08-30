@@ -402,60 +402,109 @@ async function renderRelatedProducts(category, currentProductId) {
     }
 }
 // --- NOVO: Gerador de avaliações realistas ---
+// SUBSTITUA SUA FUNÇÃO ANTIGA POR ESTA VERSÃO COMPLETA E MELHORADA
 function generateRealisticReviews(productId, productCategory) {
-    // Bancos de frases para criar variedade
-    const nomes = ["Ana S.", "Bruno C.", "Carla M.", "Diego F.", "Elisa R.", "Fábio L.", "Mariana P.", "Lucas G.", "Sofia A.", "Rafael B."];
-    const comentariosPositivos = {
-        geral: ["Produto excelente, super recomendo!", "Cumpre o que promete.", "Meu pet adorou!", "Qualidade muito boa, vale a pena.", "Chegou super rápido e bem embalado."],
-        ração: ["Meu cachorro se adaptou super bem.", "Notei o pelo dele mais brilhante.", "Ótimo custo-benefício.", "Ele come tudo, parece que o sabor é ótimo."],
-        brinquedo: ["Parece ser bem resistente.", "Meu gato não para de brincar.", "Mantém ele entretido por horas.", "Tamanho perfeito para o meu pet."],
-    };
-    const comentariosMedianos = {
-        geral: ["É um bom produto, mas achei um pouco caro.", "A embalagem poderia ser melhor.", "Demorou um pouco para chegar, mas o produto é bom.", "É bom, mas não vi grandes diferenças."],
-        ração: ["Meu cachorro gostou, mas o cheiro é um pouco forte.", "É uma boa ração, mas os grãos são um pouco grandes para raças pequenas."],
-        brinquedo: ["Meu cachorro destruiu em uma semana, mas ele é bem agitado.", "Faz um pouco de barulho, mas ele adora."],
+    // --- BANCO DE DADOS DE CONTEÚDO (MUITO MAIS EXTENSO E RELEVANTE) ---
+
+    // Nomes e Pets para dar personalidade
+    const perfis = [
+        { nome: "Ana S.", pet: "Thor", raca: "Golden Retriever" },
+        { nome: "Bruno C.", pet: "Nina", raca: "Gata SRD" },
+        { nome: "Carla M.", pet: "Luke", raca: "Bulldog Francês" },
+        { nome: "Diego F.", pet: "Mel", raca: "Shih Tzu" },
+        { nome: "Elisa R.", pet: "Simba", raca: "Gato Persa" },
+        { nome: "Fábio L.", pet: "Bolinha", raca: "Lhasa Apso" },
+        { nome: "Mariana P.", pet: "Fred", raca: "Spitz Alemão" },
+        { nome: "Lucas G.", pet: "Biscoito", raca: "Beagle" },
+        { nome: "Sofia A.", pet: "Paçoca", raca: "Gato Siamês" },
+        { nome: "Rafael B.", pet: "Rocky", raca: "Vira-lata Caramelo" }
+    ];
+
+    // Estruturas de Frases para combinação
+    const templates = {
+        intros: ["Comprei para o meu", "Estava procurando algo assim para a", "Adorei o produto!", "Recomendação do veterinário, e realmente funciona.", "Segunda vez que compro e continuo satisfeito."],
+        outros: ["A entrega foi super rápida, chegou em 2 dias.", "Ótimo custo-benefício.", "Com certeza comprarei novamente.", "Embalagem muito segura e prática.", "O atendimento da loja foi excelente."],
+        neutros: [
+            "O cheiro é um pouco forte no início, mas depois acostuma.",
+            "Gostaria que tivesse uma opção de embalagem maior.",
+            "É um pouco mais caro que outras marcas, mas a qualidade compensa.",
+            "Meu pet demorou um pouquinho para se adaptar, mas agora adora.",
+            "A cor do produto é um pouco diferente da foto, mas não é um problema."
+        ]
     };
 
+    // Comentários Específicos por Categoria
+    const comentariosPorCategoria = {
+        ração: {
+            positivos: ["Notei o pelo dele muito mais brilhante e macio.", "Ele devora tudo, o sabor deve ser ótimo.", "Ajudou muito na digestão, as fezes ficaram mais firmes.", "Os ingredientes parecem ser de ótima qualidade.", "Meu pet parece ter muito mais energia agora."],
+        },
+        brinquedo: {
+            positivos: ["Super resistente! Meu cachorro é destruidor e ainda não conseguiu estragar.", "Mantém ele entretido por horas.", "Fácil de limpar, o que é ótimo.", "O tamanho é perfeito para a boca dele.", "O barulhinho que faz o enlouquece de alegria."],
+        },
+        higiene: {
+            positivos: ["Deixou o pelo super macio e cheiroso.", "Não causou nenhuma alergia na pele sensível dele.", "Faz uma boa espuma e limpa de verdade.", "O cheirinho suave dura por dias.", "Muito eficaz para tirar os nós."],
+        },
+        farmacia: {
+            positivos: ["Foi muito fácil de administrar.", "Notei o resultado em poucos dias, foi bem rápido.", "Recomendado pelo nosso veterinário e funcionou perfeitamente.", "Aliviou o desconforto do meu pet visivelmente.", "Não teve nenhum efeito colateral negativo."],
+        },
+        geral: { // Caso a categoria não seja uma das acima
+            positivos: ["Produto excelente, super recomendo!", "Cumpre exatamente o que promete.", "Meu pet adorou, foi um sucesso aqui em casa.", "A qualidade do material é muito boa, vale a pena.", "Um dos melhores produtos que já comprei para ele(a)."],
+        }
+    };
+    
     const reviews = [];
-    // Usa o ID do produto para criar um "seed" numérico. Isso garante que o mesmo produto sempre terá as mesmas avaliações.
-    const seed = productId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const numReviews = 3 + (seed % 5); // Gera entre 3 e 7 avaliações
+    // Algoritmo Pseudo-Aleatório Melhorado (LCG) para mais variedade
+    let seed = productId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const nextRandom = () => {
+        seed = (seed * 1664525 + 1013904223) % 4294967296;
+        return seed / 4294967296;
+    };
+
+    const numReviews = 5 + Math.floor(nextRandom() * 11); // Gera entre 5 e 15 avaliações
 
     for (let i = 0; i < numReviews; i++) {
-        // Usa o seed para tornar a aleatoriedade consistente
-        const randomizer = Math.sin(seed + i) * 10000;
-        const randomValue = randomizer - Math.floor(randomizer);
-
-        const nome = nomes[Math.floor(randomValue * nomes.length)];
-        const estrelas = 3.5 + (randomValue * 1.5); // Gera notas entre 3.5 e 5.0
+        const perfil = perfis[Math.floor(nextRandom() * perfis.length)];
+        const nomeCompleto = `${perfil.nome} (dono(a) do ${perfil.pet}, um ${perfil.raca})`;
         
-        const diasAtras = Math.floor(randomValue * 90) + 1; // Avaliações nos últimos 3 meses
+        const estrelas = 4 + nextRandom() * 1; // Gera notas entre 4.0 e 5.0
+        
+        const diasAtras = Math.floor(nextRandom() * 120) + 1; // Avaliações nos últimos 4 meses
         const data = new Date();
         data.setDate(data.getDate() - diasAtras);
-        const dataFormatada = data.toLocaleDateString('pt-BR');
+        
+        // --- Montagem inteligente do comentário ---
+        const categoria = comentariosPorCategoria[productCategory] ? productCategory : 'geral';
+        const poolPositivo = comentariosPorCategoria[categoria].positivos;
 
-        // Monta o comentário
-        let comentario = "";
-        const poolPositivo = comentariosPositivos[productCategory] || comentariosPositivos.geral;
-        comentario += poolPositivo[Math.floor(randomValue * poolPositivo.length)];
-        // 1 em cada 4 avaliações terá um ponto mediano para parecer mais real
-        if (i % 4 === 0) {
-            const poolMediano = comentariosMedianos[productCategory] || comentariosMedianos.geral;
-            comentario += " " + poolMediano[Math.floor(randomValue * poolMediano.length)];
+        let comentario = templates.intros[Math.floor(nextRandom() * templates.intros.length)]
+            .replace("meu", `meu ${perfil.raca}`)
+            .replace("a", `a ${perfil.raca}`);
+
+        comentario += " " + poolPositivo[Math.floor(nextRandom() * poolPositivo.length)];
+        
+        // Adiciona uma segunda frase positiva em 70% dos casos
+        if (nextRandom() < 0.7) {
+             comentario += " " + poolPositivo[Math.floor(nextRandom() * poolPositivo.length)];
         }
         
+        // Adiciona uma frase neutra em 25% dos casos para dar realismo
+        if (nextRandom() < 0.25) {
+            comentario += " " + templates.neutros[Math.floor(nextRandom() * templates.neutros.length)];
+        }
+
+        comentario += " " + templates.outros[Math.floor(nextRandom() * templates.outros.length)];
+        
         reviews.push({
-            nome: nome,
-            avatar: nome.substring(0, 1),
-            estrelas: Math.round(estrelas * 2) / 2, // Arredonda para .0 ou .5
-            data: dataFormatada,
+            nome: nomeCompleto,
+            avatar: perfil.nome.substring(0, 1),
+            estrelas: Math.round(estrelas * 2) / 2,
+            data: data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
             comentario: comentario,
             verificada: true
         });
     }
     return reviews;
 }
-
 // --- NOVO: Função para renderizar as avaliações no HTML ---
 function renderReviews(reviews) {
     const container = document.getElementById('tab-reviews');
@@ -1147,5 +1196,6 @@ function initProductPageListeners() {
     
     initializeApp();
 });
+
 
 
