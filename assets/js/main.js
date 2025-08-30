@@ -615,7 +615,7 @@ if (pageName !== 'home') {
     // Agora procuramos por <button> também!
     const allPossibleElements = appRoot.querySelectorAll('a, button');
 // ... dentro do switch (pageName)
-case 'produto':
+'produto':
     if (params.id) {
         await renderProductPage(params.id);
         initProductPageListeners(); // <-- ADICIONE ESTA LINHA
@@ -906,6 +906,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
