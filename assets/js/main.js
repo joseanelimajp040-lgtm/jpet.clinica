@@ -724,7 +724,7 @@ function handleSocialLogin(providerName) {
 
             initPageModals();
             updateLoginStatus();
-        } catch (error)
+        } catch (error) {
             console.error('Falha ao carregar a página:', error);
             appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
         } finally {
@@ -956,27 +956,3 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
