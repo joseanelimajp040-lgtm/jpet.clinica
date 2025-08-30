@@ -2213,3 +2213,76 @@ input[type='number'] {
     color: #991b1b; /* red-800 */
 }
 /* ========== FIM: NOVOS ESTILOS PÁGINA DE PRODUTO ========== */
+
+/* ... (todo o seu CSS existente) ... */
+
+/* ========== INÍCIO: NOVOS ESTILOS PARA SEÇÃO DE AVALIAÇÕES ========== */
+
+.reviews-summary {
+    background-color: #f8fafc; /* bg-slate-50 */
+    border: 1px solid #e2e8f0; /* border-slate-200 */
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.review-card {
+    border-bottom: 1px solid #e2e8f0; /* border-slate-200 */
+    padding: 1.5rem 0;
+}
+
+.review-card:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #cbd5e1; /* bg-slate-300 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #475569; /* text-slate-600 */
+    margin-right: 0.75rem;
+}
+
+.review-author {
+    font-weight: 600;
+    color: #1e293b; /* text-slate-800 */
+}
+
+.review-date {
+    color: #64748b; /* text-slate-500 */
+    font-size: 0.875rem;
+}
+
+.verified-purchase {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #15803d; /* green-700 */
+    margin-left: 1rem;
+}
+
+.review-stars {
+    margin-bottom: 0.75rem;
+}
+
+.review-comment {
+    color: #334155; /* text-slate-700 */
+    line-height: 1.6;
+}
+/* ========== FIM: NOVOS ESTILOS PARA SEÇÃO DE AVALIAÇÕES ========== */
