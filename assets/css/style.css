@@ -2097,3 +2097,18 @@ input[type='number'] {
     font-size: 1rem; /* Ajusta o tamanho do ícone */
 }
 /* ========== FIM: Estilo do Botão Voltar ========== */
+
+/* ========== INÍCIO: Estilos da Página de Produto ========== */
+
+/* Estilo para a miniatura de imagem (thumbnail) ativa */
+.thumbnail-active {
+    border-color: #FF6B00; /* Cor primária (laranja) */
+    box-shadow: 0 0 0 2px #FF6B00;
+}
+
+/* Garante que o cursor mude para indicar que é clicável */
+.thumbnail-item {
+    cursor: pointer;
+}
+
+/* ========== FIM: Estilos da Página de Produto ========== */
