@@ -16,11 +16,11 @@ firebase.initializeApp(firebaseConfig);
 /* --- SERVICE WORKER (Mantido desativado por segurança) --- */
 /*
 if ('serviceWorker' in navigator) {
- window.addEventListener('load', () => {
-   navigator.serviceWorker.register('/jpet.clinica/sw.js')
-     .then(registration => console.log('Service Worker registrado com sucesso:', registration))
-     .catch(error => console.log('Falha ao registrar o Service Worker:', error));
- });
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/jpet.clinica/sw.js')
+            .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+            .catch(error => console.log('Falha ao registrar o Service Worker:', error));
+    });
 }
 */
 
@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
         appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
     };
-
     function showAnimation(overlayId, duration, callback) {
         const overlay = document.getElementById(overlayId);
         if (overlay) {
@@ -58,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, duration);
         }
     }
-
     function censorString(str) {
         if (!str) return '';
         if (str.length <= 4) return str.length > 1 ? str[0] + '*'.repeat(str.length - 1) : '*';
@@ -66,15 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const end = str.substring(str.length - 2);
         return `${start}${'*'.repeat(str.length - 4)}${end}`;
     }
-
     function managePageStyles(pageName) {
-        // Gerencia classe para páginas de tela cheia
+        // Controla a classe de página inteira
         if (pageName === 'farmacia') {
             document.body.classList.add('is-fullpage');
         } else {
             document.body.classList.remove('is-fullpage');
         }
-        // Gerencia decorações de fundo
+        // Controla decorações especiais do body
         if (pageName === 'instalar-ios' || pageName === 'login') {
             document.body.classList.add('body-has-decorations');
         } else {
@@ -108,28 +105,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
                 const firstName = fullName.split(' ')[0];
                 placeholder.innerHTML = `
-                    <div class="relative user-menu-container">
-                        <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
-                            <div class="flex items-center space-x-2">
-                                <i class="fas fa-user-check"></i>
-                                <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
-                                <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
-                            </div>
+                <div class="relative user-menu-container">
+                    <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-user-check"></i>
+                            <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
+                            <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
                         </div>
-                        <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
-                            <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
-                            <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
-                            <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
-                            <div class="border-t border-gray-100"></div>
-                            <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
-                        </div>
-                    </div>`;
+                    </div>
+                    <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                        <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
+                        <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
+                        <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
+                        <div class="border-t border-gray-100"></div>
+                        <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
+                    </div>
+                </div>`;
             } else {
                 placeholder.innerHTML = `
-                    <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
-                        <i class="fas fa-user"></i>
-                        <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
-                    </a>`;
+                <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
+                    <i class="fas fa-user"></i>
+                    <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
+                </a>`;
             }
         });
     }
@@ -148,62 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateElementText('checkout-total', formatCurrency(total));
     }
 
-    function updateAllHeartIcons() {
-        document.querySelectorAll('.favorite-btn').forEach(btn => {
-            const icon = btn.querySelector('i');
-            const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
-            if (isFav) {
-                icon.classList.remove('far', 'text-gray-300');
-                icon.classList.add('fas', 'text-red-500');
-            } else {
-                icon.classList.remove('fas', 'text-red-500');
-                icon.classList.add('far', 'text-gray-300');
-            }
-        });
-    }
-
-    // --- FUNÇÕES DE RENDERIZAÇÃO DE PÁGINAS E COMPONENTES ---
-    function createProductCardHTML(productData, productId) {
-        const { nome, image, price, originalPrice } = productData;
-        const isFav = state.favorites.some(fav => fav.id === productId);
-        const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
-        
-        let priceHTML = `<span class="text-primary font-bold text-lg">${formatCurrency(price)}</span>`;
-        let discountBadgeHTML = '';
-
-        if (originalPrice && originalPrice > price) {
-            priceHTML = `
-                <div>
-                    <span class="text-sm text-gray-400 line-through">${formatCurrency(originalPrice)}</span>
-                    <span class="text-primary font-bold text-lg block">${formatCurrency(price)}</span>
-                </div>`;
-            const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
-            discountBadgeHTML = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
-        }
-
-        return `
-            <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" 
-                 data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
-                <div class="relative">
-                    ${discountBadgeHTML}
-                    <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
-                        <i class="${favIconClass} fa-heart"></i>
-                    </button>
-                    <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
-                        <img src="${image}" alt="${nome}" class="w-full h-48 object-contain p-4">
-                    </a>
-                </div>
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${nome}</h3>
-                    <div class="mb-4">${priceHTML}</div>
-                    <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
-                        data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
-                        <i class="fas fa-shopping-cart mr-2"></i> Adicionar
-                    </button>
-                </div>
-            </div>`;
-    }
-
+    // --- FUNÇÕES DE RENDERIZAÇÃO DE PÁGINAS ---
     function renderCart() {
         const container = document.getElementById('cart-items-container');
         if (!container) return;
@@ -234,17 +176,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTotals();
     }
 
+    function updateAllHeartIcons() {
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const icon = btn.querySelector('i');
+            const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
+            if (isFav) {
+                icon.classList.remove('far', 'text-gray-300');
+                icon.classList.add('fas', 'text-red-500');
+            } else {
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far', 'text-gray-300');
+            }
+        });
+    }
+
     function renderFavoritesPage() {
         const container = document.getElementById('favorites-items-container');
         const emptyState = document.getElementById('favorites-empty-state');
         const clearBtn = document.getElementById('clear-favorites-btn');
         const summaryEl = document.getElementById('favorites-summary');
         if (!container || !emptyState || !clearBtn || !summaryEl) return;
-        
         const count = state.favorites.length;
         summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
         container.innerHTML = '';
-        
         if (state.favorites.length === 0) {
             emptyState.classList.remove('hidden');
             container.classList.add('hidden');
@@ -254,11 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             container.classList.remove('hidden');
             clearBtn.classList.remove('hidden');
             state.favorites.forEach(item => {
-                const productData = {
-                    nome: item.name, image: item.image,
-                    price: item.price, originalPrice: null
-                };
-                container.insertAdjacentHTML('beforeend', createProductCardHTML(productData, item.id));
+                container.insertAdjacentHTML('beforeend', `<div class="product-card bg-white rounded-lg shadow" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${item.image}"><div class="relative"><button class="favorite-btn absolute top-2 right-2 text-2xl" data-id="${item.id}"><i class="fas fa-heart text-red-500"></i></button><img src="${item.image}" class="w-full h-48 object-contain p-4"></div><div class="p-4"><h3 class="font-medium text-gray-800 mb-1 h-12">${item.name}</h3><div class="mb-2"><span class="text-primary font-bold">${formatCurrency(item.price)}</span></div><button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium"><i class="fas fa-shopping-cart mr-2"></i> Adicionar</button></div></div>`);
             });
         }
     }
@@ -277,10 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const agendaGrid = document.getElementById('agenda-grid');
         if (!agendaGrid) return;
         agendaGrid.innerHTML = '';
-        const today = new Date('2025-08-15T10:00:00'); // Data fixa para consistência
+        const today = new Date('2025-08-15T10:00:00');
         const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-        
         agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
         for (let i = 0; i < 7; i++) {
             const day = new Date(today);
@@ -297,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
                 const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
                 if (appointment) {
-                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "'");
                     agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
                 } else {
                     agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
@@ -308,7 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderProductPage(productId) {
         try {
-            const doc = await db.collection('produtos').doc(productId).get();
+            const docRef = db.collection('produtos').doc(productId);
+            const doc = await docRef.get();
             if (doc.exists) {
                 const productData = doc.data();
                 document.getElementById('main-product-image').src = productData.image;
@@ -318,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('product-description').innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
                 document.getElementById('product-price').textContent = formatCurrency(productData.price);
                 document.getElementById('breadcrumb-category').textContent = productData.category;
-                
                 const originalPriceEl = document.getElementById('product-original-price');
                 const discountBadgeEl = document.getElementById('product-discount-badge');
                 if (productData.originalPrice && productData.originalPrice > productData.price) {
@@ -331,14 +280,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     originalPriceEl.classList.add('hidden');
                     discountBadgeEl.classList.add('hidden');
                 }
-
                 const thumbnailsContainer = document.getElementById('product-thumbnails');
                 thumbnailsContainer.innerHTML = '';
                 const imageGallery = [productData.image, ...(productData.gallery || [])];
                 imageGallery.forEach((imgUrl, index) => {
-                    thumbnailsContainer.insertAdjacentHTML('beforeend', `<img src="${imgUrl}" alt="Miniatura ${index + 1}" class="thumbnail-item border-2 rounded-md p-1 ${index === 0 ? 'thumbnail-active border-primary' : 'border-transparent'}">`);
+                    thumbnailsContainer.insertAdjacentHTML('beforeend', `
+                        <img src="${imgUrl}" alt="Miniatura ${index + 1}" class="thumbnail-item border-2 rounded-md p-1 ${index === 0 ? 'thumbnail-active border-primary' : 'border-transparent'}">
+                    `);
                 });
-
                 const addToCartBtn = document.getElementById('add-to-cart-product-page');
                 addToCartBtn.dataset.id = productId;
                 addToCartBtn.dataset.name = productData.nome;
@@ -346,28 +295,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 addToCartBtn.dataset.image = productData.image;
                 addToCartBtn.classList.add('add-to-cart-btn');
             } else {
+                console.error("Produto não encontrado no Firebase com o ID:", productId);
                 appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
             }
-        } catch (error) { console.error("Erro ao buscar produto:", error); }
+        } catch (error) {
+            console.error("Erro ao buscar produto:", error);
+        }
+    }
+    
+    function createProductCardHTML(productData, productId) {
+        const { nome, image, price, originalPrice } = productData;
+        const isFav = state.favorites.some(fav => fav.id === productId);
+        const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
+        
+        let priceHTML = `<span class="text-primary font-bold text-lg">${formatCurrency(price)}</span>`;
+        let discountBadgeHTML = '';
+
+        if (originalPrice && originalPrice > price) {
+            priceHTML = `
+                <div>
+                    <span class="text-sm text-gray-400 line-through">${formatCurrency(originalPrice)}</span>
+                    <span class="text-primary font-bold text-lg block">${formatCurrency(price)}</span>
+                </div>
+            `;
+            const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
+            discountBadgeHTML = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
+        }
+
+        return `
+            <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
+                <div class="relative">
+                    ${discountBadgeHTML}
+                    <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
+                        <i class="${favIconClass} fa-heart"></i>
+                    </button>
+                    <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
+                        <img src="${image}" alt="${nome}" class="w-full h-48 object-contain p-4">
+                    </a>
+                </div>
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${nome}</h3>
+                    <div class="mb-4">
+                        ${priceHTML}
+                    </div>
+                    <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
+                        data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
+                        <i class="fas fa-shopping-cart mr-2"></i> Adicionar
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
     async function renderFeaturedProducts() {
         const container = document.getElementById('featured-products-container');
-        if (!container) return;
+        if (!container) return; 
+
         try {
             const snapshot = await db.collection('produtos').where('featured', '==', true).limit(8).get();
+
             if (snapshot.empty) {
                 container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhum produto em destaque no momento.</p>';
-            } else {
-                container.innerHTML = '';
-                snapshot.forEach(doc => {
-                    container.insertAdjacentHTML('beforeend', createProductCardHTML(doc.data(), doc.id));
-                });
+                return;
             }
-        } catch (error) { console.error("Erro ao buscar produtos em destaque: ", error); }
-    }
 
-    // --- INICIALIZAÇÃO DE EVENT LISTENERS DE PÁGINAS ---
+            container.innerHTML = ''; 
+            snapshot.forEach(doc => {
+                const productCard = createProductCardHTML(doc.data(), doc.id);
+                container.insertAdjacentHTML('beforeend', productCard);
+            });
+
+        } catch (error) {
+            console.error("Erro ao buscar produtos em destaque: ", error);
+            container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar os produtos.</p>';
+        }
+    }
+    
+    // --- INICIALIZAÇÃO DE LISTENERS ESPECÍFICOS DE PÁGINAS ---
     function initProductPageListeners() {
         const mainImage = document.getElementById('main-product-image');
         const thumbnailsContainer = document.getElementById('product-thumbnails');
@@ -376,7 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const thumbnail = e.target.closest('.thumbnail-item');
                 if (!thumbnail || !mainImage) return;
                 mainImage.src = thumbnail.src;
-                thumbnailsContainer.querySelectorAll('.thumbnail-item').forEach(img => img.classList.remove('thumbnail-active', 'border-primary'));
+                thumbnailsContainer.querySelectorAll('.thumbnail-item').forEach(img => {
+                    img.classList.remove('thumbnail-active', 'border-primary');
+                });
                 thumbnail.classList.add('thumbnail-active', 'border-primary');
             });
         }
@@ -385,11 +391,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const plusBtn = document.getElementById('quantity-plus');
         if (minusBtn && plusBtn && quantityInput) {
             minusBtn.addEventListener('click', () => {
-                let val = parseInt(quantityInput.value);
-                if (val > 1) quantityInput.value = val - 1;
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
             });
             plusBtn.addEventListener('click', () => {
-                quantityInput.value = parseInt(quantityInput.value) + 1;
+                let currentValue = parseInt(quantityInput.value);
+                quantityInput.value = currentValue + 1;
             });
         }
     }
@@ -397,11 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function initBanhoTosaEventListeners() {
         const pageContainer = document.getElementById('app-root');
         if (!pageContainer) return;
-
         pageContainer.addEventListener('click', e => {
             const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
             const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
-            
             const availableSlot = e.target.closest('.time-slot.available');
             if (availableSlot) {
                 if (state.loggedInUser) {
@@ -416,22 +423,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     openModal(document.getElementById('login-required-modal'));
                 }
             }
-            
             const bookedSlot = e.target.closest('.time-slot.booked');
             if (bookedSlot) {
-                const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+                const appointment = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
                 document.getElementById('details-tutor-name').textContent = censorString(appointment.tutorName);
                 document.getElementById('details-pet-name').textContent = censorString(appointment.petName);
                 document.getElementById('details-phone-number').textContent = censorString(appointment.phoneNumber);
                 openModal(document.getElementById('appointment-details-modal'));
             }
-
             if (e.target.closest('#redirect-to-login-btn')) {
                 closeModal(document.getElementById('login-required-modal'));
                 loadPage('login');
             }
         });
-
         const bookingForm = document.getElementById('booking-form');
         if (bookingForm) {
             bookingForm.addEventListener('submit', e => {
@@ -446,43 +450,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.appointments.push(newAppointment);
                 save.appointments();
                 document.getElementById('booking-modal').style.display = 'none';
-                showAnimation('success-animation-overlay', 1500, () => renderCalendar());
+                showAnimation('success-animation-overlay', 1500);
+                renderCalendar();
             });
         }
     }
-
+    
     // --- LÓGICA DE AUTENTICAÇÃO ---
     function handleSocialLogin(providerName) {
         const errorEl = document.getElementById('login-error');
         if (errorEl) errorEl.classList.add('hidden');
-
         let provider;
-        if (providerName === 'google') provider = new firebase.auth.GoogleAuthProvider();
-        else if (providerName === 'apple') {
+        if (providerName === 'google') {
+            provider = new firebase.auth.GoogleAuthProvider();
+        } else if (providerName === 'apple') {
             provider = new firebase.auth.OAuthProvider('apple.com');
-            provider.addScope('email'); provider.addScope('name');
-        } 
-        else return console.error('Provider não suportado:', providerName);
-
-        auth.signInWithPopup(provider).then((result) => {
-            if (result.additionalUserInfo.isNewUser) {
-                return db.collection('users').doc(result.user.uid).set({
-                    name: result.user.displayName, email: result.user.email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => loadPage('home'));
-            } else {
-                loadPage('home');
-            }
-        }).catch((error) => {
-            console.error("Erro no login social:", error);
-            const currentErrorEl = document.getElementById('login-error');
-            if (!currentErrorEl) return;
-            let msg = "Ocorreu um erro ao tentar entrar. Tente novamente.";
-            if (error.code === 'auth/account-exists-with-different-credential') msg = "Já existe uma conta com este e-mail.";
-            else if (error.code === 'auth/popup-closed-by-user') return;
-            currentErrorEl.textContent = msg;
-            currentErrorEl.classList.remove('hidden');
-        });
+            provider.addScope('email');
+            provider.addScope('name');
+        } else {
+            console.error('Provider não suportado:', providerName);
+            return;
+        }
+        auth.signInWithPopup(provider)
+            .then((result) => {
+                const user = result.user;
+                const additionalUserInfo = result.additionalUserInfo;
+                if (additionalUserInfo.isNewUser) {
+                    console.log('Novo usuário via login social, criando registro no Firestore...');
+                    return db.collection('users').doc(user.uid).set({
+                        name: user.displayName,
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        loadPage('home');
+                    });
+                } else {
+                    console.log('Usuário existente logado via login social.');
+                    loadPage('home');
+                }
+            })
+            .catch((error) => {
+                console.error("Erro no login social:", error);
+                const currentErrorEl = document.getElementById('login-error');
+                if (!currentErrorEl) return;
+                let errorMessage = "Ocorreu um erro ao tentar entrar. Tente novamente.";
+                if (error.code === 'auth/account-exists-with-different-credential') {
+                    errorMessage = "Já existe uma conta com este e-mail. Tente entrar com o método original.";
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    return;
+                }
+                currentErrorEl.textContent = errorMessage;
+                currentErrorEl.classList.remove('hidden');
+            });
     }
 
     function handleCreateAccount(event) {
@@ -492,18 +511,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('signup-password').value;
         const errorEl = document.getElementById('signup-error');
         errorEl.classList.add('hidden');
-        
         auth.createUserWithEmailAndPassword(email, password)
-            .then(cred => cred.user.updateProfile({ displayName: name })
-                .then(() => db.collection('users').doc(cred.user.uid).set({
-                    name: name, email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }))
-            )
+            .then(userCredential => {
+                const user = userCredential.user;
+                return user.updateProfile({ displayName: name })
+                    .then(() => db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }));
+            })
             .then(() => {
                 alert(`Conta para ${name} criada com sucesso! Por favor, faça o login.`);
                 loadPage('login');
             })
             .catch(error => {
+                console.error("Erro ao criar conta:", error);
                 errorEl.textContent = "Erro: " + error.message;
                 errorEl.classList.remove('hidden');
             });
@@ -517,43 +540,48 @@ document.addEventListener('DOMContentLoaded', () => {
         errorEl.classList.add('hidden');
         auth.signInWithEmailAndPassword(email, password)
             .then(() => loadPage('home'))
-            .catch(() => {
+            .catch(error => {
+                console.error("Erro ao fazer login:", error);
                 errorEl.textContent = "E-mail ou senha inválidos.";
                 errorEl.classList.remove('hidden');
             });
     }
 
-    function handleLogout() { auth.signOut().catch(error => console.error("Erro ao fazer logout:", error)); }
+    function handleLogout() {
+        auth.signOut().catch(error => console.error("Erro ao fazer logout:", error));
+    }
     
     auth.onAuthStateChanged(user => {
-        state.loggedInUser = user ? { email: user.email, uid: user.uid, displayName: user.displayName } : null;
+        if (user) {
+            state.loggedInUser = { email: user.email, uid: user.uid, displayName: user.displayName };
+        } else {
+            state.loggedInUser = null;
+        }
         updateLoginStatus();
     });
 
-    // --- LÓGICA E MANIPULADORES DE EVENTOS GLOBAIS ---
+    // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
     function handleAddToCart(event) {
         const button = event.target.closest('.add-to-cart-btn');
         if (!button || button.classList.contains('added')) return;
-        
         const quantityInput = document.getElementById('product-quantity');
         const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
         const productData = button.dataset;
         if (!productData.id) return;
-
         const existingProduct = state.cart.find(item => item.id === productData.id);
         if (existingProduct) {
             existingProduct.quantity += quantity;
         } else {
             state.cart.push({
-                id: productData.id, name: productData.name,
-                price: parseFloat(productData.price), image: productData.image,
+                id: productData.id,
+                name: productData.name,
+                price: parseFloat(productData.price),
+                image: productData.image,
                 quantity: quantity
             });
         }
-        
         save.cart();
         updateCounters();
-
         const originalContent = button.innerHTML;
         button.classList.add('added');
         button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
@@ -569,7 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!button) return;
         const card = button.closest('.product-card');
         if (!card) return;
-        
         const productId = card.dataset.id;
         const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
         if (favoriteIndex > -1) {
@@ -579,37 +606,42 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             state.favorites.push({
-                id: productId, name: card.dataset.name,
-                price: parseFloat(card.dataset.price), image: card.querySelector('img').src
+                id: productId,
+                name: card.dataset.name,
+                price: parseFloat(card.dataset.price),
+                image: card.querySelector('img').src
             });
         }
-        
         save.favorites();
         updateCounters();
         updateAllHeartIcons();
     }
-
-    // --- LÓGICA DO CHAT DA MARRIE ---
+    
+    // --- LÓGICA DE CONVERSA DO CHATBOT MARRIE ---
     function addChatMessage(message, sender) {
-        const chatWindowBody = document.querySelector('#marrie-chat-window .overflow-y-auto');
+        const chatWindowBody = document.getElementById('marrie-chat-window')?.querySelector('.overflow-y-auto');
         if (!chatWindowBody) return;
-
+        
         const typingIndicator = chatWindowBody.querySelector('.typing-indicator');
-        if (typingIndicator) typingIndicator.remove();
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
 
         const messageContainer = document.createElement('div');
         messageContainer.className = 'chat-message-container';
+        
         const messageBubble = document.createElement('div');
         messageBubble.className = `chat-message ${sender}-message`;
         messageBubble.textContent = message;
         
         messageContainer.appendChild(messageBubble);
         chatWindowBody.appendChild(messageContainer);
+        
         chatWindowBody.scrollTop = chatWindowBody.scrollHeight;
     }
 
     function showTypingIndicator() {
-        const chatWindowBody = document.querySelector('#marrie-chat-window .overflow-y-auto');
+        const chatWindowBody = document.getElementById('marrie-chat-window')?.querySelector('.overflow-y-auto');
         if (!chatWindowBody) return;
         const indicator = document.createElement('div');
         indicator.className = 'typing-indicator';
@@ -620,6 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleSendMessage() {
         const chatInput = document.getElementById('marrie-chat-input');
+        if (!chatInput) return;
         const userMessage = chatInput.value.trim();
         if (!userMessage) return;
 
@@ -633,15 +666,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMessage }),
             });
+
             if (!response.ok) throw new Error('A resposta da rede não foi OK.');
+
             const data = await response.json();
             addChatMessage(data.reply, 'ai');
         } catch (error) {
+            console.error('Erro ao contatar a Marrie:', error);
             addChatMessage('Desculpe, estou com um probleminha para me conectar. Tente novamente mais tarde.', 'ai');
         }
     }
 
-    // --- CARREGAMENTO DE PÁGINAS (ROTEAMENTO) ---
+    // --- CARREGAMENTO DE PÁGINAS ---
     async function loadComponent(url, placeholderId) {
         try {
             const response = await fetch(url);
@@ -653,18 +689,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadPage(pageName, params = {}) {
         managePageStyles(pageName);
         loadingOverlay.style.display = 'flex';
-        
+    
         try {
+            // ETAPA 1: Carrega o conteúdo HTML da página
             const response = await fetch(`pages/${pageName}.html`);
             if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
             appRoot.innerHTML = await response.text();
-        
-            // Lógica unificada para mostrar/esconder elementos do header
-            const topBanner = document.getElementById('top-banner');
-            if(topBanner) topBanner.style.display = pageName === 'home' ? '' : 'none';
-            const mainNavBar = document.getElementById('main-nav-bar');
-            if(mainNavBar) mainNavBar.style.display = pageName === 'home' ? '' : 'none';
-
+    
+            // ETAPA 2: Lógica do botão "Voltar para o início"
             if (pageName !== 'home') {
                 const backButtonHTML = `
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -673,54 +705,82 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </div>`;
                 appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
-                
-                appRoot.querySelectorAll('a, button').forEach(element => {
-                    if (element.textContent.trim().includes('Voltar para o início') && !element.hasAttribute('data-dynamic-back-button')) {
-                        element.remove();
+    
+                const allPossibleElements = appRoot.querySelectorAll('a, button');
+                allPossibleElements.forEach(element => {
+                    const hasText = element.textContent.trim().includes('Voltar para o início');
+                    const isOurButton = element.hasAttribute('data-dynamic-back-button');
+    
+                    if (hasText && !isOurButton) {
+                        element.parentElement.remove();
                     }
                 });
             }
-        
+            
+            // ETAPA 3: Controla visibilidade de elementos globais (Banners, etc)
+            const topBanner = document.getElementById('top-banner');
+            if(topBanner) pageName === 'home' ? topBanner.classList.remove('hidden') : topBanner.classList.add('hidden');
+            
+            const mainNavBar = document.getElementById('main-nav-bar');
+            if(mainNavBar) pageName === 'home' ? mainNavBar.classList.remove('hidden') : mainNavBar.classList.add('hidden');
+    
+            // ETAPA 4: Executa o código específico para a página que foi carregada
             switch (pageName) {
                 case 'home':
                     initSlider();
                     initComparisonSlider();
                     renderFeaturedProducts();
+                    updateAllHeartIcons();
                     break;
                 case 'cart':
                     renderCart();
-                    initCartPageListeners();
+                    initCartPageListeners(state);
                     break;
                 case 'produto':
                     if (params.id) {
                         await renderProductPage(params.id);
                         initProductPageListeners();
+                    } else {
+                        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
                     }
                     break;
                 case 'checkout':
                     renderCheckoutSummary();
-                    initCheckoutPageListeners();
+                    initCheckoutPageListeners(state);
                     break;
-                case 'favorites': renderFavoritesPage(); break;
+                case 'favorites':
+                    renderFavoritesPage();
+                    updateAllHeartIcons();
+                    break;
                 case 'banho-e-tosa':
                     renderCalendar();
                     initBanhoTosaEventListeners();
                     break;
+                // Páginas estáticas que não precisam de JS específico
+                case 'adocao-caes':
+                case 'adocao-gatos':
+                case 'como-baixar-app':
+                case 'instalar-ios':
+                case 'farmacia':
+                    break;
             }
-            
+    
             initPageModals();
-            updateAllHeartIcons();
             updateLoginStatus();
-        
+    
         } catch (error) {
             console.error('Falha ao carregar a página:', error);
-            appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página.</p>`;
+            appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
         } finally {
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
-        
+    
             if (pageName === 'home') {
-                setTimeout(() => document.querySelectorAll('.animate-on-load').forEach(el => el.classList.add('animated')), 100);
+                setTimeout(() => {
+                    document.querySelectorAll('.animate-on-load').forEach(el => {
+                        el.classList.add('animated');
+                    });
+                }, 100);
             }
         }
     }
@@ -732,11 +792,14 @@ document.addEventListener('DOMContentLoaded', () => {
             loadComponent('components/footer.html', 'footer-placeholder')
         ]);
         
+        // --- LISTENERS GLOBAIS ---
         document.body.addEventListener('click', (e) => {
             const navLink = e.target.closest('.nav-link');
-            if (navLink?.dataset.page) {
+            if (navLink && navLink.dataset.page) {
                 e.preventDefault();
-                loadPage(navLink.dataset.page, { id: navLink.dataset.id });
+                const pageName = navLink.dataset.page;
+                const params = { id: navLink.dataset.id };
+                loadPage(pageName, params);
             }
 
             if (e.target.closest('.logout-btn')) handleLogout();
@@ -745,46 +808,64 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.closest('.add-to-cart-btn')) handleAddToCart(e);
             if (e.target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
-            const removeFromCartBtn = e.target.closest('.remove-from-cart');
-            if (removeFromCartBtn) {
-                state.cart = state.cart.filter(item => item.id !== removeFromCartBtn.dataset.id);
-                save.cart(); updateCounters(); renderCart();
+            if (e.target.closest('.remove-from-cart')) {
+                const productId = e.target.closest('.remove-from-cart').dataset.id;
+                state.cart = state.cart.filter(item => item.id !== productId);
+                save.cart();
+                updateCounters();
+                renderCart();
             }
-
-            const quantityChangeBtn = e.target.closest('.quantity-change');
-            if (quantityChangeBtn) {
-                const item = state.cart.find(item => item.id === quantityChangeBtn.dataset.id);
+            if (e.target.closest('.quantity-change')) {
+                const btn = e.target.closest('.quantity-change');
+                const productId = btn.dataset.id;
+                const change = parseInt(btn.dataset.change);
+                const item = state.cart.find(item => item.id === productId);
                 if (item) {
-                    item.quantity += parseInt(quantityChangeBtn.dataset.change);
+                    item.quantity += change;
                     if (item.quantity < 1) item.quantity = 1;
-                    save.cart(); updateCounters(); renderCart();
+                    save.cart();
+                    updateCounters();
+                    renderCart();
                 }
             }
-
             if (e.target.closest('#clear-cart-btn')) {
-                if (confirm('Tem certeza?')) showAnimation('clear-cart-animation-overlay', 5800, () => {
-                    state.cart = []; save.cart(); updateCounters(); renderCart();
-                });
+                if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+                    showAnimation('clear-cart-animation-overlay', 5800, () => {
+                        state.cart = [];
+                        save.cart();
+                        updateCounters();
+                        renderCart();
+                    });
+                }
             }
             if (e.target.closest('#clear-favorites-btn')) {
-                if (confirm('Tem certeza?')) showAnimation('unfavorite-animation-overlay', 1500, () => {
-                    state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
-                });
+                if (confirm('Tem certeza que deseja limpar seus favoritos?')) {
+                    showAnimation('unfavorite-animation-overlay', 1500, () => {
+                        state.favorites = [];
+                        save.favorites();
+                        updateCounters();
+                        renderFavoritesPage();
+                    });
+                }
             }
             if (e.target.closest('#checkout-btn')) {
                 e.preventDefault();
                 if (state.cart.length === 0) return alert("Seu carrinho está vazio.");
                 if (!state.shipping.neighborhood) {
                     alert("Por favor, selecione uma taxa de entrega.");
-                    document.getElementById('shipping-modal')?.style.display = 'flex';
+                    const shippingModal = document.getElementById('shipping-modal');
+                    if (shippingModal) shippingModal.style.display = 'flex';
                     return;
                 }
                 loadPage('checkout');
             }
             if (e.target.closest('#confirm-purchase-btn')) {
                 alert('Compra confirmada com sucesso! Obrigado.');
-                state.cart = []; state.shipping = { fee: 0, neighborhood: '' };
-                save.cart(); updateCounters(); loadPage('home');
+                state.cart = [];
+                state.shipping = { fee: 0, neighborhood: '' };
+                save.cart();
+                updateCounters();
+                loadPage('home');
             }
         });
 
@@ -800,56 +881,53 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTotals();
         });
 
-        // --- LÓGICA E EVENTOS DO CHAT DA MARRIE ---
+        // --- LÓGICA COMPLETA DO CHATBOT MARRIE E PLAQUINHA ---
         const marrieButton = document.getElementById('marrie-chat-button');
         const marrieWindow = document.getElementById('marrie-chat-window');
         const marrieCloseButton = document.getElementById('marrie-chat-close');
+        const chatInput = document.getElementById('marrie-chat-input');
+        const chatSendButton = document.getElementById('marrie-chat-send');
         const plaqueContainer = document.getElementById('marrie-plaque-container');
 
-        if (marrieButton && marrieWindow && marrieCloseButton) {
-            // **CORREÇÃO APLICADA AQUI**
-            marrieButton.addEventListener('click', () => {
-                marrieWindow.classList.toggle('active');
-                if (marrieWindow.classList.contains('active')) {
-                    marrieWindow.classList.remove('hidden');
-                } else {
-                    setTimeout(() => {
-                        marrieWindow.classList.add('hidden');
-                    }, 500); // Espera a animação de saída (fade-out) terminar
-                }
-            });
-            marrieCloseButton.addEventListener('click', () => {
-                marrieWindow.classList.remove('active');
-                setTimeout(() => {
-                    marrieWindow.classList.add('hidden');
-                }, 500);
-            });
-        }
-
+        // Lógica da Plaquinha
         if (plaqueContainer && marrieButton) {
             let plaqueTimer;
             const showPlaque = () => {
                 plaqueContainer.classList.add('active');
                 plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
             };
+            setTimeout(showPlaque, 2000);
             const hidePlaque = () => {
                 clearTimeout(plaqueTimer);
                 plaqueContainer.classList.remove('active');
                 marrieButton.removeEventListener('click', hidePlaque);
             };
-            setTimeout(showPlaque, 2000);
             marrieButton.addEventListener('click', hidePlaque);
         }
+        
+        // Lógica de abrir/fechar janela do Chat
+        if (marrieButton && marrieWindow && marrieCloseButton) {
+            const toggleChatWindow = () => {
+                marrieWindow.classList.toggle('active');
+                if (marrieWindow.classList.contains('active')) {
+                    marrieWindow.classList.remove('hidden');
+                } else {
+                    setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+                }
+            };
+            marrieButton.addEventListener('click', toggleChatWindow);
+            marrieCloseButton.addEventListener('click', toggleChatWindow);
+        }
 
-        const chatInput = document.getElementById('marrie-chat-input');
-        const chatSendButton = document.getElementById('marrie-chat-send');
+        // Lógica de envio de mensagens do Chat
         if (chatInput && chatSendButton) {
             chatSendButton.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleSendMessage();
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') handleSendMessage();
             });
         }
         
+        // --- CARGA INICIAL ---
         updateCounters();
         await loadPage('home');
     }
