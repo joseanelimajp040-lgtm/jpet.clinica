@@ -142,6 +142,42 @@ if (state.loggedInUser) {
      }
  });
 }
+function initProductPageListeners() {
+    const mainImage = document.getElementById('main-product-image');
+    const thumbnailsContainer = document.getElementById('product-thumbnails');
+    
+    // Event listener para a galeria de miniaturas
+    thumbnailsContainer.addEventListener('click', (e) => {
+        const thumbnail = e.target.closest('.thumbnail-item');
+        if (!thumbnail || !mainImage) return;
+
+        // Troca a imagem principal
+        mainImage.src = thumbnail.src;
+
+        // Atualiza o estilo da miniatura ativa
+        thumbnailsContainer.querySelectorAll('.thumbnail-item').forEach(img => {
+            img.classList.remove('thumbnail-active', 'border-primary');
+        });
+        thumbnail.classList.add('thumbnail-active', 'border-primary');
+    });
+
+    // Event listeners para o seletor de quantidade
+    const quantityInput = document.getElementById('product-quantity');
+    const minusBtn = document.getElementById('quantity-minus');
+    const plusBtn = document.getElementById('quantity-plus');
+
+    minusBtn.addEventListener('click', () => {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+
+    plusBtn.addEventListener('click', () => {
+        let currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    });
+}
     function updateTotals() {
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const shippingFee = state.shipping.fee || 0;
@@ -272,36 +308,53 @@ if (state.loggedInUser) {
     }
 async function renderProductPage(productId) {
     try {
-        // Pega o documento do produto no Firebase usando o ID
         const docRef = db.collection('produtos').doc(productId);
         const doc = await docRef.get();
 
         if (doc.exists) {
             const productData = doc.data();
 
-            // Preenche os elementos do HTML com os dados do Firebase
-            document.getElementById('product-image').src = productData.image;
-            document.getElementById('product-image').alt = productData.nome;
+            // --- Preenche os dados básicos ---
+            document.getElementById('main-product-image').src = productData.image;
+            document.getElementById('main-product-image').alt = productData.nome;
             document.getElementById('product-name').textContent = productData.nome;
-            document.getElementById('product-brand').textContent = productData.brand;
+            document.getElementById('product-brand').querySelector('span').textContent = productData.brand;
             document.getElementById('product-description').innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
             document.getElementById('product-price').textContent = formatCurrency(productData.price);
-            
+            document.getElementById('breadcrumb-category').textContent = productData.category;
+
+            // --- Lógica de Preço Original e Desconto ---
             const originalPriceEl = document.getElementById('product-original-price');
+            const discountBadgeEl = document.getElementById('product-discount-badge');
             if (productData.originalPrice && productData.originalPrice > productData.price) {
                 originalPriceEl.textContent = formatCurrency(productData.originalPrice);
                 originalPriceEl.classList.remove('hidden');
+                
+                const discount = Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100);
+                discountBadgeEl.textContent = `-${discount}%`;
+                discountBadgeEl.classList.remove('hidden');
             } else {
                 originalPriceEl.classList.add('hidden');
+                discountBadgeEl.classList.add('hidden');
             }
 
-            // Configura o botão "Adicionar ao Carrinho" com os dados do produto
+            // --- Lógica da Galeria de Miniaturas ---
+            const thumbnailsContainer = document.getElementById('product-thumbnails');
+            thumbnailsContainer.innerHTML = ''; // Limpa antes de adicionar
+            // Assumindo que você terá um campo 'gallery' com um array de URLs no Firebase
+            const imageGallery = [productData.image, ...(productData.gallery || [])]; 
+            imageGallery.forEach((imgUrl, index) => {
+                thumbnailsContainer.insertAdjacentHTML('beforeend', `
+                    <img src="${imgUrl}" alt="Miniatura ${index + 1}" class="thumbnail-item border-2 rounded-md p-1 ${index === 0 ? 'thumbnail-active border-primary' : 'border-transparent'}">
+                `);
+            });
+
+            // --- Configura o Botão "Adicionar ao Carrinho" ---
             const addToCartBtn = document.getElementById('add-to-cart-product-page');
-            addToCartBtn.dataset.id = productId; // Usa o ID do documento
+            addToCartBtn.dataset.id = productId;
             addToCartBtn.dataset.name = productData.nome;
             addToCartBtn.dataset.price = productData.price;
             addToCartBtn.dataset.image = productData.image;
-            // Adiciona a classe para que o evento de clique funcione
             addToCartBtn.classList.add('add-to-cart-btn');
 
         } else {
@@ -472,24 +525,43 @@ function handleSocialLogin(providerName) {
 
     // --- MANIPULADORES DE EVENTOS DE PRODUTO ---
     function handleAddToCart(event) {
-        const button = event.target.closest('.add-to-cart-btn');
-        if (!button || button.classList.contains('added')) return;
-        const card = button.closest('.product-card, .container');
-        if (!card || !card.dataset.id) return;
-        const product = { id: card.dataset.id, name: card.dataset.name, price: parseFloat(card.dataset.price), image: card.dataset.image };
-        const existingProduct = state.cart.find(item => item.id === product.id);
-        if (existingProduct) existingProduct.quantity++;
-        else state.cart.push({ ...product, quantity: 1 });
-        save.cart();
-        updateCounters();
-        const originalContent = button.innerHTML;
-        button.classList.add('added');
-        button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
-        setTimeout(() => {
-            button.classList.remove('added');
-            button.innerHTML = originalContent;
-        }, 2000);
+    const button = event.target.closest('.add-to-cart-btn');
+    if (!button || button.classList.contains('added')) return;
+
+    // Acha o campo de quantidade, se existir na página do produto
+    const quantityInput = document.getElementById('product-quantity');
+    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+
+    // Pega os dados do produto do botão
+    const productData = button.dataset;
+    if (!productData.id) return;
+
+    const existingProduct = state.cart.find(item => item.id === productData.id);
+    if (existingProduct) {
+        existingProduct.quantity += quantity;
+    } else {
+        state.cart.push({
+            id: productData.id,
+            name: productData.name,
+            price: parseFloat(productData.price),
+            image: productData.image,
+            quantity: quantity
+        });
     }
+    
+    save.cart();
+    updateCounters();
+
+    // Animação de sucesso no botão
+    const originalContent = button.innerHTML;
+    button.classList.add('added');
+    button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
+    setTimeout(() => {
+        button.classList.remove('added');
+        button.innerHTML = originalContent;
+        if(quantityInput) quantityInput.value = '1'; // Reseta a quantidade para 1
+    }, 2000);
+}
     function handleFavoriteToggle(event) {
         const button = event.target.closest('.favorite-btn');
         if (!button) return;
@@ -544,15 +616,14 @@ if (pageName !== 'home') {
     const allPossibleElements = appRoot.querySelectorAll('a, button');
 // ... dentro do switch (pageName)
 case 'produto':
-    // Se a página for 'produto', chama a função para renderizar com o ID
     if (params.id) {
         await renderProductPage(params.id);
+        initProductPageListeners(); // <-- ADICIONE ESTA LINHA
     } else {
-        // Se não tiver ID, mostra um erro ou volta pra home
         appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
     }
     break;
-// ... outros cases
+// ...
     allPossibleElements.forEach(element => {
         const hasText = element.textContent.trim().includes('Voltar para o início');
         const isOurButton = element.hasAttribute('data-dynamic-back-button');
@@ -835,6 +906,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
