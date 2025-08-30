@@ -593,7 +593,7 @@ function handleSocialLogin(providerName) {
         } catch (error) { console.error(error); }
     }
 
-   async function loadPage(pageName, params = {}) {
+  async function loadPage(pageName, params = {}) {
     managePageStyles(pageName);
     loadingOverlay.style.display = 'flex';
 
@@ -605,7 +605,6 @@ function handleSocialLogin(providerName) {
 
         // ETAPA 2: Lógica do botão "Voltar para o início"
         if (pageName !== 'home') {
-            // Adiciona o nosso botão novo e correto
             const backButtonHTML = `
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                     <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
@@ -614,7 +613,6 @@ function handleSocialLogin(providerName) {
                 </div>`;
             appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
 
-            // Remove qualquer botão "Voltar" antigo para evitar duplicidade
             const allPossibleElements = appRoot.querySelectorAll('a, button');
             allPossibleElements.forEach(element => {
                 const hasText = element.textContent.trim().includes('Voltar para o início');
@@ -654,6 +652,7 @@ function handleSocialLogin(providerName) {
                 renderFavoritesPage();
                 updateAllHeartIcons();
                 break;
+
             case 'banho-e-tosa':
                 renderCalendar();
                 initBanhoTosaEventListeners();
@@ -663,11 +662,9 @@ function handleSocialLogin(providerName) {
             case 'como-baixar-app':
             case 'instalar-ios':
             case 'farmacia':
-                // Nenhuma ação extra de JS necessária para estas páginas por enquanto
                 break;
         }
 
-        // ETAPA 4: Lógica que roda para todas as páginas (depois do switch)
         initPageModals();
         updateLoginStatus();
 
@@ -678,7 +675,7 @@ function handleSocialLogin(providerName) {
         setTimeout(() => loadingOverlay.style.display = 'none', 300);
         window.scrollTo(0, 0);
 
-        // Adiciona a animação apenas na página inicial
+        // Adiciona a animação apenas na página inicial (CÓDIGO CORRIGIDO AQUI)
         if (pageName === 'home') {
             setTimeout(() => {
                 document.querySelectorAll('.animate-on-load').forEach(el => {
@@ -959,6 +956,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
