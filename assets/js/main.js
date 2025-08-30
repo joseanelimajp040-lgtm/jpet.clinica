@@ -807,13 +807,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const plaqueContainer = document.getElementById('marrie-plaque-container');
 
         if (marrieButton && marrieWindow && marrieCloseButton) {
+            // **CORREÇÃO APLICADA AQUI**
             marrieButton.addEventListener('click', () => {
                 marrieWindow.classList.toggle('active');
-                marrieWindow.classList.toggle('hidden', !marrieWindow.classList.contains('active'));
+                if (marrieWindow.classList.contains('active')) {
+                    marrieWindow.classList.remove('hidden');
+                } else {
+                    setTimeout(() => {
+                        marrieWindow.classList.add('hidden');
+                    }, 500); // Espera a animação de saída (fade-out) terminar
+                }
             });
             marrieCloseButton.addEventListener('click', () => {
                 marrieWindow.classList.remove('active');
-                setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+                setTimeout(() => {
+                    marrieWindow.classList.add('hidden');
+                }, 500);
             });
         }
 
