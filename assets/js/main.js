@@ -614,26 +614,44 @@ if (pageName !== 'home') {
     // ETAPA 2: Remove o botão ANTIGO (hardcoded no cart.html, etc.)
     // Agora procuramos por <button> também!
     const allPossibleElements = appRoot.querySelectorAll('a, button');
-// ... dentro do switch (pageName)
-'produto':
-    if (params.id) {
-        await renderProductPage(params.id);
-        initProductPageListeners(); // <-- ADICIONE ESTA LINHA
-    } else {
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
-    }
-    break;
-// ...
-    allPossibleElements.forEach(element => {
-        const hasText = element.textContent.trim().includes('Voltar para o início');
-        const isOurButton = element.hasAttribute('data-dynamic-back-button');
+// Executa o código específico para a página que foi carregada
+    switch (pageName) {
+        case 'home':
+            initSlider();
+            initComparisonSlider();
+            renderFeaturedProducts(); 
+            updateAllHeartIcons();
+            break;
 
-        if (hasText && !isOurButton) {
-            // CORREÇÃO FINAL: Remove APENAS o elemento antigo, e não o seu container.
-            element.remove();
-        }
-    });
-}
+        case 'cart':
+            renderCart();
+            initCartPageListeners();
+            break;
+
+        case 'produto':
+            if (params.id) {
+                await renderProductPage(params.id);
+                initProductPageListeners();
+            } else {
+                appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
+            }
+            break;
+        
+        case 'checkout': 
+            renderCheckoutSummary(); 
+            initCheckoutPageListeners(); 
+            break;
+
+        case 'favorites': 
+            renderFavoritesPage(); 
+            updateAllHeartIcons(); 
+            break;
+
+        case 'banho-e-tosa': 
+            renderCalendar(); 
+            initBanhoTosaEventListeners(); 
+            break;
+    }
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
@@ -906,6 +924,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
