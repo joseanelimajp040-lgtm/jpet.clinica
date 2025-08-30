@@ -703,7 +703,6 @@ function handleSocialLogin(providerName) {
                 }
             }
             
-           if (pageName === 'instalar-ios' || pageName === 'login') {
                 document.body.classList.add('body-has-decorations');
            } else {
                 document.body.classList.remove('body-has-decorations');
@@ -954,4 +953,5 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
