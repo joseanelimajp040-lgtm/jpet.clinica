@@ -736,14 +736,13 @@ function handleSocialLogin(providerName) {
 
             // Adiciona a animação apenas na página inicial
             if (pageName === 'home') {
-                setTimeout(() => {
-                    document.querySelectorAll('.animate-on-load').forEach(el => {
-                        el.classList.add('animated');
-                    });
-                }, 100);
-            }
-        }
-    }
+    setTimeout(() => {
+        // A sintaxe correta do forEach é com "(el => { ... })"
+        document.querySelectorAll('.animate-on-load').forEach(el => {
+            el.classList.add('animated');
+        });
+    }, 100);
+}
 
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     async function initializeApp() {
@@ -960,6 +959,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
