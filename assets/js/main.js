@@ -270,6 +270,48 @@ if (state.loggedInUser) {
             }
         });
     }
+async function renderProductPage(productId) {
+    try {
+        // Pega o documento do produto no Firebase usando o ID
+        const docRef = db.collection('produtos').doc(productId);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+            const productData = doc.data();
+
+            // Preenche os elementos do HTML com os dados do Firebase
+            document.getElementById('product-image').src = productData.image;
+            document.getElementById('product-image').alt = productData.nome;
+            document.getElementById('product-name').textContent = productData.nome;
+            document.getElementById('product-brand').textContent = productData.brand;
+            document.getElementById('product-description').innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
+            document.getElementById('product-price').textContent = formatCurrency(productData.price);
+            
+            const originalPriceEl = document.getElementById('product-original-price');
+            if (productData.originalPrice && productData.originalPrice > productData.price) {
+                originalPriceEl.textContent = formatCurrency(productData.originalPrice);
+                originalPriceEl.classList.remove('hidden');
+            } else {
+                originalPriceEl.classList.add('hidden');
+            }
+
+            // Configura o botão "Adicionar ao Carrinho" com os dados do produto
+            const addToCartBtn = document.getElementById('add-to-cart-product-page');
+            addToCartBtn.dataset.id = productId; // Usa o ID do documento
+            addToCartBtn.dataset.name = productData.nome;
+            addToCartBtn.dataset.price = productData.price;
+            addToCartBtn.dataset.image = productData.image;
+            // Adiciona a classe para que o evento de clique funcione
+            addToCartBtn.classList.add('add-to-cart-btn');
+
+        } else {
+            console.error("Produto não encontrado no Firebase com o ID:", productId);
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
+        }
+    } catch (error) {
+        console.error("Erro ao buscar produto:", error);
+    }
+}
     function initBanhoTosaEventListeners() {
         const pageContainer = document.getElementById('app-root');
         if (!pageContainer) return;
@@ -479,7 +521,7 @@ function handleSocialLogin(providerName) {
         } catch (error) { console.error(error); }
     }
 
-   async function loadPage(pageName) {
+   async function loadPage(pageName, params = {}) {
         managePageStyles(pageName); // <-- ADIÇÃO 1
         loadingOverlay.style.display = 'flex';
         try {
@@ -488,7 +530,7 @@ function handleSocialLogin(providerName) {
             appRoot.innerHTML = await response.text();
 // Adiciona o botão "Voltar para o início" se a página não for a 'home'
 if (pageName !== 'home') {
-    // ETAPA 1: Adiciona o nosso botão CORRETO primeiro.
+    // ETAPA 1: Adiciona o botão CORRETO primeiro.
     const backButtonHTML = `
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
@@ -500,7 +542,17 @@ if (pageName !== 'home') {
     // ETAPA 2: Remove o botão ANTIGO (hardcoded no cart.html, etc.)
     // Agora procuramos por <button> também!
     const allPossibleElements = appRoot.querySelectorAll('a, button');
-
+// ... dentro do switch (pageName)
+case 'produto':
+    // Se a página for 'produto', chama a função para renderizar com o ID
+    if (params.id) {
+        await renderProductPage(params.id);
+    } else {
+        // Se não tiver ID, mostra um erro ou volta pra home
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
+    }
+    break;
+// ... outros cases
     allPossibleElements.forEach(element => {
         const hasText = element.textContent.trim().includes('Voltar para o início');
         const isOurButton = element.hasAttribute('data-dynamic-back-button');
@@ -783,6 +835,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
