@@ -402,113 +402,60 @@ async function renderRelatedProducts(category, currentProductId) {
     }
 }
 // --- NOVO: Gerador de avaliações realistas ---
-// SUBSTITUA SUA FUNÇÃO generateRealisticReviews PELA VERSÃO ABAIXO. ELA É MUITO MAIS AVANÇADA.
 function generateRealisticReviews(productId, productCategory) {
-    // --- BANCO DE DADOS DE CONTEÚDO SEMÂNTICO ---
-    const bancoDeDados = {
-        perfis: [
-            { nome: "Ana S.", pet: "Thor", raca: "Golden Retriever" },
-            { nome: "Bruno C.", pet: "Nina", raca: "Gata SRD" },
-            { nome: "Carla M.", pet: "Luke", raca: "Bulldog Francês" },
-            { nome: "Diego F.", pet: "Mel", raca: "Shih Tzu" },
-            { nome: "Elisa R.", pet: "Simba", raca: "Gato Persa" },
-            { nome: "Fábio L.", pet: "Bolinha", raca: "Lhasa Apso" },
-            { nome: "Mariana P.", pet: "Fred", raca: "Spitz Alemão" },
-            { nome: "Lucas G.", pet: "Biscoito", raca: "Beagle" },
-            { nome: "Sofia A.", pet: "Paçoca", raca: "Gato Siamês" },
-            { nome: "Rafael B.", pet: "Rocky", raca: "Vira-lata Caramelo" }
-        ],
-        templatesPorCategoria: {
-            ração: [
-                "O {pet}, meu {raca}, é bem chato pra comer, mas devorou essa ração! Notei o pelo dele até mais brilhante. Recomendo!",
-                "Excelente! Ajudou muito na digestão do {pet}. As fezes ficaram mais firmes e ele parece mais disposto. Ótimo custo-benefício.",
-                "Meu {raca} se adaptou super bem. Os grãos são de um tamanho bom e ele come tudo sem reclamar. A entrega foi pontual.",
-                "Qualidade premium. Dá pra ver pelos ingredientes. O cheiro é agradável e o {pet} fica esperando ansiosamente pela hora de comer.",
-                "A veterinária recomendou e realmente valeu a pena. O {pet} está com muito mais energia. O único ponto é que a embalagem poderia ter um fecho melhor."
-            ],
-            brinquedo: [
-                "Este brinquedo é o novo favorito do {pet}! Super resistente às mordidas do meu {raca}. Já comprei outros que não duraram um dia, mas este está intacto.",
-                "Mantém o {pet} entretido por horas! Perfeito para os dias que preciso trabalhar em casa. O material parece ser de boa qualidade e seguro.",
-                "A {pet} ficou doida com o barulhinho que faz! É o primeiro brinquedo que ela pega quando acorda. A cor é bem vibrante, fácil de achar pela casa.",
-                "Ótimo para a saúde dental do {pet}. Ele passa um bom tempo roendo e ajuda a limpar os dentes. Aprovado!",
-                "Comprei para meu {raca} e foi um sucesso. É um pouco menor do que eu imaginava, mas ele adorou mesmo assim. Comprarei outros da mesma marca."
-            ],
-            higiene: [
-                "Usei este shampoo no {pet} e o resultado foi incrível. Deixou o pelo super macio e com um cheirinho muito agradável que dura dias. Recomendo!",
-                "Meu {raca} tem a pele sensível e este produto não causou nenhuma irritação. Limpa bem e é suave. Excelente qualidade.",
-                "O perfume é muito bom, não é forte demais. O pelo da {pet} ficou desembaraçado e fácil de escovar. Valeu cada centavo.",
-                "Prático e eficiente. Usei o produto para limpeza das patinhas do {pet} depois do passeio e funcionou perfeitamente. Comprarei de novo.",
-                "Deixa um brilho maravilhoso no pelo escuro do meu {raca}. Além disso, rende bastante. Estou muito satisfeito com a compra."
-            ],
-            farmacia: [
-                "Foi muito fácil de administrar para o {pet}, não tive problemas. O efeito foi rápido e ele melhorou visivelmente em poucos dias.",
-                "Produto recomendado pelo nosso veterinário. Cumpriu exatamente o que prometia e ajudou na recuperação da {pet}. Embalagem segura.",
-                "Aliviou o desconforto do meu {raca} quase que imediatamente. É um item essencial para ter no nosso kit de primeiros socorros.",
-                "O aplicador facilita muito o uso. Consegui dar o remédio para o {pet} sem estresse. A eficácia foi comprovada.",
-                "O custo-benefício é ótimo comparado a outros que já pesquisei. E o mais importante: funcionou perfeitamente para a {pet}."
-            ],
-            geral: [ // Fallback para categorias não mapeadas
-                "Produto de excelente qualidade, cumpre o que promete. O {pet} se adaptou super bem. A entrega foi muito rápida!",
-                "Estou muito satisfeito(a) com a compra. O item é exatamente como descrito. Meu {raca}, o {pet}, está usando todos os dias.",
-                "Recomendo! Um dos melhores produtos que já comprei para o {pet}. A qualidade é perceptível e valeu o investimento."
-            ]
-        }
+    // Bancos de frases para criar variedade
+    const nomes = ["Ana S.", "Bruno C.", "Carla M.", "Diego F.", "Elisa R.", "Fábio L.", "Mariana P.", "Lucas G.", "Sofia A.", "Rafael B."];
+    const comentariosPositivos = {
+        geral: ["Produto excelente, super recomendo!", "Cumpre o que promete.", "Meu pet adorou!", "Qualidade muito boa, vale a pena.", "Chegou super rápido e bem embalado."],
+        ração: ["Meu cachorro se adaptou super bem.", "Notei o pelo dele mais brilhante.", "Ótimo custo-benefício.", "Ele come tudo, parece que o sabor é ótimo."],
+        brinquedo: ["Parece ser bem resistente.", "Meu gato não para de brincar.", "Mantém ele entretido por horas.", "Tamanho perfeito para o meu pet."],
     };
-
-    // Função interna para garantir que a categoria correta seja usada
-    const getCategoriaRelevante = (productCategory) => {
-        const cat = (productCategory || "").toLowerCase();
-        if (cat.includes('ração') || cat.includes('alimento')) return 'ração';
-        if (cat.includes('brinquedo') || cat.includes('mordedor')) return 'brinquedo';
-        if (cat.includes('shampoo') || cat.includes('higiene') || cat.includes('perfume')) return 'higiene';
-        if (cat.includes('remédio') || cat.includes('farmácia') || cat.includes('suplemento') || cat.includes('antipulgas')) return 'farmacia';
-        return 'geral';
+    const comentariosMedianos = {
+        geral: ["É um bom produto, mas achei um pouco caro.", "A embalagem poderia ser melhor.", "Demorou um pouco para chegar, mas o produto é bom.", "É bom, mas não vi grandes diferenças."],
+        ração: ["Meu cachorro gostou, mas o cheiro é um pouco forte.", "É uma boa ração, mas os grãos são um pouco grandes para raças pequenas."],
+        brinquedo: ["Meu cachorro destruiu em uma semana, mas ele é bem agitado.", "Faz um pouco de barulho, mas ele adora."],
     };
 
     const reviews = [];
-    let seed = productId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const nextRandom = () => {
-        seed = (seed * 1664525 + 1013904223) % 4294967296;
-        return seed / 4294967296;
-    };
-
-    const numReviews = 5 + Math.floor(nextRandom() * 11); // Entre 5 e 15 avaliações
-    const categoriaRelevante = getCategoriaRelevante(productCategory);
-    const poolDeTemplates = bancoDeDados.templatesPorCategoria[categoriaRelevante];
+    // Usa o ID do produto para criar um "seed" numérico. Isso garante que o mesmo produto sempre terá as mesmas avaliações.
+    const seed = productId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const numReviews = 3 + (seed % 5); // Gera entre 3 e 7 avaliações
 
     for (let i = 0; i < numReviews; i++) {
-        const perfil = bancoDeDados.perfis[Math.floor(nextRandom() * bancoDeDados.perfis.length)];
-        const nomeCompleto = `${perfil.nome} (dono(a) do ${perfil.pet}, um ${perfil.raca})`;
+        // Usa o seed para tornar a aleatoriedade consistente
+        const randomizer = Math.sin(seed + i) * 10000;
+        const randomValue = randomizer - Math.floor(randomizer);
+
+        const nome = nomes[Math.floor(randomValue * nomes.length)];
+        const estrelas = 3.5 + (randomValue * 1.5); // Gera notas entre 3.5 e 5.0
         
-        const estrelas = 4 + nextRandom(); // Gera notas entre 4.0 e 5.0
-        
-        const diasAtras = Math.floor(nextRandom() * 120) + 1; // Últimos 4 meses
+        const diasAtras = Math.floor(randomValue * 90) + 1; // Avaliações nos últimos 3 meses
         const data = new Date();
         data.setDate(data.getDate() - diasAtras);
-        
-        // Seleciona um template e preenche os placeholders
-        let comentario = poolDeTemplates[Math.floor(nextRandom() * poolDeTemplates.length)];
-        comentario = comentario.replace(/{pet}/g, perfil.pet).replace(/{raca}/g, perfil.raca);
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+
+        // Monta o comentário
+        let comentario = "";
+        const poolPositivo = comentariosPositivos[productCategory] || comentariosPositivos.geral;
+        comentario += poolPositivo[Math.floor(randomValue * poolPositivo.length)];
+        // 1 em cada 4 avaliações terá um ponto mediano para parecer mais real
+        if (i % 4 === 0) {
+            const poolMediano = comentariosMedianos[productCategory] || comentariosMedianos.geral;
+            comentario += " " + poolMediano[Math.floor(randomValue * poolMediano.length)];
+        }
         
         reviews.push({
-            nome: nomeCompleto,
-            avatar: perfil.nome.substring(0, 1),
+            nome: nome,
+            avatar: nome.substring(0, 1),
             estrelas: Math.round(estrelas * 2) / 2, // Arredonda para .0 ou .5
-            data: data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
+            data: dataFormatada,
             comentario: comentario,
             verificada: true
         });
     }
-    // Garante que não haja perfis duplicados, para maior realismo
-    const perfisUsados = new Set();
-    return reviews.filter(review => {
-        if (perfisUsados.has(review.nome)) {
-            return false;
-        }
-        perfisUsados.add(review.nome);
-        return true;
-    });
+    return reviews;
 }
+
 // --- NOVO: Função para renderizar as avaliações no HTML ---
 function renderReviews(reviews) {
     const container = document.getElementById('tab-reviews');
@@ -1200,7 +1147,4 @@ function initProductPageListeners() {
     
     initializeApp();
 });
-
-
-
 
