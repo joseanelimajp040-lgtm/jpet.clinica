@@ -900,3 +900,4 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
