@@ -703,7 +703,10 @@ function handleSocialLogin(providerName) {
                 }
             }
             
+           if (pageName === 'instalar-ios' || pageName === 'login') {
                 document.body.classList.add('body-has-decorations');
+           } else {
+                document.body.classList.remove('body-has-decorations');
            }
             
             switch (pageName) {
@@ -721,8 +724,10 @@ function handleSocialLogin(providerName) {
 
             initPageModals();
             updateLoginStatus();
+        } catch (error) {
             console.error('Falha ao carregar a página:', error);
             appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
+        } finally {
             setTimeout(() => loadingOverlay.style.display = 'none', 300);
             window.scrollTo(0, 0);
 
@@ -951,7 +956,3 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
-
-
-
-
