@@ -594,64 +594,100 @@ function handleSocialLogin(providerName) {
     }
 
    async function loadPage(pageName, params = {}) {
-        managePageStyles(pageName); // <-- ADIÇÃO 1
-        loadingOverlay.style.display = 'flex';
-        try {
-            const response = await fetch(`pages/${pageName}.html`);
-            if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
-            appRoot.innerHTML = await response.text();
-// Adiciona o botão "Voltar para o início" se a página não for a 'home'
-if (pageName !== 'home') {
-    // ETAPA 1: Adiciona o botão CORRETO primeiro.
-    const backButtonHTML = `
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-            <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
-                <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
-            </a>
-        </div>`;
-    appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
+    managePageStyles(pageName);
+    loadingOverlay.style.display = 'flex';
 
-    // ETAPA 2: Remove o botão ANTIGO (hardcoded no cart.html, etc.)
-    // Agora procuramos por <button> também!
-    const allPossibleElements = appRoot.querySelectorAll('a, button');
-// Executa o código específico para a página que foi carregada
-    switch (pageName) {
-        case 'home':
-            initSlider();
-            initComparisonSlider();
-            renderFeaturedProducts(); 
-            updateAllHeartIcons();
-            break;
+    try {
+        // ETAPA 1: Carrega o conteúdo HTML da página
+        const response = await fetch(`pages/${pageName}.html`);
+        if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
+        appRoot.innerHTML = await response.text();
 
-        case 'cart':
-            renderCart();
-            initCartPageListeners();
-            break;
+        // ETAPA 2: Lógica do botão "Voltar para o início"
+        if (pageName !== 'home') {
+            // Adiciona o nosso botão novo e correto
+            const backButtonHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
+                        <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
+                    </a>
+                </div>`;
+            appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
 
-        case 'produto':
-            if (params.id) {
-                await renderProductPage(params.id);
-                initProductPageListeners();
-            } else {
-                appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
-            }
-            break;
-        
-        case 'checkout': 
-            renderCheckoutSummary(); 
-            initCheckoutPageListeners(); 
-            break;
+            // Remove qualquer botão "Voltar" antigo para evitar duplicidade
+            const allPossibleElements = appRoot.querySelectorAll('a, button');
+            allPossibleElements.forEach(element => {
+                const hasText = element.textContent.trim().includes('Voltar para o início');
+                const isOurButton = element.hasAttribute('data-dynamic-back-button');
 
-        case 'favorites': 
-            renderFavoritesPage(); 
-            updateAllHeartIcons(); 
-            break;
+                if (hasText && !isOurButton) {
+                    element.parentElement.remove();
+                }
+            });
+        }
 
-        case 'banho-e-tosa': 
-            renderCalendar(); 
-            initBanhoTosaEventListeners(); 
-            break;
+        // ETAPA 3: Executa o código específico para a página que foi carregada
+        switch (pageName) {
+            case 'home':
+                initSlider();
+                initComparisonSlider();
+                renderFeaturedProducts();
+                updateAllHeartIcons();
+                break;
+            case 'cart':
+                renderCart();
+                initCartPageListeners();
+                break;
+            case 'produto':
+                if (params.id) {
+                    await renderProductPage(params.id);
+                    initProductPageListeners();
+                } else {
+                    appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
+                }
+                break;
+            case 'checkout':
+                renderCheckoutSummary();
+                initCheckoutPageListeners();
+                break;
+            case 'favorites':
+                renderFavoritesPage();
+                updateAllHeartIcons();
+                break;
+            case 'banho-e-tosa':
+                renderCalendar();
+                initBanhoTosaEventListeners();
+                break;
+            case 'adocao-caes':
+            case 'adocao-gatos':
+            case 'como-baixar-app':
+            case 'instalar-ios':
+            case 'farmacia':
+                // Nenhuma ação extra de JS necessária para estas páginas por enquanto
+                break;
+        }
+
+        // ETAPA 4: Lógica que roda para todas as páginas (depois do switch)
+        initPageModals();
+        updateLoginStatus();
+
+    } catch (error) {
+        console.error('Falha ao carregar a página:', error);
+        appRoot.innerHTML = `<p class="text-red-500 text-center py-20">Erro ao carregar a página. Verifique o console.</p>`;
+    } finally {
+        setTimeout(() => loadingOverlay.style.display = 'none', 300);
+        window.scrollTo(0, 0);
+
+        // Adiciona a animação apenas na página inicial
+        if (pageName === 'home') {
+            setTimeout(() => {
+                document.querySelectorAll('.animate-on-load').forEach(el => {
+                    el.classList.add('animated');
+                });
+            }, 100);
+        }
     }
+}
             const topBanner = document.getElementById('top-banner');
             if (topBanner) {
                 if (pageName === 'home') {
@@ -924,6 +960,7 @@ chatInput.addEventListener('keypress', (event) => {
     
     initializeApp();
 });
+
 
 
 
