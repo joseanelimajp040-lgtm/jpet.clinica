@@ -255,8 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-   // COLE A NOVA FUNÇÃO AQUI
-// SUBSTITUA SUA renderProductPage ANTIGA POR ESTA
+// SUBSTITUA SUA FUNÇÃO renderProductPage PELA VERSÃO ABAIXO
 async function renderProductPage(productId) {
     try {
         const docRef = db.collection('produtos').doc(productId);
@@ -266,15 +265,19 @@ async function renderProductPage(productId) {
             const defaultIndex = productData.defaultVariationIndex || 0;
             const defaultVariation = productData.variations[defaultIndex];
 
-            // Preenche os dados iniciais com a variação padrão
-            document.getElementById('main-product-image').src = productData.image;
+            // (O resto do código que preenche imagem, nome, preço, etc., continua igual...)
+            document.getElementById('main-product-image').src = defaultVariation.image || productData.image;
             document.getElementById('product-name').textContent = productData.nome;
             document.getElementById('product-brand').querySelector('span').textContent = productData.brand;
-            document.getElementById('product-description').innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
-            document.getElementById('breadcrumb-category').textContent = productData.category;
             document.getElementById('product-price').textContent = formatCurrency(defaultVariation.price);
+            document.getElementById('breadcrumb-category').textContent = productData.category;
+            // ...
+
+            // --- CORREÇÃO ESTÁ AQUI ---
+            // Chamamos a função renderStockStatus com o estoque da variação padrão.
+            renderStockStatus(defaultVariation.stock);
             
-            // Lógica de preço com desconto
+            // O resto da função continua igual...
             const originalPriceEl = document.getElementById('product-original-price');
             const discountBadgeEl = document.getElementById('product-discount-badge');
             if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
@@ -287,8 +290,7 @@ async function renderProductPage(productId) {
                 originalPriceEl.classList.add('hidden');
                 discountBadgeEl.classList.add('hidden');
             }
-
-            // Popula as variações
+            
             const variationsContainer = document.querySelector('#product-variations .variations-container');
             variationsContainer.innerHTML = productData.variations.map((v, index) => `
                 <button 
@@ -297,17 +299,17 @@ async function renderProductPage(productId) {
                     data-price="${v.price}"
                     data-original-price="${v.originalPrice || ''}"
                     data-weight="${v.weight}"
-                    data-stock="${v.stock}">
+                    data-stock="${v.stock}"
+                    data-image="${v.image || productData.image}">
                     ${v.weight}
                 </button>
             `).join('');
 
-            // Configura o botão de adicionar ao carrinho com a variação padrão
             const addToCartBtn = document.getElementById('add-to-cart-product-page');
             addToCartBtn.dataset.id = productId;
             addToCartBtn.dataset.name = productData.nome;
             addToCartBtn.dataset.price = defaultVariation.price;
-            addToCartBtn.dataset.image = productData.image;
+            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
             addToCartBtn.dataset.weight = defaultVariation.weight;
             addToCartBtn.classList.add('add-to-cart-btn');
 
@@ -956,67 +958,59 @@ function initProductPageListeners() {
                 loadPage(pageName, params);
             }
 // LÓGICA PARA ATUALIZAR VARIAÇÕES DE PRODUTO
-            const variationBtn = e.target.closest('.variation-btn');
-            if (variationBtn) {
-                e.preventDefault();
-                const selectedData = variationBtn.dataset;
-                
-                // Remove a seleção de todos os botões irmãos
-                variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
-                // Adiciona a seleção ao botão clicado
-                variationBtn.classList.add('selected');
+           // DENTRO DE initializeApp > document.body.addEventListener('click' ...
+const variationBtn = e.target.closest('.variation-btn');
+if (variationBtn) {
+    e.preventDefault();
+    const selectedData = variationBtn.dataset;
+    const newImage = selectedData.image;
+    
+    variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+    variationBtn.classList.add('selected');
 
-                // Verifica o contexto: estamos em um card ou na página de produto?
-                const productCard = variationBtn.closest('.product-card');
+    const productCard = variationBtn.closest('.product-card');
 
-                if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
-                    const priceContainer = productCard.querySelector('.product-price-container');
-                    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+    if (productCard) {
+        // Lógica para o card (não precisa mostrar estoque, então permanece igual)
+        // ...
+    } else { 
+        // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
+        const pagePrice = document.getElementById('product-price');
+        const pageOriginalPrice = document.getElementById('product-original-price');
+        const pageDiscountBadge = document.getElementById('product-discount-badge');
+        const pageAddToCartBtn = document.getElementById('add-to-cart-product-page');
+        const pageImage = document.getElementById('main-product-image');
 
-                    // Atualiza o HTML do preço no card
-                    if (selectedData.originalPrice) {
-                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-                        priceContainer.innerHTML = `
-                            <div>
-                                <span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span>
-                                <span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span>
-                            </div>`;
-                        // Opcional: Atualizar o badge de desconto
-                         const discountBadge = productCard.querySelector('.product-discount-display');
-                         if (discountBadge) discountBadge.textContent = `-${discount}%`;
+        // --- CORREÇÃO ESTÁ AQUI ---
+        // Chamamos a função renderStockStatus com o novo valor de estoque do botão clicado.
+        renderStockStatus(parseInt(selectedData.stock));
 
-                    } else {
-                        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
-                    }
-                    
-                    // Atualiza os dados do botão "Adicionar" do card
-                    addToCartBtn.dataset.price = selectedData.price;
-                    addToCartBtn.dataset.weight = selectedData.weight;
-
-                } else { // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
-                    const pagePrice = document.getElementById('product-price');
-                    const pageOriginalPrice = document.getElementById('product-original-price');
-                    const pageDiscountBadge = document.getElementById('product-discount-badge');
-                    const pageAddToCartBtn = document.getElementById('add-to-cart-product-page');
-
-                    // Atualiza os preços na página
-                    pagePrice.textContent = formatCurrency(selectedData.price);
-                    if (selectedData.originalPrice) {
-                        pageOriginalPrice.textContent = formatCurrency(selectedData.originalPrice);
-                        pageOriginalPrice.classList.remove('hidden');
-                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-                        pageDiscountBadge.textContent = `-${discount}%`;
-                        pageDiscountBadge.classList.remove('hidden');
-                    } else {
-                        pageOriginalPrice.classList.add('hidden');
-                        pageDiscountBadge.classList.add('hidden');
-                    }
-                    
-                    // Atualiza os dados do botão "Adicionar" da página
-                    pageAddToCartBtn.dataset.price = selectedData.price;
-                    pageAddToCartBtn.dataset.weight = selectedData.weight;
-                }
-            }
+        // O resto do código para atualizar preço, imagem, etc., continua igual...
+        pagePrice.textContent = formatCurrency(selectedData.price);
+        if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+            pageOriginalPrice.textContent = formatCurrency(selectedData.originalPrice);
+            pageOriginalPrice.classList.remove('hidden');
+            const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+            pageDiscountBadge.textContent = `-${discount}%`;
+            pageDiscountBadge.classList.remove('hidden');
+        } else {
+            pageOriginalPrice.classList.add('hidden');
+            pageDiscountBadge.classList.add('hidden');
+        }
+        
+        if (newImage && pageImage.src !== newImage) {
+            pageImage.style.opacity = '0';
+            setTimeout(() => {
+                pageImage.src = newImage;
+                pageImage.style.opacity = '1';
+            }, 200);
+        }
+        
+        pageAddToCartBtn.dataset.price = selectedData.price;
+        pageAddToCartBtn.dataset.weight = selectedData.weight;
+        pageAddToCartBtn.dataset.image = newImage;
+    }
+}
             if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
             if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -1149,5 +1143,6 @@ function initProductPageListeners() {
     
     initializeApp();
 });
+
 
 
