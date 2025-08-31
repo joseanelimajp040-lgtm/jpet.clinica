@@ -2286,3 +2286,38 @@ input[type='number'] {
     line-height: 1.6;
 }
 /* ========== FIM: NOVOS ESTILOS PARA SEÇÃO DE AVALIAÇÕES ========== */
+
+/* ... (todo o seu CSS existente) ... */
+
+/* ========== INÍCIO: ESTILOS PARA VARIAÇÕES DE PRODUTO ========== */
+.variations-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem; /* 12px */
+    margin-top: 1rem;
+}
+
+.variation-btn {
+    padding: 0.5rem 1rem; /* 8px 16px */
+    border: 2px solid #e2e8f0; /* border-slate-200 */
+    background-color: #f8fafc; /* bg-slate-50 */
+    border-radius: 9999px; /* rounded-full */
+    font-weight: 500;
+    color: #475569; /* text-slate-600 */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.variation-btn:hover {
+    border-color: #cbd5e1; /* border-slate-300 */
+    background-color: #f1f5f9; /* bg-slate-100 */
+}
+
+.variation-btn.selected {
+    border-color: #4ade80; /* green-400 */
+    background-color: #f0fdf4; /* green-50 */
+    color: #166534; /* green-800 */
+    font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
+}
+/* ========== FIM: ESTILOS PARA VARIAÇÕES DE PRODUTO ========== */
