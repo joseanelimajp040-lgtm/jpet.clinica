@@ -254,30 +254,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-// SUBSTITUA SUA FUNÇÃO renderProductPage PELA VERSÃO ABAIXO
+// SUBSTITUA SUA FUNÇÃO renderProductPage INTEIRA PELA VERSÃO COMPLETA E CORRIGIDA ABAIXO
 async function renderProductPage(productId) {
     try {
         const docRef = db.collection('produtos').doc(productId);
         const doc = await docRef.get();
         if (doc.exists) {
             const productData = doc.data();
+
+            // --- 1. LÓGICA DE VARIAÇÕES E AVALIAÇÕES (JÁ EXISTENTE) ---
             const defaultIndex = productData.defaultVariationIndex || 0;
             const defaultVariation = productData.variations[defaultIndex];
+            const reviews = generateRealisticReviews(productId, productData.category); // Supondo que você manteve esta função
+            const totalReviews = reviews.length;
+            const averageRating = totalReviews > 0 ? reviews.reduce((sum, r) => sum + r.estrelas, 0) / totalReviews : 0;
 
-            // (O resto do código que preenche imagem, nome, preço, etc., continua igual...)
+            // --- 2. PREENCHIMENTO DOS DADOS PRINCIPAIS ---
             document.getElementById('main-product-image').src = defaultVariation.image || productData.image;
             document.getElementById('product-name').textContent = productData.nome;
             document.getElementById('product-brand').querySelector('span').textContent = productData.brand;
             document.getElementById('product-price').textContent = formatCurrency(defaultVariation.price);
             document.getElementById('breadcrumb-category').textContent = productData.category;
-            // ...
+            
+            // --- 3. RENDERIZAÇÃO DOS COMPONENTES DINÂMICOS ---
+            
+            // Renderiza a descrição (com verificação de segurança)
+            const descriptionContainer = document.getElementById('product-description');
+            if (productData.description) {
+                descriptionContainer.innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
+            } else {
+                descriptionContainer.innerHTML = '<p>Este produto não possui uma descrição detalhada.</p>';
+            }
 
-            // --- CORREÇÃO ESTÁ AQUI ---
-            // Chamamos a função renderStockStatus com o estoque da variação padrão.
+            // Renderiza o status de estoque
             renderStockStatus(defaultVariation.stock);
             
-            // O resto da função continua igual...
+            // Renderiza as avaliações e especificações nas suas respectivas abas
+            renderReviews(reviews);
+            renderProductSpecs(productData.specifications);
+            
+            // Renderiza os produtos relacionados
+            renderRelatedProducts(productData.category, productId);
+
+            // Lógica de preço com desconto
             const originalPriceEl = document.getElementById('product-original-price');
             const discountBadgeEl = document.getElementById('product-discount-badge');
             if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
@@ -290,12 +309,12 @@ async function renderProductPage(productId) {
                 originalPriceEl.classList.add('hidden');
                 discountBadgeEl.classList.add('hidden');
             }
-            
+
+            // Popula os botões de variações
             const variationsContainer = document.querySelector('#product-variations .variations-container');
             variationsContainer.innerHTML = productData.variations.map((v, index) => `
                 <button 
                     class="variation-btn ${index === defaultIndex ? 'selected' : ''}" 
-                    data-index="${index}"
                     data-price="${v.price}"
                     data-original-price="${v.originalPrice || ''}"
                     data-weight="${v.weight}"
@@ -305,6 +324,7 @@ async function renderProductPage(productId) {
                 </button>
             `).join('');
 
+            // Configura o botão de adicionar ao carrinho
             const addToCartBtn = document.getElementById('add-to-cart-product-page');
             addToCartBtn.dataset.id = productId;
             addToCartBtn.dataset.name = productData.nome;
@@ -318,7 +338,8 @@ async function renderProductPage(productId) {
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
         }
     } catch (error) {
-        console.error("Erro ao buscar produto:", error);
+        console.error("Erro ao renderizar a página do produto:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar os detalhes deste produto. Verifique o console.</p>`;
     }
 }
     // --- NOVO: Função para renderizar as estrelas de avaliação ---
@@ -1143,6 +1164,7 @@ if (variationBtn) {
     
     initializeApp();
 });
+
 
 
 
