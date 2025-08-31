@@ -254,51 +254,74 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-// SUBSTITUA SUA FUNÇÃO renderProductPage INTEIRA PELA VERSÃO COMPLETA E CORRIGIDA ABAIXO
+// SUBSTITUA SUA FUNÇÃO PELA VERSÃO FINAL E À PROVA DE FALHAS ABAIXO
 async function renderProductPage(productId) {
     try {
         const docRef = db.collection('produtos').doc(productId);
         const doc = await docRef.get();
-        if (doc.exists) {
-            const productData = doc.data();
 
-            // --- 1. LÓGICA DE VARIAÇÕES E AVALIAÇÕES (JÁ EXISTENTE) ---
-            const defaultIndex = productData.defaultVariationIndex || 0;
-            const defaultVariation = productData.variations[defaultIndex];
-            const reviews = generateRealisticReviews(productId, productData.category); // Supondo que você manteve esta função
-            const totalReviews = reviews.length;
-            const averageRating = totalReviews > 0 ? reviews.reduce((sum, r) => sum + r.estrelas, 0) / totalReviews : 0;
+        if (!doc.exists) {
+            console.error("Firebase Error: Documento não encontrado para o ID:", productId);
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado no banco de dados.</p>`;
+            return;
+        }
 
-            // --- 2. PREENCHIMENTO DOS DADOS PRINCIPAIS ---
-            document.getElementById('main-product-image').src = defaultVariation.image || productData.image;
-            document.getElementById('product-name').textContent = productData.nome;
-            document.getElementById('product-brand').querySelector('span').textContent = productData.brand;
-            document.getElementById('product-price').textContent = formatCurrency(defaultVariation.price);
-            document.getElementById('breadcrumb-category').textContent = productData.category;
-            
-            // --- 3. RENDERIZAÇÃO DOS COMPONENTES DINÂMICOS ---
-            
-            // Renderiza a descrição (com verificação de segurança)
-            const descriptionContainer = document.getElementById('product-description');
+        const productData = doc.data();
+
+        // Bloco de verificação de dados essenciais
+        if (!productData.variations || productData.variations.length === 0) {
+            console.error("Data Error: O produto não possui a lista 'variations'.", productData);
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro de dados: Produto sem variações cadastradas.</p>`;
+            return;
+        }
+
+        const defaultIndex = productData.defaultVariationIndex || 0;
+        const defaultVariation = productData.variations[defaultIndex];
+
+        const categoryForReviews = productData.category || 'geral';
+        const reviews = generateRealisticReviews(productId, categoryForReviews);
+
+        // --- INÍCIO DA RENDERIZAÇÃO SEGURA ---
+        // Cada 'if (element)' é uma verificação para evitar que a página quebre.
+        
+        const mainImageEl = document.getElementById('main-product-image');
+        if (mainImageEl) mainImageEl.src = defaultVariation.image || productData.image;
+
+        const productNameEl = document.getElementById('product-name');
+        if (productNameEl) productNameEl.textContent = productData.nome || "Produto sem nome";
+        
+        const brandSpanEl = document.getElementById('product-brand')?.querySelector('span');
+        if (brandSpanEl) brandSpanEl.textContent = productData.brand || "Marca desconhecida";
+
+        const priceEl = document.getElementById('product-price');
+        if (priceEl) priceEl.textContent = formatCurrency(defaultVariation.price);
+        
+        const breadcrumbEl = document.getElementById('breadcrumb-category');
+        if (breadcrumbEl) breadcrumbEl.textContent = productData.category || "Sem categoria";
+        
+        const descriptionContainer = document.getElementById('product-description');
+        if (descriptionContainer) {
             if (productData.description) {
                 descriptionContainer.innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
             } else {
                 descriptionContainer.innerHTML = '<p>Este produto não possui uma descrição detalhada.</p>';
             }
-
-            // Renderiza o status de estoque
-            renderStockStatus(defaultVariation.stock);
-            
-            // Renderiza as avaliações e especificações nas suas respectivas abas
-            renderReviews(reviews);
-            renderProductSpecs(productData.specifications);
-            
-            // Renderiza os produtos relacionados
+        }
+        
+        renderStockStatus(defaultVariation.stock);
+        renderReviews(reviews);
+        renderProductSpecs(productData.specifications);
+        
+        if (productData.category) {
             renderRelatedProducts(productData.category, productId);
+        } else {
+            const relatedContainer = document.getElementById('related-products-container');
+            if (relatedContainer) relatedContainer.innerHTML = '<p class="col-span-full">Categoria do produto não definida.</p>';
+        }
 
-            // Lógica de preço com desconto
-            const originalPriceEl = document.getElementById('product-original-price');
-            const discountBadgeEl = document.getElementById('product-discount-badge');
+        const originalPriceEl = document.getElementById('product-original-price');
+        const discountBadgeEl = document.getElementById('product-discount-badge');
+        if (originalPriceEl && discountBadgeEl) {
             if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
                 originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
                 originalPriceEl.classList.remove('hidden');
@@ -309,37 +332,30 @@ async function renderProductPage(productId) {
                 originalPriceEl.classList.add('hidden');
                 discountBadgeEl.classList.add('hidden');
             }
+        }
 
-            // Popula os botões de variações
-            const variationsContainer = document.querySelector('#product-variations .variations-container');
+        const variationsContainer = document.querySelector('#product-variations .variations-container');
+        if (variationsContainer) {
             variationsContainer.innerHTML = productData.variations.map((v, index) => `
-                <button 
-                    class="variation-btn ${index === defaultIndex ? 'selected' : ''}" 
-                    data-price="${v.price}"
-                    data-original-price="${v.originalPrice || ''}"
-                    data-weight="${v.weight}"
-                    data-stock="${v.stock}"
-                    data-image="${v.image || productData.image}">
+                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}">
                     ${v.weight}
                 </button>
             `).join('');
+        }
 
-            // Configura o botão de adicionar ao carrinho
-            const addToCartBtn = document.getElementById('add-to-cart-product-page');
+        const addToCartBtn = document.getElementById('add-to-cart-product-page');
+        if (addToCartBtn) {
             addToCartBtn.dataset.id = productId;
             addToCartBtn.dataset.name = productData.nome;
             addToCartBtn.dataset.price = defaultVariation.price;
             addToCartBtn.dataset.image = defaultVariation.image || productData.image;
             addToCartBtn.dataset.weight = defaultVariation.weight;
             addToCartBtn.classList.add('add-to-cart-btn');
-
-        } else {
-            console.error("Produto não encontrado:", productId);
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
         }
+
     } catch (error) {
-        console.error("Erro ao renderizar a página do produto:", error);
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar os detalhes deste produto. Verifique o console.</p>`;
+        console.error("Ocorreu um erro CRÍTICO ao renderizar a página do produto:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar os detalhes deste produto. Verifique o console para um erro CRÍTICO.</p>`;
     }
 }
     // --- NOVO: Função para renderizar as estrelas de avaliação ---
@@ -1164,6 +1180,7 @@ if (variationBtn) {
     
     initializeApp();
 });
+
 
 
 
