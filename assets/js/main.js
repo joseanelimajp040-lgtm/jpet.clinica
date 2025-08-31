@@ -256,28 +256,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
    // COLE A NOVA FUNÇÃO AQUI
+// SUBSTITUA SUA renderProductPage ANTIGA POR ESTA
 async function renderProductPage(productId) {
     try {
         const docRef = db.collection('produtos').doc(productId);
         const doc = await docRef.get();
         if (doc.exists) {
             const productData = doc.data();
+            const defaultIndex = productData.defaultVariationIndex || 0;
+            const defaultVariation = productData.variations[defaultIndex];
 
-            // Preenchimento dos dados existentes...
+            // Preenche os dados iniciais com a variação padrão
             document.getElementById('main-product-image').src = productData.image;
-            document.getElementById('main-product-image').alt = productData.nome;
             document.getElementById('product-name').textContent = productData.nome;
             document.getElementById('product-brand').querySelector('span').textContent = productData.brand;
             document.getElementById('product-description').innerHTML = `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>`;
-            document.getElementById('product-price').textContent = formatCurrency(productData.price);
             document.getElementById('breadcrumb-category').textContent = productData.category;
-
+            document.getElementById('product-price').textContent = formatCurrency(defaultVariation.price);
+            
+            // Lógica de preço com desconto
             const originalPriceEl = document.getElementById('product-original-price');
             const discountBadgeEl = document.getElementById('product-discount-badge');
-            if (productData.originalPrice && productData.originalPrice > productData.price) {
-                originalPriceEl.textContent = formatCurrency(productData.originalPrice);
+            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
                 originalPriceEl.classList.remove('hidden');
-                const discount = Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100);
+                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
                 discountBadgeEl.textContent = `-${discount}%`;
                 discountBadgeEl.classList.remove('hidden');
             } else {
@@ -285,30 +288,31 @@ async function renderProductPage(productId) {
                 discountBadgeEl.classList.add('hidden');
             }
 
-            const thumbnailsContainer = document.getElementById('product-thumbnails');
-            thumbnailsContainer.innerHTML = '';
-            const imageGallery = [productData.image, ...(productData.gallery || [])];
-            imageGallery.forEach((imgUrl, index) => {
-                thumbnailsContainer.insertAdjacentHTML('beforeend', `
-                    <img src="${imgUrl}" alt="Miniatura ${index + 1}" class="thumbnail-item border-2 rounded-md p-1 ${index === 0 ? 'thumbnail-active border-primary' : 'border-transparent'}">
-                `);
-            });
+            // Popula as variações
+            const variationsContainer = document.querySelector('#product-variations .variations-container');
+            variationsContainer.innerHTML = productData.variations.map((v, index) => `
+                <button 
+                    class="variation-btn ${index === defaultIndex ? 'selected' : ''}" 
+                    data-index="${index}"
+                    data-price="${v.price}"
+                    data-original-price="${v.originalPrice || ''}"
+                    data-weight="${v.weight}"
+                    data-stock="${v.stock}">
+                    ${v.weight}
+                </button>
+            `).join('');
 
+            // Configura o botão de adicionar ao carrinho com a variação padrão
             const addToCartBtn = document.getElementById('add-to-cart-product-page');
             addToCartBtn.dataset.id = productId;
             addToCartBtn.dataset.name = productData.nome;
-            addToCartBtn.dataset.price = productData.price;
+            addToCartBtn.dataset.price = defaultVariation.price;
             addToCartBtn.dataset.image = productData.image;
+            addToCartBtn.dataset.weight = defaultVariation.weight;
             addToCartBtn.classList.add('add-to-cart-btn');
 
-            // --- NOVO: Renderiza os componentes adicionais ---
-            renderStarRating(productData.rating, productData.reviewCount);
-            renderStockStatus(productData.stock);
-            renderProductSpecs(productData.specifications); // Supondo que você tenha um campo 'specifications'
-            renderRelatedProducts(productData.category, productId);
-
         } else {
-            console.error("Produto não encontrado no Firebase com o ID:", productId);
+            console.error("Produto não encontrado:", productId);
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
         }
     } catch (error) {
@@ -395,49 +399,74 @@ async function renderRelatedProducts(category, currentProductId) {
         container.innerHTML = '<p class="col-span-full text-red-500">Não foi possível carregar produtos relacionados.</p>';
     }
 }
-    function createProductCardHTML(productData, productId) {
-        const { nome, image, price, originalPrice } = productData;
-        const isFav = state.favorites.some(fav => fav.id === productId);
-        const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
-        
-        let priceHTML = `<span class="text-primary font-bold text-lg">${formatCurrency(price)}</span>`;
-        let discountBadgeHTML = '';
 
-        if (originalPrice && originalPrice > price) {
-            priceHTML = `
-                <div>
-                    <span class="text-sm text-gray-400 line-through">${formatCurrency(originalPrice)}</span>
-                    <span class="text-primary font-bold text-lg block">${formatCurrency(price)}</span>
-                </div>
-            `;
-            const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
-            discountBadgeHTML = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
-        }
+function createProductCardHTML(productData, productId) {
+    // Pega a variação padrão para exibir inicialmente
+    const defaultIndex = productData.defaultVariationIndex || 0;
+    const defaultVariation = productData.variations[defaultIndex];
 
-        return `
-            <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
-                <div class="relative">
-                    ${discountBadgeHTML}
-                    <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
-                        <i class="${favIconClass} fa-heart"></i>
-                    </button>
-                    <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
-                        <img src="${image}" alt="${nome}" class="w-full h-48 object-contain p-4">
-                    </a>
-                </div>
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${nome}</h3>
-                    <div class="mb-4">
-                        ${priceHTML}
-                    </div>
-                    <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
-                        data-id="${productId}" data-name="${nome}" data-price="${price}" data-image="${image}">
-                        <i class="fas fa-shopping-cart mr-2"></i> Adicionar
-                    </button>
-                </div>
-            </div>
-        `;
+    const isFav = state.favorites.some(fav => fav.id === productId);
+    const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
+
+    // Gera o HTML para os botões de variação
+    const variationsHTML = productData.variations.map((v, index) => `
+        <button 
+            class="variation-btn ${index === defaultIndex ? 'selected' : ''}" 
+            data-index="${index}"
+            data-price="${v.price}"
+            data-original-price="${v.originalPrice || ''}"
+            data-weight="${v.weight}"
+            data-stock="${v.stock}">
+            ${v.weight}
+        </button>
+    `).join('');
+    
+    // Gera o HTML do preço inicial
+    let priceHTML = `<span class="text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span>`;
+    let discountBadgeHTML = '';
+
+    if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+        priceHTML = `
+            <div>
+                <span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(defaultVariation.originalPrice)}</span>
+                <span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(defaultVariation.price)}</span>
+            </div>`;
+        const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.price) * 100);
+        discountBadgeHTML = `<div class="product-discount-display absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
+    } else {
+         priceHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span></div>`;
     }
+
+    // O card agora tem um data-product-id para ser facilmente encontrado pelo JS
+    return `
+        <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-product-id="${productId}">
+            <div class="relative">
+                ${discountBadgeHTML}
+                <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
+                    <i class="${favIconClass} fa-heart"></i>
+                </button>
+                <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
+                    <img src="${productData.image}" alt="${productData.nome}" class="w-full h-48 object-contain p-4">
+                </a>
+            </div>
+            <div class="p-4 flex flex-col flex-grow">
+                <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${productData.nome}</h3>
+                <div class="product-price-container mb-2">${priceHTML}</div>
+                
+                <div class="variations-container mb-4">${variationsHTML}</div>
+
+                <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
+                    data-id="${productId}"
+                    data-name="${productData.nome}"
+                    data-price="${defaultVariation.price}"
+                    data-image="${productData.image}"
+                    data-weight="${defaultVariation.weight}">
+                    <i class="fas fa-shopping-cart mr-2"></i> Adicionar
+                </button>
+            </div>
+        </div>
+    `;
+}
 
     async function renderFeaturedProducts() {
         const container = document.getElementById('featured-products-container');
@@ -917,7 +946,68 @@ function initProductPageListeners() {
                 const params = { id: navLink.dataset.id };
                 loadPage(pageName, params);
             }
+// LÓGICA PARA ATUALIZAR VARIAÇÕES DE PRODUTO
+            const variationBtn = e.target.closest('.variation-btn');
+            if (variationBtn) {
+                e.preventDefault();
+                const selectedData = variationBtn.dataset;
+                
+                // Remove a seleção de todos os botões irmãos
+                variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+                // Adiciona a seleção ao botão clicado
+                variationBtn.classList.add('selected');
 
+                // Verifica o contexto: estamos em um card ou na página de produto?
+                const productCard = variationBtn.closest('.product-card');
+
+                if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
+                    const priceContainer = productCard.querySelector('.product-price-container');
+                    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+
+                    // Atualiza o HTML do preço no card
+                    if (selectedData.originalPrice) {
+                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+                        priceContainer.innerHTML = `
+                            <div>
+                                <span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span>
+                                <span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span>
+                            </div>`;
+                        // Opcional: Atualizar o badge de desconto
+                         const discountBadge = productCard.querySelector('.product-discount-display');
+                         if (discountBadge) discountBadge.textContent = `-${discount}%`;
+
+                    } else {
+                        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
+                    }
+                    
+                    // Atualiza os dados do botão "Adicionar" do card
+                    addToCartBtn.dataset.price = selectedData.price;
+                    addToCartBtn.dataset.weight = selectedData.weight;
+
+                } else { // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
+                    const pagePrice = document.getElementById('product-price');
+                    const pageOriginalPrice = document.getElementById('product-original-price');
+                    const pageDiscountBadge = document.getElementById('product-discount-badge');
+                    const pageAddToCartBtn = document.getElementById('add-to-cart-product-page');
+
+                    // Atualiza os preços na página
+                    pagePrice.textContent = formatCurrency(selectedData.price);
+                    if (selectedData.originalPrice) {
+                        pageOriginalPrice.textContent = formatCurrency(selectedData.originalPrice);
+                        pageOriginalPrice.classList.remove('hidden');
+                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+                        pageDiscountBadge.textContent = `-${discount}%`;
+                        pageDiscountBadge.classList.remove('hidden');
+                    } else {
+                        pageOriginalPrice.classList.add('hidden');
+                        pageDiscountBadge.classList.add('hidden');
+                    }
+                    
+                    // Atualiza os dados do botão "Adicionar" da página
+                    pageAddToCartBtn.dataset.price = selectedData.price;
+                    pageAddToCartBtn.dataset.weight = selectedData.weight;
+                }
+            }
             if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
             if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -1050,3 +1140,4 @@ function initProductPageListeners() {
     
     initializeApp();
 });
+
