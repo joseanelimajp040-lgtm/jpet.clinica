@@ -400,8 +400,17 @@ async function renderRelatedProducts(category, currentProductId) {
     }
 }
 
+// SUBSTITUA SUA createProductCardHTML PELA VERSÃO ABAIXO, QUE É MAIS SEGURA
 function createProductCardHTML(productData, productId) {
-    // Pega a variação padrão para exibir inicialmente
+    // --- NOVO: Bloco de segurança ---
+    // Se o produto não tiver a estrutura de 'variations', ele será ignorado.
+    // Isso evita que a página quebre se um produto antigo estiver nos destaques.
+    if (!productData.variations || productData.variations.length === 0) {
+        console.warn(`O produto "${productData.nome}" (ID: ${productId}) não possui a estrutura de 'variations' e não será exibido.`);
+        return ''; // Retorna uma string vazia para não renderizar o card quebrado.
+    }
+
+    // Pega a variação padrão para exibir inicialmente (lógica que já existe)
     const defaultIndex = productData.defaultVariationIndex || 0;
     const defaultVariation = productData.variations[defaultIndex];
 
@@ -1140,4 +1149,5 @@ function initProductPageListeners() {
     
     initializeApp();
 });
+
 
