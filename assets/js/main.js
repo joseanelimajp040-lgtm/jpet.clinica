@@ -1252,143 +1252,107 @@ function initProductPageListeners() {
         
         // --- LISTENERS GLOBAIS ---
         document.body.addEventListener('click', (e) => {
+            // Navegação principal
             const navLink = e.target.closest('.nav-link');
             if (navLink && navLink.dataset.page) {
                 e.preventDefault();
                 const pageName = navLink.dataset.page;
-                const params = { id: navLink.dataset.id };
+                const params = { id: navLink.dataset.id, query: navLink.dataset.query };
                 loadPage(pageName, params);
             }
-// LÓGICA PARA ATUALIZAR VARIAÇÕES DE PRODUTO
-           // DENTRO DE initializeApp > document.body.addEventListener('click' ...
-const variationBtn = e.target.closest('.variation-btn');
-if (variationBtn) {
-    e.preventDefault();
-    const selectedData = variationBtn.dataset;
-    const newImage = selectedData.image;
-    const newFullName = selectedData.fullName;
-    
-    variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
-    variationBtn.classList.add('selected');
 
-    const productCard = variationBtn.closest('.product-card');
+            // Lógica para atualizar variações de produto
+            const variationBtn = e.target.closest('.variation-btn');
+            if (variationBtn) {
+                e.preventDefault();
+                const selectedData = variationBtn.dataset;
+                const newImage = selectedData.image;
+                const newFullName = selectedData.fullName;
+                
+                variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+                variationBtn.classList.add('selected');
 
-   if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
-    const priceContainer = productCard.querySelector('.product-price-container');
-    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
-    const cardImage = productCard.querySelector('.product-card-image');
-    const cardName = productCard.querySelector('.product-name-display');
+                const productCard = variationBtn.closest('.product-card');
 
-    // Atualiza o HTML do preço no card (já deve estar correto)
-    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
-        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-        priceContainer.innerHTML = `<div><span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span><span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span></div>`;
-        const discountBadge = productCard.querySelector('.product-discount-display');
-        if (discountBadge) discountBadge.textContent = `-${discount}%`;
-    } else {
-        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
-    }
+                if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
+                    const priceContainer = productCard.querySelector('.product-price-container');
+                    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+                    const cardImage = productCard.querySelector('.product-card-image');
+                    const cardName = productCard.querySelector('.product-name-display');
 
-    // Troca a imagem do card com um efeito suave (já deve estar correto)
-    if (newImage && cardImage.src !== newImage) {
-        cardImage.style.opacity = '0';
-        setTimeout(() => {
-            cardImage.src = newImage;
-            cardImage.style.opacity = '1';
-        }, 200);
-    }
+                    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+                        priceContainer.innerHTML = `<div><span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span><span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span></div>`;
+                        const discountBadge = productCard.querySelector('.product-discount-display');
+                        if (discountBadge) discountBadge.textContent = `-${discount}%`;
+                    } else {
+                        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
+                    }
 
-    // ATUALIZAÇÃO DO NOME (a linha que provavelmente faltava)
-    if (cardName && newFullName) {
-        cardName.textContent = newFullName;
-    }
+                    if (newImage && cardImage && cardImage.src !== newImage) {
+                        cardImage.style.opacity = '0';
+                        setTimeout(() => {
+                            cardImage.src = newImage;
+                            cardImage.style.opacity = '1';
+                        }, 200);
+                    }
 
-    // Atualiza os dados do botão "Adicionar" do card
-    addToCartBtn.dataset.price = selectedData.price;
-    addToCartBtn.dataset.weight = selectedData.weight;
-    addToCartBtn.dataset.image = newImage;
-    addToCartBtn.dataset.name = newFullName;
-}
+                    if (cardName && newFullName) {
+                        cardName.textContent = newFullName;
+                    }
 
-    // Atualiza o HTML do preço no card
-    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
-        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-        priceContainer.innerHTML = `
-            <div>
-                <span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span>
-                <span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span>
-            </div>`;
-        const discountBadge = productCard.querySelector('.product-discount-display');
-        if (discountBadge) discountBadge.textContent = `-${discount}%`;
-    } else {
-        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
-    }
+                    addToCartBtn.dataset.price = selectedData.price;
+                    addToCartBtn.dataset.weight = selectedData.weight;
+                    addToCartBtn.dataset.image = newImage;
+                    addToCartBtn.dataset.name = newFullName;
 
-    // Troca a imagem do card com um efeito suave
-    if (newImage && cardImage.src !== newImage) {
-        cardImage.style.opacity = '0';
-        setTimeout(() => {
-            cardImage.src = newImage;
-            cardImage.style.opacity = '1';
-        }, 200);
-    }
+                } else { // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
+                    const pagePrice = document.getElementById('product-price');
+                    const pageOriginalPrice = document.getElementById('product-original-price');
+                    const pageDiscountBadge = document.getElementById('product-discount-badge');
+                    const pageAddToCartBtn = document.getElementById('add-to-cart-product-page');
+                    const pageImage = document.getElementById('main-product-image');
+                    const pageName = document.getElementById('product-name');
+                    
+                    renderStockStatus(parseInt(selectedData.stock));
 
-    // Atualiza o nome no card
-    if (cardName && newFullName) {
-        cardName.textContent = newFullName;
-    }
+                    if (pagePrice) pagePrice.textContent = formatCurrency(selectedData.price);
 
-    // Atualiza os dados do botão "Adicionar" do card
-    addToCartBtn.dataset.price = selectedData.price;
-    addToCartBtn.dataset.weight = selectedData.weight;
-    addToCartBtn.dataset.image = newImage;
-    addToCartBtn.dataset.name = newFullName;
-    } else { 
-        // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
-        const pagePrice = document.getElementById('product-price');
-        const pageOriginalPrice = document.getElementById('product-original-price');
-        const pageDiscountBadge = document.getElementById('product-discount-badge');
-        const pageAddToCartBtn = document.getElementById('add-to-cart-product-page');
-        const pageImage = document.getElementById('main-product-image');
+                    if (pageOriginalPrice && pageDiscountBadge) {
+                         if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+                            pageOriginalPrice.textContent = formatCurrency(selectedData.originalPrice);
+                            pageOriginalPrice.classList.remove('hidden');
+                            const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+                            pageDiscountBadge.textContent = `-${discount}%`;
+                            pageDiscountBadge.classList.remove('hidden');
+                        } else {
+                            pageOriginalPrice.classList.add('hidden');
+                            pageDiscountBadge.classList.add('hidden');
+                        }
+                    }
+                    
+                    if (newImage && pageImage && pageImage.src !== newImage) {
+                        pageImage.style.opacity = '0';
+                        setTimeout(() => {
+                            pageImage.src = newImage;
+                            pageImage.style.opacity = '1';
+                        }, 200);
+                    }
+                    
+                    if (pageName && newFullName) {
+                        pageName.textContent = newFullName;
+                    }
 
-        // --- CORREÇÃO ESTÁ AQUI ---
-        // Chamamos a função renderStockStatus com o novo valor de estoque do botão clicado.
-        renderStockStatus(parseInt(selectedData.stock));
+                    if (pageAddToCartBtn) {
+                        pageAddToCartBtn.dataset.price = selectedData.price;
+                        pageAddToCartBtn.dataset.weight = selectedData.weight;
+                        pageAddToCartBtn.dataset.image = newImage;
+                        pageAddToCartBtn.dataset.name = newFullName;
+                    }
+                }
+            }
 
-        // O resto do código para atualizar preço, imagem, etc., continua igual...
-        pagePrice.textContent = formatCurrency(selectedData.price);
-        if (selectedData.originalPrice && selectedData.originalPrice > 0) {
-            pageOriginalPrice.textContent = formatCurrency(selectedData.originalPrice);
-            pageOriginalPrice.classList.remove('hidden');
-            const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-            pageDiscountBadge.textContent = `-${discount}%`;
-            pageDiscountBadge.classList.remove('hidden');
-        } else {
-            pageOriginalPrice.classList.add('hidden');
-            pageDiscountBadge.classList.add('hidden');
-        }
-        
-        if (newImage && pageImage.src !== newImage) {
-            pageImage.style.opacity = '0';
-            setTimeout(() => {
-                pageImage.src = newImage;
-                pageImage.style.opacity = '1';
-            }, 200);
-        }
-const cardName = productCard.querySelector('.product-name-display');
-if (cardName && newFullName) {
-    cardName.textContent = newFullName;
-}
-const pageName = document.getElementById('product-name');
-if (pageName && newFullName) {
-    pageName.textContent = newFullName;
-}
-        pageAddToCartBtn.dataset.price = selectedData.price;
-        pageAddToCartBtn.dataset.weight = selectedData.weight;
-        pageAddToCartBtn.dataset.image = newImage;
-        pageAddToCartBtn.dataset.name = newFullName;
-    }
-});
+            // Outras ações de clique
             if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
             if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -1454,32 +1418,30 @@ if (pageName && newFullName) {
                 updateCounters();
                 loadPage('home');
             }
-        };
+        });
 
         document.body.addEventListener('submit', e => {
             if (e.target.id === 'login-form') handleLogin(e);
             if (e.target.id === 'create-account-form') handleCreateAccount(e);
-        if (e.target.id === 'search-form') {
-        e.preventDefault(); // Impede que a página recarregue
-        const searchInput = document.getElementById('search-input');
-        const searchTerm = searchInput.value.trim(); // Pega o texto e remove espaços
-        const searchError = document.getElementById('search-error');
 
-        if (!searchTerm) {
-            // Se a busca estiver vazia, mostra o erro
-            searchError.classList.remove('hidden');
-            searchInput.classList.add('animate-shake');
-            setTimeout(() => {
-                searchError.classList.add('hidden');
-                searchInput.classList.remove('animate-shake');
-            }, 2000);
-        } else {
-            // Se a busca for válida, carrega a página de busca com o parâmetro
-            loadPage('busca', { query: searchTerm });
-            searchInput.value = ''; // Limpa a barra de busca
-        }
-    }
-});
+            if (e.target.id === 'search-form') {
+                e.preventDefault();
+                const searchInput = document.getElementById('search-input');
+                const searchTerm = searchInput.value.trim();
+                const searchError = document.getElementById('search-error');
+                if (!searchTerm) {
+                    searchError.classList.remove('hidden');
+                    searchInput.classList.add('animate-shake');
+                    setTimeout(() => {
+                        searchError.classList.add('hidden');
+                        searchInput.classList.remove('animate-shake');
+                    }, 2000);
+                } else {
+                    loadPage('busca', { query: searchTerm });
+                    searchInput.value = '';
+                }
+            }
+        });
         
         document.addEventListener('shippingSelected', (e) => {
             state.shipping = e.detail;
@@ -1496,7 +1458,6 @@ if (pageName && newFullName) {
         const chatSendButton = document.getElementById('marrie-chat-send');
         const plaqueContainer = document.getElementById('marrie-plaque-container');
 
-        // Lógica da Plaquinha
         if (plaqueContainer && marrieButton) {
             let plaqueTimer;
             const showPlaque = () => {
@@ -1512,7 +1473,6 @@ if (pageName && newFullName) {
             marrieButton.addEventListener('click', hidePlaque);
         }
         
-        // Lógica de abrir/fechar janela do Chat
         if (marrieButton && marrieWindow && marrieCloseButton) {
             const toggleChatWindow = () => {
                 marrieWindow.classList.toggle('active');
@@ -1526,7 +1486,6 @@ if (pageName && newFullName) {
             marrieCloseButton.addEventListener('click', toggleChatWindow);
         }
 
-        // Lógica de envio de mensagens do Chat
         if (chatInput && chatSendButton) {
             chatSendButton.addEventListener('click', handleSendMessage);
             chatInput.addEventListener('keypress', (event) => {
