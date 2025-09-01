@@ -254,8 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-// Armazenará os produtos da busca atual para não precisar ir no banco toda hora
-let currentSearchResults = [];
+// APAGUE AS FUNÇÕES DE BUSCA ANTIGAS E SUBSTITUA POR ESTE BLOCO CORRIGIDO
+
+let currentSearchResults = []; // Armazena os produtos da busca atual
 
 // Função principal que orquestra a página de busca
 async function renderBuscaPage(params) {
@@ -270,16 +271,18 @@ async function renderBuscaPage(params) {
     try {
         const snapshot = await db.collection('produtos').get();
         currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-                                    // Garante que só produtos com variações sejam processados
                                     .filter(p => p.variations && p.variations.length > 0);
 
         let initialProducts = currentSearchResults;
         if (searchTerm) {
             if(titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
-            initialProducts = currentSearchResults.filter(p => 
-                (p.search_keywords && p.search_keywords.includes(searchTerm.toLowerCase())) ||
-                p.nome.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            initialProducts = currentSearchResults.filter(p => {
+                // CORREÇÃO: Procura tanto no nome base quanto nas palavras-chave
+                const nameMatch = (p.nome || "").toLowerCase().includes(lowerCaseSearchTerm);
+                const keywordMatch = p.search_keywords && p.search_keywords.includes(lowerCaseSearchTerm);
+                return nameMatch || keywordMatch;
+            });
         } else {
             if(titleEl) titleEl.textContent = 'Todos os Produtos';
         }
@@ -348,7 +351,7 @@ function applyFilters() {
         });
     });
 
-    // CORREÇÃO: Pega o preço da primeira variação para ordenar
+    // Pega o preço da primeira variação para ordenar
     const sortBy = document.getElementById('sort-by').value;
     if (sortBy === 'price-asc') {
         filteredProducts.sort((a, b) => a.variations[0].price - b.variations[0].price);
@@ -1274,38 +1277,43 @@ function initProductPageListeners() {
 
                 const productCard = variationBtn.closest('.product-card');
 
-                if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
-                    const priceContainer = productCard.querySelector('.product-price-container');
-                    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
-                    const cardImage = productCard.querySelector('.product-card-image');
-                    const cardName = productCard.querySelector('.product-name-display');
+               // DENTRO DO addEventListener('click', ...), SUBSTITUA APENAS O BLOCO if (productCard)
+if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
+    const priceContainer = productCard.querySelector('.product-price-container');
+    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+    const cardImage = productCard.querySelector('.product-card-image');
+    const cardName = productCard.querySelector('.product-name-display');
 
-                    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
-                        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
-                        priceContainer.innerHTML = `<div><span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span><span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span></div>`;
-                        const discountBadge = productCard.querySelector('.product-discount-display');
-                        if (discountBadge) discountBadge.textContent = `-${discount}%`;
-                    } else {
-                        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
-                    }
+    // Atualiza o HTML do preço no card
+    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+        priceContainer.innerHTML = `<div><span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span><span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span></div>`;
+        const discountBadge = productCard.querySelector('.product-discount-display');
+        if (discountBadge) discountBadge.textContent = `-${discount}%`;
+    } else {
+        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
+    }
 
-                    if (newImage && cardImage && cardImage.src !== newImage) {
-                        cardImage.style.opacity = '0';
-                        setTimeout(() => {
-                            cardImage.src = newImage;
-                            cardImage.style.opacity = '1';
-                        }, 200);
-                    }
+    // Troca a imagem do card com um efeito suave
+    if (newImage && cardImage && cardImage.src !== newImage) {
+        cardImage.style.opacity = '0';
+        setTimeout(() => {
+            cardImage.src = newImage;
+            cardImage.style.opacity = '1';
+        }, 200);
+    }
 
-                    if (cardName && newFullName) {
-                        cardName.textContent = newFullName;
-                    }
+    // CORREÇÃO: ATUALIZA O NOME NO CARD
+    if (cardName && newFullName) {
+        cardName.textContent = newFullName;
+    }
 
-                    addToCartBtn.dataset.price = selectedData.price;
-                    addToCartBtn.dataset.weight = selectedData.weight;
-                    addToCartBtn.dataset.image = newImage;
-                    addToCartBtn.dataset.name = newFullName;
-
+    // Atualiza os dados do botão "Adicionar" do card
+    addToCartBtn.dataset.price = selectedData.price;
+    addToCartBtn.dataset.weight = selectedData.weight;
+    addToCartBtn.dataset.image = newImage;
+    addToCartBtn.dataset.name = newFullName;
+}
                 } else { // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
                     const pagePrice = document.getElementById('product-price');
                     const pageOriginalPrice = document.getElementById('product-original-price');
@@ -1500,6 +1508,7 @@ function initProductPageListeners() {
     
     initializeApp();
 });
+
 
 
 
