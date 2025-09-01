@@ -763,7 +763,7 @@ function createProductCardHTML(productData, productId) {
                 
                 <div class="variations-container mb-4">${variationsHTML}</div>
 
-                <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
+               <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
     data-id="${productId}"
     data-name="${defaultVariation.fullName || productData.nome}"
     data-price="${defaultVariation.price}"
@@ -771,6 +771,10 @@ function createProductCardHTML(productData, productId) {
     data-weight="${defaultVariation.weight}">
     <i class="fas fa-shopping-cart mr-2"></i> Adicionar
 </button>
+            </div>
+        </div>
+    `;
+}
 
     async function renderFeaturedProducts() {
         const container = document.getElementById('featured-products-container');
@@ -1504,8 +1508,6 @@ if (pageName && newFullName) {
     
     initializeApp();
 });
-
-
 
 
 
