@@ -1388,7 +1388,7 @@ if (pageName && newFullName) {
         pageAddToCartBtn.dataset.image = newImage;
         pageAddToCartBtn.dataset.name = newFullName;
     }
-}
+});
             if (e.target.closest('.logout-btn')) handleLogout();
             if (e.target.closest('#google-login-btn')) handleSocialLogin('google');
             if (e.target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -1541,6 +1541,7 @@ if (pageName && newFullName) {
     
     initializeApp();
 });
+
 
 
 
