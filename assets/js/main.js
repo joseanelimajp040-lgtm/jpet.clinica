@@ -133,6 +133,7 @@ function updateTotals() {
 function updateAllHeartIcons() {
     document.querySelectorAll('.favorite-btn').forEach(btn => {
         const icon = btn.querySelector('i');
+        if (!icon) return;
         const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
         if (isFav) {
             icon.classList.remove('far', 'text-gray-300');
@@ -558,29 +559,31 @@ function renderStarRating(reviews) {
     container.innerHTML = `${starsHTML} <span class="review-count">(${reviewCount} avaliações)</span>`;
 }
 
-// --- Funções da Página de Busca ---
+// --- Funções da Página de Busca (CORRIGIDO) ---
 async function renderBuscaPage(params) {
     const searchTerm = params.query || '';
     const grid = document.getElementById('products-grid');
     const countEl = document.getElementById('products-count');
     const titleEl = document.querySelector('#app-root h1');
 
-    if (grid) grid.innerHTML = '<p class="col-span-full text-center py-8">Buscando produtos...</p>';
+    if (grid) grid.innerHTML = '<p class="col-span-full text-center py-8">Carregando filtros...</p>';
     if (countEl) countEl.textContent = '...';
 
     try {
         const snapshot = await db.collection('produtos').get();
-        currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-            .filter(p => p.variations && p.variations.length > 0);
+        currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         let initialProducts = currentSearchResults;
         if (searchTerm) {
             if (titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
             const lowerCaseTerm = searchTerm.toLowerCase();
-            initialProducts = currentSearchResults.filter(p =>
-                (p.nome || "").toLowerCase().includes(lowerCaseTerm) ||
-                (p.search_keywords && p.search_keywords.some(k => k.toLowerCase().includes(lowerCaseTerm)))
-            );
+            initialProducts = currentSearchResults.filter(p => {
+                const nameMatch = (p.nome || "").toLowerCase().includes(lowerCaseTerm);
+                const keywordMatch = Array.isArray(p.search_keywords) && p.search_keywords.some(k => 
+                    typeof k === 'string' && k.toLowerCase().includes(lowerCaseTerm)
+                );
+                return nameMatch || keywordMatch;
+            });
         } else {
             if (titleEl) titleEl.textContent = 'Todos os Produtos';
         }
@@ -593,7 +596,7 @@ async function renderBuscaPage(params) {
 
     } catch (error) {
         console.error("Erro ao buscar produtos:", error);
-        if (grid) grid.innerHTML = '<p class="text-red-500 col-span-full">Não foi possível carregar os produtos.</p>';
+        if (grid) grid.innerHTML = '<p class="col-span-full text-red-500 text-center">Não foi possível carregar os produtos.</p>';
     }
 }
 
@@ -640,12 +643,15 @@ function applyFilters() {
     });
 
     const sortBy = document.getElementById('sort-by').value;
+    // Filtra produtos sem variações antes de tentar ordenar para evitar erros
+    const sortableProducts = filteredProducts.filter(p => p.variations && p.variations.length > 0);
+
     if (sortBy === 'price-asc') {
-        filteredProducts.sort((a, b) => a.variations[0].price - b.variations[0].price);
+        sortableProducts.sort((a, b) => a.variations[0].price - b.variations[0].price);
     } else if (sortBy === 'price-desc') {
-        filteredProducts.sort((a, b) => b.variations[0].price - a.variations[0].price);
+        sortableProducts.sort((a, b) => b.variations[0].price - a.variations[0].price);
     }
-    displayProducts(filteredProducts);
+    displayProducts(sortableProducts);
 }
 
 function displayProducts(products) {
@@ -862,6 +868,7 @@ export async function loadPage(pageName, params = {}) {
         if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
         appRoot.innerHTML = await response.text();
 
+        // Lógica do botão "Voltar para o início"
         if (pageName !== 'home') {
             const backButtonHTML = `
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -919,7 +926,6 @@ export async function loadPage(pageName, params = {}) {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
-            // Páginas estáticas não precisam de JS específico
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -928,7 +934,7 @@ export async function loadPage(pageName, params = {}) {
                 break;
         }
 
-        initPageModals(); // Inicializa modais que podem existir em qualquer página
+        initPageModals();
         updateLoginStatus();
 
     } catch (error) {
