@@ -23,15 +23,16 @@
                 </a>
             </div>
             
-            <div class="flex-1 mx-8 relative">
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-black rounded-full focus:outline-none search-bar">
-                    <button id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
-            </div>
+            <!-- COLE ESTE NOVO BLOCO NO LUGAR -->
+<div class="flex-1 mx-8 relative">
+    <form id="search-form" class="relative">
+        <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-black rounded-full focus:outline-none search-bar">
+        <button type="submit" id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+    <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
+</div>
             
             <div class="flex items-center">
                 <a href="#" class="nav-link relative mr-4" data-page="favorites">
@@ -78,6 +79,7 @@
         </div>
     </div>
 </nav>
+
 
 
 
