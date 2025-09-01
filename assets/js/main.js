@@ -1454,7 +1454,7 @@ if (pageName && newFullName) {
                 updateCounters();
                 loadPage('home');
             }
-        });
+        };
 
         document.body.addEventListener('submit', e => {
             if (e.target.id === 'login-form') handleLogin(e);
@@ -1541,6 +1541,7 @@ if (pageName && newFullName) {
     
     initializeApp();
 });
+
 
 
 
