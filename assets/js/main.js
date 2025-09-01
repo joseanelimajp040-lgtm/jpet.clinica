@@ -758,16 +758,17 @@ function createProductCardHTML(productData, productId) {
                 </a>
             </div>
             <div class="p-4 flex flex-col flex-grow">
-                <h3 class="font-medium text-gray-800 mb-2 h-12 flex-grow">${productData.nome}</h3>
+                <h3 class="font-medium text-gray-800 ... product-name-display">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="product-price-container mb-2">${priceHTML}</div>
                 
                 <div class="variations-container mb-4">${variationsHTML}</div>
 
                 <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
                     data-id="${productId}"
-                    data-name="${productData.nome}"
+                    data-name="${defaultVariation.fullName || productData.nome}"
                     data-price="${defaultVariation.price}"
                     data-image="${productData.image}"
+                    data-full-name="${v.fullName || productData.nome}">
                     data-weight="${defaultVariation.weight}">
                     <i class="fas fa-shopping-cart mr-2"></i> Adicionar
                 </button>
@@ -1264,6 +1265,7 @@ if (variationBtn) {
     e.preventDefault();
     const selectedData = variationBtn.dataset;
     const newImage = selectedData.image;
+    const newFullName = selectedData.fullName;
     
     variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
     variationBtn.classList.add('selected');
@@ -1271,8 +1273,44 @@ if (variationBtn) {
     const productCard = variationBtn.closest('.product-card');
 
     if (productCard) {
-        // Lógica para o card (não precisa mostrar estoque, então permanece igual)
-        // ...
+    const priceContainer = productCard.querySelector('.product-price-container');
+    const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+    const cardImage = productCard.querySelector('.product-card-image');
+    const cardName = productCard.querySelector('.product-name-display');
+
+    // Atualiza o HTML do preço no card
+    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+        priceContainer.innerHTML = `
+            <div>
+                <span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span>
+                <span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span>
+            </div>`;
+        const discountBadge = productCard.querySelector('.product-discount-display');
+        if (discountBadge) discountBadge.textContent = `-${discount}%`;
+    } else {
+        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
+    }
+
+    // Troca a imagem do card com um efeito suave
+    if (newImage && cardImage.src !== newImage) {
+        cardImage.style.opacity = '0';
+        setTimeout(() => {
+            cardImage.src = newImage;
+            cardImage.style.opacity = '1';
+        }, 200);
+    }
+
+    // Atualiza o nome no card
+    if (cardName && newFullName) {
+        cardName.textContent = newFullName;
+    }
+
+    // Atualiza os dados do botão "Adicionar" do card
+    addToCartBtn.dataset.price = selectedData.price;
+    addToCartBtn.dataset.weight = selectedData.weight;
+    addToCartBtn.dataset.image = newImage;
+    addToCartBtn.dataset.name = newFullName;
     } else { 
         // --- LÓGICA PARA A PÁGINA DE PRODUTO ---
         const pagePrice = document.getElementById('product-price');
@@ -1305,10 +1343,18 @@ if (variationBtn) {
                 pageImage.style.opacity = '1';
             }, 200);
         }
-        
+const cardName = productCard.querySelector('.product-name-display');
+if (cardName && newFullName) {
+    cardName.textContent = newFullName;
+}
+const pageName = document.getElementById('product-name');
+if (pageName && newFullName) {
+    pageName.textContent = newFullName;
+}
         pageAddToCartBtn.dataset.price = selectedData.price;
         pageAddToCartBtn.dataset.weight = selectedData.weight;
         pageAddToCartBtn.dataset.image = newImage;
+        pageAddToCartBtn.dataset.name = newFullName;
     }
 }
             if (e.target.closest('.logout-btn')) handleLogout();
@@ -1463,6 +1509,7 @@ if (variationBtn) {
     
     initializeApp();
 });
+
 
 
 
