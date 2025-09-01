@@ -2321,3 +2321,48 @@ input[type='number'] {
     box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
 }
 /* ========== FIM: ESTILOS PARA VARIAÇÕES DE PRODUTO ========== */
+
+/* ========== INÍCIO: ESTILOS OPCIONAIS PARA PÁGINA DE BUSCA ========== */
+
+/* Estiliza os checkboxes dos filtros */
+#filters-container input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 1.25rem; /* 20px */
+    width: 1.25rem; /* 20px */
+    border: 2px solid #cbd5e1; /* slate-300 */
+    border-radius: 0.25rem; /* 4px */
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+#filters-container input[type="checkbox"]:hover {
+    border-color: #94a3b8; /* slate-400 */
+}
+
+/* Estilo do checkbox quando está marcado */
+#filters-container input[type="checkbox"]:checked {
+    background-color: #00A8A8; /* Sua cor secundária */
+    border-color: #00A8A8;
+}
+
+/* Adiciona o ícone de "check" dentro do checkbox marcado */
+#filters-container input[type="checkbox"]:checked::after {
+    content: '\f00c'; /* Código do ícone de check do Font Awesome */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 0.8rem; /* 13px */
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Efeito de hover na label inteira do filtro */
+#filters-container label:hover {
+    color: #FF6B00; /* Sua cor primária */
+}
+/* ========== FIM: ESTILOS OPCIONAIS PARA PÁGINA DE BUSCA ========== */
