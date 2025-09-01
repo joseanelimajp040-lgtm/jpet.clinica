@@ -1381,7 +1381,27 @@ if (variationBtn) {
         document.body.addEventListener('submit', e => {
             if (e.target.id === 'login-form') handleLogin(e);
             if (e.target.id === 'create-account-form') handleCreateAccount(e);
-        });
+        if (e.target.id === 'search-form') {
+        e.preventDefault(); // Impede que a página recarregue
+        const searchInput = document.getElementById('search-input');
+        const searchTerm = searchInput.value.trim(); // Pega o texto e remove espaços
+        const searchError = document.getElementById('search-error');
+
+        if (!searchTerm) {
+            // Se a busca estiver vazia, mostra o erro
+            searchError.classList.remove('hidden');
+            searchInput.classList.add('animate-shake');
+            setTimeout(() => {
+                searchError.classList.add('hidden');
+                searchInput.classList.remove('animate-shake');
+            }, 2000);
+        } else {
+            // Se a busca for válida, carrega a página de busca com o parâmetro
+            loadPage('busca', { query: searchTerm });
+            searchInput.value = ''; // Limpa a barra de busca
+        }
+    }
+});
         
         document.addEventListener('shippingSelected', (e) => {
             state.shipping = e.detail;
@@ -1443,6 +1463,7 @@ if (variationBtn) {
     
     initializeApp();
 });
+
 
 
 
