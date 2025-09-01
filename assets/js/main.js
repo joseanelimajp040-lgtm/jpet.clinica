@@ -258,36 +258,46 @@ document.addEventListener('DOMContentLoaded', () => {
 let currentSearchResults = [];
 
 // Função principal que orquestra a página de busca
+let currentSearchResults = []; // Armazena os produtos da busca atual
+
+// Função principal que orquestra a página de busca
 async function renderBuscaPage(params) {
-    const searchTerm = params.query || ''; // Pega o termo da busca, se houver
-    document.getElementById('products-grid').innerHTML = '<p>Buscando produtos...</p>';
+    const searchTerm = params.query || '';
+    const grid = document.getElementById('products-grid');
+    const countEl = document.getElementById('products-count');
+    const titleEl = document.querySelector('#app-root h1');
+
+    if (grid) grid.innerHTML = '<p>Buscando produtos...</p>';
+    if (countEl) countEl.textContent = '...';
     
     try {
-        // Busca inicial no Firebase
-        // Por simplicidade, vamos buscar todos os produtos. Para um site real, a busca seria mais otimizada.
         const snapshot = await db.collection('produtos').get();
-        currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                                    // Garante que só produtos com variações sejam processados
+                                    .filter(p => p.variations && p.variations.length > 0);
 
-        // Agora, aplica o filtro inicial da busca (se houver)
         let initialProducts = currentSearchResults;
         if (searchTerm) {
-             document.querySelector('#app-root h1').textContent = `Resultados para "${searchTerm}"`;
-             initialProducts = currentSearchResults.filter(p => 
+            if(titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
+            initialProducts = currentSearchResults.filter(p => 
                 (p.search_keywords && p.search_keywords.includes(searchTerm.toLowerCase())) ||
                 p.nome.toLowerCase().includes(searchTerm.toLowerCase())
             );
+        } else {
+            if(titleEl) titleEl.textContent = 'Todos os Produtos';
         }
 
-        generateFilters(initialProducts); // Gera os filtros da sidebar
-        displayProducts(initialProducts); // Mostra os produtos na tela
+        generateFilters(initialProducts);
+        displayProducts(initialProducts);
 
-        // Adiciona os 'listeners' para os filtros e ordenação
-        document.getElementById('filters-container').addEventListener('change', applyFilters);
-        document.getElementById('sort-by').addEventListener('change', applyFilters);
+        const filtersContainer = document.getElementById('filters-container');
+        const sortByEl = document.getElementById('sort-by');
+        if (filtersContainer) filtersContainer.addEventListener('change', applyFilters);
+        if (sortByEl) sortByEl.addEventListener('change', applyFilters);
 
     } catch (error) {
         console.error("Erro ao buscar produtos:", error);
-        document.getElementById('products-grid').innerHTML = '<p class="text-red-500">Não foi possível carregar os produtos.</p>';
+        if (grid) grid.innerHTML = '<p class="text-red-500 col-span-full">Não foi possível carregar os produtos.</p>';
     }
 }
 
@@ -296,13 +306,7 @@ function generateFilters(products) {
     const filtersContainer = document.getElementById('filters-container');
     if (!filtersContainer) return;
 
-    const filters = {
-        brand: new Set(),
-        pet_type: new Set(),
-        size: new Set(),
-        age: new Set()
-    };
-
+    const filters = { brand: new Set(), pet_type: new Set(), size: new Set(), age: new Set() };
     products.forEach(p => {
         if (p.brand) filters.brand.add(p.brand);
         if (p.pet_type) filters.pet_type.add(p.pet_type);
@@ -310,31 +314,31 @@ function generateFilters(products) {
         if (p.age) filters.age.add(p.age);
     });
     
-    let html = '';
-    // Helper para criar um bloco de filtro
     const createFilterGroup = (title, key, options) => {
         if (options.size === 0) return '';
-        let optionsHTML = '';
-        [...options].sort().forEach(option => {
-             // Simplificado: sem contagem dinâmica por enquanto
-            optionsHTML += `<div><label class="flex items-center"><input type="checkbox" data-filter-key="${key}" value="${option}" class="mr-2">${option}</label></div>`;
-        });
+        const optionsHTML = [...options].sort().map(option => `
+            <div>
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" data-filter-key="${key}" value="${option}" class="mr-2">
+                    <span class="capitalize">${option}</span>
+                </label>
+            </div>
+        `).join('');
         return `<div class="border-t pt-4"><h3 class="font-semibold mb-2">${title}</h3><div class="space-y-2">${optionsHTML}</div></div>`;
     };
     
+    let html = '';
     html += createFilterGroup('Marca', 'brand', filters.brand);
     html += createFilterGroup('Tipo de Pet', 'pet_type', filters.pet_type);
     html += createFilterGroup('Porte', 'size', filters.size);
     html += createFilterGroup('Idade', 'age', filters.age);
     
-    filtersContainer.innerHTML = html;
+    filtersContainer.innerHTML = html || '<p>Nenhum filtro disponível.</p>';
 }
 
 // Aplica os filtros e a ordenação selecionados
 function applyFilters() {
-    const selectedFilters = {
-        brand: [], pet_type: [], size: [], age: []
-    };
+    const selectedFilters = { brand: [], pet_type: [], size: [], age: [] };
     
     document.querySelectorAll('#filters-container input:checked').forEach(input => {
         selectedFilters[input.dataset.filterKey].push(input.value);
@@ -347,7 +351,7 @@ function applyFilters() {
         });
     });
 
-    // Aplica a ordenação
+    // CORREÇÃO: Pega o preço da primeira variação para ordenar
     const sortBy = document.getElementById('sort-by').value;
     if (sortBy === 'price-asc') {
         filteredProducts.sort((a, b) => a.variations[0].price - b.variations[0].price);
@@ -362,16 +366,17 @@ function applyFilters() {
 function displayProducts(products) {
     const grid = document.getElementById('products-grid');
     const countEl = document.getElementById('products-count');
+    if (!grid || !countEl) return;
     
     countEl.textContent = `${products.length} produtos encontrados`;
     
     if (products.length === 0) {
-        grid.innerHTML = '<p class="col-span-full">Nenhum produto encontrado com estes filtros.</p>';
+        grid.innerHTML = '<p class="col-span-full text-center">Nenhum produto encontrado com estes filtros.</p>';
         return;
     }
     
     grid.innerHTML = products.map(p => createProductCardHTML(p, p.id)).join('');
-    updateAllHeartIcons(); // Para os corações de favorito funcionarem
+    updateAllHeartIcons();
 }
 // SUBSTITUA SUA FUNÇÃO PELA VERSÃO FINAL E À PROVA DE FALHAS ABAIXO
 async function renderProductPage(productId) {
@@ -1271,11 +1276,42 @@ if (variationBtn) {
 
     const productCard = variationBtn.closest('.product-card');
 
-    if (productCard) {
+   if (productCard) { // --- LÓGICA PARA O CARD DE PRODUTO ---
     const priceContainer = productCard.querySelector('.product-price-container');
     const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
     const cardImage = productCard.querySelector('.product-card-image');
     const cardName = productCard.querySelector('.product-name-display');
+
+    // Atualiza o HTML do preço no card (já deve estar correto)
+    if (selectedData.originalPrice && selectedData.originalPrice > 0) {
+        const discount = Math.round(((selectedData.originalPrice - selectedData.price) / selectedData.originalPrice) * 100);
+        priceContainer.innerHTML = `<div><span class="product-original-price-display text-sm text-gray-400 line-through">${formatCurrency(selectedData.originalPrice)}</span><span class="product-price-display text-primary font-bold text-lg block">${formatCurrency(selectedData.price)}</span></div>`;
+        const discountBadge = productCard.querySelector('.product-discount-display');
+        if (discountBadge) discountBadge.textContent = `-${discount}%`;
+    } else {
+        priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(selectedData.price)}</span></div>`;
+    }
+
+    // Troca a imagem do card com um efeito suave (já deve estar correto)
+    if (newImage && cardImage.src !== newImage) {
+        cardImage.style.opacity = '0';
+        setTimeout(() => {
+            cardImage.src = newImage;
+            cardImage.style.opacity = '1';
+        }, 200);
+    }
+
+    // ATUALIZAÇÃO DO NOME (a linha que provavelmente faltava)
+    if (cardName && newFullName) {
+        cardName.textContent = newFullName;
+    }
+
+    // Atualiza os dados do botão "Adicionar" do card
+    addToCartBtn.dataset.price = selectedData.price;
+    addToCartBtn.dataset.weight = selectedData.weight;
+    addToCartBtn.dataset.image = newImage;
+    addToCartBtn.dataset.name = newFullName;
+}
 
     // Atualiza o HTML do preço no card
     if (selectedData.originalPrice && selectedData.originalPrice > 0) {
@@ -1508,6 +1544,7 @@ if (pageName && newFullName) {
     
     initializeApp();
 });
+
 
 
 
