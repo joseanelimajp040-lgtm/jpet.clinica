@@ -1,0 +1,33 @@
+<div class="bg-gray-50">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:py-12 sm:px-8">
+        <div class="lg:grid lg:grid-cols-4 lg:gap-8">
+            
+            <aside id="filters-sidebar" class="hidden lg:block lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4">Filtros</h2>
+                <div id="filters-container" class="space-y-6">
+                    <p>Carregando filtros...</p>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-3">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 class="text-2xl font-bold">Resultados da Busca</h1>
+                        <p id="products-count" class="text-sm text-gray-600">0 produtos encontrados</p>
+                    </div>
+                    <select id="sort-by" class="border-gray-300 rounded-md">
+                        <option value="relevance">Relevante</option>
+                        <option value="price-asc">Menor Preço</option>
+                        <option value="price-desc">Maior Preço</option>
+                    </select>
+                </div>
+
+                <div id="products-grid" class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
+                    </div>
+
+                <div id="pagination-container" class="mt-8 text-center">
+                    </div>
+            </main>
+        </div>
+    </div>
+</div>
