@@ -14,6 +14,17 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
+/* --- SERVICE WORKER (Mantido desativado por segurança) --- */
+/*
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/jpet.clinica/sw.js')
+            .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+            .catch(error => console.log('Falha ao registrar o Service Worker:', error));
+    });
+}
+*/
+
 // --- VARIÁVEIS GLOBAIS E ESTADO DA APLICAÇÃO ---
 let state = {};
 let db, auth;
@@ -851,6 +862,24 @@ export async function loadPage(pageName, params = {}) {
         if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
         appRoot.innerHTML = await response.text();
 
+        if (pageName !== 'home') {
+            const backButtonHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
+                        <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
+                    </a>
+                </div>`;
+            appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
+    
+            appRoot.querySelectorAll('a, button').forEach(element => {
+                const hasText = element.textContent.trim().includes('Voltar para o início');
+                const isOurButton = element.hasAttribute('data-dynamic-back-button');
+                if (hasText && !isOurButton) {
+                    element.parentElement.remove();
+                }
+            });
+        }
+        
         // Controla elementos globais
         const topBanner = document.getElementById('top-banner');
         if (topBanner) topBanner.classList.toggle('hidden', pageName !== 'home');
@@ -890,6 +919,13 @@ export async function loadPage(pageName, params = {}) {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
+            // Páginas estáticas não precisam de JS específico
+            case 'adocao-caes':
+            case 'adocao-gatos':
+            case 'como-baixar-app':
+            case 'instalar-ios':
+            case 'farmacia':
+                break;
         }
 
         initPageModals(); // Inicializa modais que podem existir em qualquer página
@@ -901,6 +937,14 @@ export async function loadPage(pageName, params = {}) {
     } finally {
         setTimeout(() => loadingOverlay.style.display = 'none', 300);
         window.scrollTo(0, 0);
+
+        if (pageName === 'home') {
+            setTimeout(() => {
+                document.querySelectorAll('.animate-on-load').forEach(el => {
+                    el.classList.add('animated');
+                });
+            }, 100);
+        }
     }
 }
 
@@ -939,7 +983,6 @@ function initBanhoTosaEventListeners() {
     if (!pageContainer) return;
     pageContainer.addEventListener('click', e => {
         const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
-        const closeModal = (modal) => { if (modal) modal.style.display = 'none'; };
 
         const availableSlot = e.target.closest('.time-slot.available');
         if (availableSlot) {
@@ -1097,7 +1140,15 @@ async function initializeApp() {
             e.preventDefault();
             const searchInput = document.getElementById('search-input');
             const searchTerm = searchInput.value.trim();
-            if (searchTerm) {
+            const searchError = document.getElementById('search-error');
+            if (!searchTerm) {
+                searchError.classList.remove('hidden');
+                searchInput.classList.add('animate-shake');
+                setTimeout(() => {
+                    searchError.classList.add('hidden');
+                    searchInput.classList.remove('animate-shake');
+                }, 2000);
+            } else {
                 loadPage('busca', { query: searchTerm });
                 searchInput.value = '';
             }
@@ -1110,17 +1161,41 @@ async function initializeApp() {
         updateTotals();
     });
 
-    // Lógica do Chatbot
+    // Lógica do Chatbot e Plaquinha
     const marrieButton = document.getElementById('marrie-chat-button');
     const marrieWindow = document.getElementById('marrie-chat-window');
     const chatInput = document.getElementById('marrie-chat-input');
     const chatSendButton = document.getElementById('marrie-chat-send');
+    const plaqueContainer = document.getElementById('marrie-plaque-container');
+
+    if (plaqueContainer && marrieButton) {
+        let plaqueTimer;
+        const showPlaque = () => {
+            plaqueContainer.classList.add('active');
+            plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
+        };
+        setTimeout(showPlaque, 2000);
+        const hidePlaque = () => {
+            clearTimeout(plaqueTimer);
+            plaqueContainer.classList.remove('active');
+            marrieButton.removeEventListener('click', hidePlaque);
+        };
+        marrieButton.addEventListener('click', hidePlaque);
+    }
 
     if (marrieButton && marrieWindow) {
-        const toggleChat = () => marrieWindow.classList.toggle('active');
+        const toggleChat = () => {
+            marrieWindow.classList.toggle('active');
+            if (marrieWindow.classList.contains('active')) {
+                marrieWindow.classList.remove('hidden');
+            } else {
+                setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+            }
+        };
         marrieButton.addEventListener('click', toggleChat);
         document.getElementById('marrie-chat-close')?.addEventListener('click', toggleChat);
     }
+
     if (chatInput && chatSendButton) {
         chatSendButton.addEventListener('click', handleSendMessage);
         chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
@@ -1156,10 +1231,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeApp();
 });
-
-
-
-
-
-
-
