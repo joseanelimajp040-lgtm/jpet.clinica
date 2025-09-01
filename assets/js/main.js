@@ -254,6 +254,125 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+// Armazenará os produtos da busca atual para não precisar ir no banco toda hora
+let currentSearchResults = [];
+
+// Função principal que orquestra a página de busca
+async function renderBuscaPage(params) {
+    const searchTerm = params.query || ''; // Pega o termo da busca, se houver
+    document.getElementById('products-grid').innerHTML = '<p>Buscando produtos...</p>';
+    
+    try {
+        // Busca inicial no Firebase
+        // Por simplicidade, vamos buscar todos os produtos. Para um site real, a busca seria mais otimizada.
+        const snapshot = await db.collection('produtos').get();
+        currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Agora, aplica o filtro inicial da busca (se houver)
+        let initialProducts = currentSearchResults;
+        if (searchTerm) {
+             document.querySelector('#app-root h1').textContent = `Resultados para "${searchTerm}"`;
+             initialProducts = currentSearchResults.filter(p => 
+                (p.search_keywords && p.search_keywords.includes(searchTerm.toLowerCase())) ||
+                p.nome.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        generateFilters(initialProducts); // Gera os filtros da sidebar
+        displayProducts(initialProducts); // Mostra os produtos na tela
+
+        // Adiciona os 'listeners' para os filtros e ordenação
+        document.getElementById('filters-container').addEventListener('change', applyFilters);
+        document.getElementById('sort-by').addEventListener('change', applyFilters);
+
+    } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        document.getElementById('products-grid').innerHTML = '<p class="text-red-500">Não foi possível carregar os produtos.</p>';
+    }
+}
+
+// Gera os filtros na sidebar com base nos produtos encontrados
+function generateFilters(products) {
+    const filtersContainer = document.getElementById('filters-container');
+    if (!filtersContainer) return;
+
+    const filters = {
+        brand: new Set(),
+        pet_type: new Set(),
+        size: new Set(),
+        age: new Set()
+    };
+
+    products.forEach(p => {
+        if (p.brand) filters.brand.add(p.brand);
+        if (p.pet_type) filters.pet_type.add(p.pet_type);
+        if (p.size) filters.size.add(p.size);
+        if (p.age) filters.age.add(p.age);
+    });
+    
+    let html = '';
+    // Helper para criar um bloco de filtro
+    const createFilterGroup = (title, key, options) => {
+        if (options.size === 0) return '';
+        let optionsHTML = '';
+        [...options].sort().forEach(option => {
+             // Simplificado: sem contagem dinâmica por enquanto
+            optionsHTML += `<div><label class="flex items-center"><input type="checkbox" data-filter-key="${key}" value="${option}" class="mr-2">${option}</label></div>`;
+        });
+        return `<div class="border-t pt-4"><h3 class="font-semibold mb-2">${title}</h3><div class="space-y-2">${optionsHTML}</div></div>`;
+    };
+    
+    html += createFilterGroup('Marca', 'brand', filters.brand);
+    html += createFilterGroup('Tipo de Pet', 'pet_type', filters.pet_type);
+    html += createFilterGroup('Porte', 'size', filters.size);
+    html += createFilterGroup('Idade', 'age', filters.age);
+    
+    filtersContainer.innerHTML = html;
+}
+
+// Aplica os filtros e a ordenação selecionados
+function applyFilters() {
+    const selectedFilters = {
+        brand: [], pet_type: [], size: [], age: []
+    };
+    
+    document.querySelectorAll('#filters-container input:checked').forEach(input => {
+        selectedFilters[input.dataset.filterKey].push(input.value);
+    });
+
+    let filteredProducts = currentSearchResults.filter(product => {
+        return Object.keys(selectedFilters).every(key => {
+            if (selectedFilters[key].length === 0) return true;
+            return selectedFilters[key].includes(product[key]);
+        });
+    });
+
+    // Aplica a ordenação
+    const sortBy = document.getElementById('sort-by').value;
+    if (sortBy === 'price-asc') {
+        filteredProducts.sort((a, b) => a.variations[0].price - b.variations[0].price);
+    } else if (sortBy === 'price-desc') {
+        filteredProducts.sort((a, b) => b.variations[0].price - a.variations[0].price);
+    }
+
+    displayProducts(filteredProducts);
+}
+
+// Mostra os produtos filtrados na tela
+function displayProducts(products) {
+    const grid = document.getElementById('products-grid');
+    const countEl = document.getElementById('products-count');
+    
+    countEl.textContent = `${products.length} produtos encontrados`;
+    
+    if (products.length === 0) {
+        grid.innerHTML = '<p class="col-span-full">Nenhum produto encontrado com estes filtros.</p>';
+        return;
+    }
+    
+    grid.innerHTML = products.map(p => createProductCardHTML(p, p.id)).join('');
+    updateAllHeartIcons(); // Para os corações de favorito funcionarem
+}
 // SUBSTITUA SUA FUNÇÃO PELA VERSÃO FINAL E À PROVA DE FALHAS ABAIXO
 async function renderProductPage(productId) {
     try {
@@ -1078,6 +1197,9 @@ function initProductPageListeners() {
                         appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado!</p>`;
                     }
                     break;
+                 case 'busca':
+                await renderBuscaPage(params);
+                break;
                 case 'checkout':
                     renderCheckoutSummary();
                     initCheckoutPageListeners(state);
@@ -1321,6 +1443,7 @@ if (variationBtn) {
     
     initializeApp();
 });
+
 
 
 
