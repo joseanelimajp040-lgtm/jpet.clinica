@@ -258,9 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
 let currentSearchResults = [];
 
 // Função principal que orquestra a página de busca
-let currentSearchResults = []; // Armazena os produtos da busca atual
-
-// Função principal que orquestra a página de busca
 async function renderBuscaPage(params) {
     const searchTerm = params.query || '';
     const grid = document.getElementById('products-grid');
@@ -1544,6 +1541,7 @@ if (pageName && newFullName) {
     
     initializeApp();
 });
+
 
 
 
