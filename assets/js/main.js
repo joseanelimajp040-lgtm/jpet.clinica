@@ -244,14 +244,17 @@ function renderCart() {
     updateTotals();
 }
 
-// CÓDIGO MODIFICADO 2
 async function renderFavoritesPage() {
     const container = document.getElementById('favorites-items-container');
     const emptyState = document.getElementById('favorites-empty-state');
     const clearBtn = document.getElementById('clear-favorites-btn');
     const summaryEl = document.getElementById('favorites-summary');
 
-    if (!container || !emptyState || !clearBtn || !summaryEl) return;
+    // ADICIONADO: Verificação de segurança com mensagem de erro no console
+    if (!container || !emptyState || !clearBtn || !summaryEl) {
+        console.error("ERRO: Elementos essenciais da página de favoritos não foram encontrados no HTML. Verifique se os IDs 'favorites-items-container', 'favorites-empty-state', 'clear-favorites-btn' e 'favorites-summary' existem em pages/favorites.html");
+        return;
+    }
 
     const count = state.favorites.length;
     summaryEl.textContent = `Você tem ${count} ${count === 1 ? 'item salvo' : 'itens salvos'}.`;
@@ -325,7 +328,7 @@ function renderCalendar() {
                 const appointmentData = JSON.stringify(appointment).replace(/'/g, "'");
                 agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
             } else {
-           D        agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
+                agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
             }
         }
     });
@@ -738,7 +741,6 @@ function handleAddToCart(event) {
     }, 2000);
 }
 
-// CÓDIGO MODIFICADO 1
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
@@ -915,7 +917,7 @@ export async function loadPage(pageName, params = {}) {
                     </a>
                 </div>`;
             appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
-           
+            
             appRoot.querySelectorAll('a, button').forEach(element => {
                 const hasText = element.textContent.trim().includes('Voltar para o início');
                 const isOurButton = element.hasAttribute('data-dynamic-back-button');
@@ -924,7 +926,7 @@ export async function loadPage(pageName, params = {}) {
                 }
             });
         }
-           
+            
         // Controla elementos globais
         const topBanner = document.getElementById('top-banner');
         if (topBanner) topBanner.classList.toggle('hidden', pageName !== 'home');
@@ -1220,7 +1222,7 @@ async function initializeApp() {
                 state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
             });
         }
-         
+           
         if (target.closest('#checkout-btn')) {
             e.preventDefault();
             if (state.cart.length === 0) {
