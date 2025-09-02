@@ -6,7 +6,7 @@
             <a href="#" class="nav-link text-blue-600 underline hover:text-blue-800 font-medium" data-page="veterinarios">Saiba mais</a>
         </div>
         <div class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex">
-            <a href="https://maps.app.goo.gl/WhMrteoFFtgH2GvC8" target="_blank" class="hover:text-primary flex items-center">
+            <a href="https://maps.app.goo.gl/qX1tM3yJd4ZzW5e99" target="_blank" class="hover:text-primary flex items-center">
                 <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i> Encontre nossa loja
             </a>
         </div>
@@ -23,19 +23,22 @@
                 </a>
             </div>
             
-            <!-- COLE ESTE NOVO BLOCO NO LUGAR -->
-<div class="flex-1 mx-8 relative">
-    <form id="search-form" class="relative">
-        <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-black rounded-full focus:outline-none search-bar">
-        <button type="submit" id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
-            <i class="fas fa-search"></i>
-        </button>
-    </form>
-    <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
-</div>
+            <div class="flex-1 mx-8 relative hidden md:flex">
+                <form id="search-form" class="relative w-full">
+                    <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-black rounded-full focus:outline-none search-bar">
+                    <button type="submit" id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
+            </div>
             
-            <div class="flex items-center">
-                <a href="#" class="nav-link relative mr-4" data-page="favorites">
+            <div class="flex items-center space-x-4">
+                <a href="#" id="mobile-search-icon" class="text-2xl text-gray-700 md:hidden">
+                    <i class="fas fa-search"></i>
+                </a>
+
+                <a href="#" class="nav-link relative" data-page="favorites">
                     <i class="fas fa-heart text-2xl text-gray-700"></i>
                     <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </a>
@@ -48,7 +51,7 @@
     </div>
 </header>
     
-<nav id="main-nav-bar" class="bg-primary text-white hidden">
+<nav id="main-nav-bar" class="bg-primary text-white hidden md:block">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between">
             <div class="dropdown relative">
@@ -59,7 +62,7 @@
                     <a href="#" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-tags fa-fw mr-2 text-primary"></i> Promoções</a>
                     <a href="#" id="racao-btn-dropdown" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-bone fa-fw mr-2 text-primary"></i> Rações</a>
                     <a href="#" id="medicamentos-btn-dropdown" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-pills fa-fw mr-2 text-primary"></i> Medicamentos</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-primary transition" data-page="farmacia">Farmácia</a>
+                    <a href="#" class="nav-link text-gray-800 hover:bg-gray-100 border-b flex items-center px-4 py-3" data-page="farmacia"><i class="fas fa-briefcase-medical fa-fw mr-2 text-primary"></i> Farmácia</a>
                     <a href="#" class="nav-link block px-4 py-3 text-gray-800 hover:bg-gray-100 flex items-center" data-page="banho-e-tosa"><i class="fas fa-cut fa-fw mr-2 text-primary"></i> Banho e tosa</a>
                 </div>
             </div>
@@ -68,18 +71,30 @@
                 <a href="#" class="py-3 px-2 font-medium hover:bg-orange-700">Promoções</a>
                 <a href="#" id="racao-btn-nav" class="py-3 px-2 font-medium hover:bg-orange-700">Rações</a>
                 <a href="#" id="medicamentos-btn" class="py-3 px-2 font-medium hover:bg-orange-700">Medicamentos</a>
-               <a href="#" class="nav-link py-3 px-2 text-gray-700 hover:bg-orange-700" data-page="farmacia">Farmácia</a>
+                <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="farmacia">Farmácia</a>
                 <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="banho-e-tosa">Banho e tosa</a>
                  <div id="login-placeholder-desktop">
-                    </div>
+                     </div>
             </div>
-
-            <div id="login-placeholder-mobile" class="md:hidden ml-4">
-                 </div>
         </div>
     </div>
 </nav>
 
-
-
-
+<div class="bg-white border-b md:hidden">
+    <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+        <div class="dropdown relative">
+            <button class="bg-secondary text-white px-4 py-2 rounded-full font-medium flex items-center text-sm">
+                <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
+            </button>
+             <div class="dropdown-menu absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-md hidden z-50">
+                 <a href="#" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-tags fa-fw mr-2 text-primary"></i> Promoções</a>
+                 <a href="#" id="racao-btn-dropdown-mobile" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-bone fa-fw mr-2 text-primary"></i> Rações</a>
+                 <a href="#" id="medicamentos-btn-dropdown-mobile" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-pills fa-fw mr-2 text-primary"></i> Medicamentos</a>
+                 <a href="#" class="nav-link text-gray-800 hover:bg-gray-100 border-b flex items-center px-4 py-3" data-page="farmacia"><i class="fas fa-briefcase-medical fa-fw mr-2 text-primary"></i> Farmácia</a>
+                 <a href="#" class="nav-link block px-4 py-3 text-gray-800 hover:bg-gray-100 flex items-center" data-page="banho-e-tosa"><i class="fas fa-cut fa-fw mr-2 text-primary"></i> Banho e tosa</a>
+             </div>
+        </div>
+        <div id="login-placeholder-mobile">
+            </div>
+    </div>
+</div>
