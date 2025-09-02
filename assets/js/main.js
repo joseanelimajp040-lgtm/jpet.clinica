@@ -244,7 +244,7 @@ function renderCart() {
     updateTotals();
 }
 
-// CÓDIGO MODIFICADO 2 - Início
+// NOVA VERSÃO CORRIGIDA da função renderFavoritesPage
 async function renderFavoritesPage() {
     const container = document.getElementById('favorites-items-container');
     const emptyState = document.getElementById('favorites-empty-state');
@@ -270,16 +270,21 @@ async function renderFavoritesPage() {
     container.innerHTML = '<p class="col-span-full text-center">Carregando seus produtos favoritos...</p>';
 
     try {
+        // Mapeia os IDs dos favoritos para promessas de busca no Firestore
         const favoriteProductPromises = state.favorites.map(fav => db.collection('produtos').doc(fav.id).get());
+        // Espera todas as buscas terminarem
         const favoriteProductDocs = await Promise.all(favoriteProductPromises);
+        
         let productsHTML = '';
         favoriteProductDocs.forEach(doc => {
             if (doc.exists) {
+                // Usa a função createProductCardHTML para renderizar cada produto
                 productsHTML += createProductCardHTML(doc.data(), doc.id);
             } else {
-                console.warn(`Produto favoritado com ID ${doc.id} não foi encontrado.`);
+                console.warn(`Produto favoritado com ID ${doc.id} não foi encontrado no banco de dados.`);
             }
         });
+
         container.innerHTML = productsHTML || '<p class="col-span-full text-center">Nenhum de seus produtos favoritos foi encontrado.</p>';
         updateAllHeartIcons();
     } catch (error) {
@@ -287,7 +292,6 @@ async function renderFavoritesPage() {
         container.innerHTML = '<p class="col-span-full text-center text-red-500">Ocorreu um erro ao carregar seus favoritos.</p>';
     }
 }
-// CÓDIGO MODIFICADO 2 - Fim
 
 function renderCheckoutSummary() {
     const container = document.getElementById('checkout-summary-items');
@@ -738,7 +742,7 @@ function handleAddToCart(event) {
     }, 2000);
 }
 
-// CÓDIGO MODIFICADO 1 - Início
+// NOVA VERSÃO CORRIGIDA da função handleFavoriteToggle
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
@@ -749,23 +753,23 @@ function handleFavoriteToggle(event) {
     const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
 
     if (favoriteIndex > -1) {
+        // Remove o item da lista de favoritos
         state.favorites.splice(favoriteIndex, 1);
         showAnimation('unfavorite-animation-overlay', 1500);
     } else {
-        // Agora salvamos apenas o ID, que é mais seguro e leve.
+        // Adiciona apenas o ID do produto, que é mais leve e seguro
         state.favorites.push({ id: productId });
     }
-    
+    
     save.favorites();
     updateCounters();
     updateAllHeartIcons();
 
-    // Se estivermos na página de favoritos, atualiza a lista de itens.
+    // Se a ação ocorreu na página de favoritos, atualiza a lista de produtos exibidos
     if (document.getElementById('favorites-items-container')) {
         renderFavoritesPage();
     }
 }
-// CÓDIGO MODIFICADO 1 - Fim
 
 // --- LÓGICA DE AUTENTICAÇÃO ---
 function handleSocialLogin(providerName) {
@@ -958,7 +962,7 @@ export async function loadPage(pageName, params = {}) {
                 initCheckoutPageListeners(state);
                 break;
             case 'favorites':
-                await renderFavoritesPage(); // MODIFICAÇÃO: 'await' adicionado
+                await renderFavoritesPage(); // CORREÇÃO: "await" garante que a busca assíncrona termine
                 break;
             case 'banho-e-tosa':
                 renderCalendar();
