@@ -1061,7 +1061,51 @@ async function initializeApp() {
             loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
-        // Lógica de Variação de Produto
+// --- INÍCIO: LÓGICA DO MODAL DE BUSCA MOBILE ---
+    const mobileSearchIcon = document.getElementById('mobile-search-icon');
+    const mobileSearchModal = document.getElementById('mobile-search-modal');
+    const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
+    const mobileSearchForm = document.getElementById('mobile-search-form');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+
+    if (mobileSearchIcon && mobileSearchModal) {
+        mobileSearchIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            mobileSearchModal.classList.add('active');
+            // Foco automático no campo de input ao abrir
+            setTimeout(() => mobileSearchInput.focus(), 100); 
+        });
+    }
+
+    if (mobileSearchCloseBtn) {
+        mobileSearchCloseBtn.addEventListener('click', () => {
+            mobileSearchModal.classList.remove('active');
+        });
+    }
+
+    // Fecha o modal se clicar no fundo desfocado
+    if (mobileSearchModal) {
+        mobileSearchModal.addEventListener('click', (e) => {
+            if (e.target === mobileSearchModal) {
+                mobileSearchModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (mobileSearchForm) {
+        mobileSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchTerm = mobileSearchInput.value.trim();
+            if (searchTerm) {
+                loadPage('busca', { query: searchTerm });
+                mobileSearchModal.classList.remove('active');
+                mobileSearchInput.value = '';
+            }
+        });
+    }
+    // --- FIM: LÓGICA DO MODAL DE BUSCA MOBILE ---
+        
+// Lógica de Variação de Produto
         const variationBtn = target.closest('.variation-btn');
         if (variationBtn) {
             e.preventDefault();
@@ -1279,3 +1323,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeApp();
 });
+
