@@ -579,19 +579,28 @@ async function renderBuscaPage(params) {
             const lowerCaseTerm = searchTerm.toLowerCase();
             
             initialProducts = currentSearchResults.filter(p => {
+                // 1. Busca no nome principal (seja string ou array)
                 let nameMatch = false;
                 if (typeof p.nome === 'string') {
                     nameMatch = p.nome.toLowerCase().includes(lowerCaseTerm);
-                } 
-                else if (Array.isArray(p.nome)) {
+                } else if (Array.isArray(p.nome)) {
                     nameMatch = p.nome.some(name => typeof name === 'string' && name.toLowerCase().includes(lowerCaseTerm));
                 }
 
+                // 2. Busca na marca do produto
+                const brandMatch = (p.brand || "").toLowerCase().includes(lowerCaseTerm);
+
+                // 3. Busca nas palavras-chave
                 const keywordMatch = Array.isArray(p.search_keywords) && p.search_keywords.some(k => 
                     typeof k === 'string' && k.toLowerCase().includes(lowerCaseTerm)
                 );
 
-                return nameMatch || keywordMatch;
+                // 4. Busca nos nomes completos de cada variação
+                const variationMatch = Array.isArray(p.variations) && p.variations.some(v =>
+                    (v.fullName || "").toLowerCase().includes(lowerCaseTerm)
+                );
+
+                return nameMatch || brandMatch || keywordMatch || variationMatch;
             });
         } else {
             if (titleEl) titleEl.textContent = 'Todos os Produtos';
