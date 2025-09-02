@@ -250,8 +250,7 @@ async function renderFavoritesPage() {
     const clearBtn = document.getElementById('clear-favorites-btn');
     const summaryEl = document.getElementById('favorites-summary');
 
-    // ADICIONADO: Verificação de segurança com mensagem de erro no console
-    if (!container || !emptyState || !clearBtn || !summaryEl) {
+    if (!container || !emptyState || !clearBtn || !summaryEl) {
         console.error("ERRO: Elementos essenciais da página de favoritos não foram encontrados no HTML. Verifique se os IDs 'favorites-items-container', 'favorites-empty-state', 'clear-favorites-btn' e 'favorites-summary' existem em pages/favorites.html");
         return;
     }
@@ -930,8 +929,8 @@ export async function loadPage(pageName, params = {}) {
         // Controla elementos globais
         const topBanner = document.getElementById('top-banner');
         if (topBanner) topBanner.classList.toggle('hidden', pageName !== 'home');
-        const mainNavBar = document.getElementById('main-nav-bar');
-        if (mainNavBar) mainNavBar.classList.toggle('hidden', pageName !== 'home');
+        
+        // A LINHA PROBLEMÁTICA FOI REMOVIDA DAQUI
 
         // Executa scripts e listeners específicos da página
         switch (pageName) {
