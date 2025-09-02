@@ -1,32 +1,32 @@
-<div class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8 md:py-12">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+<div class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b">
             <div>
-                <button class="nav-link text-secondary hover:underline font-medium flex items-center mb-4 md:mb-0" data-page="home">
-                    <i class="fas fa-arrow-left mr-2"></i> Voltar para o início
-                </button>
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Meus Favoritos</h1>
-                <p id="favorites-summary" class="text-gray-600 mt-1">Você tem 0 itens salvos.</p>
+                <h1 class="text-3xl font-bold text-gray-900">Meus Favoritos</h1>
+                <p id="favorites-summary" class="mt-1 text-sm text-gray-600">Calculando itens...</p>
             </div>
-            <button id="clear-favorites-btn" class="hidden mt-4 md:mt-0 bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2">
-                <i class="fas fa-trash-alt"></i> Limpar Tudo
+            <button id="clear-favorites-btn" class="mt-4 sm:mt-0 text-sm bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 hidden">
+                <i class="fas fa-trash-alt mr-2"></i>Limpar Tudo
             </button>
         </div>
 
-        <div id="favorites-items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        </div>
+        <div id="favorites-container-wrapper">
 
-        <div id="favorites-empty-state" class="hidden text-center py-16 px-6 bg-white rounded-lg shadow-md">
-            <div class="text-primary mx-auto mb-4">
-                <svg class="w-16 h-16 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                </svg>
+            <div id="favorites-items-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                </div>
+
+            <div id="favorites-empty-state" class="text-center py-20 px-6 bg-white rounded-lg shadow-md hidden">
+                 <div class="empty-cart-animation-wrapper mx-auto mb-4">
+                    <i class="fas fa-heart-broken" style="font-size: 4rem; color: #cbd5e1;"></i>
+                 </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Sua lista de favoritos está vazia.</h2>
+                <p class="text-gray-600 mb-6">Clique no ícone de coração nos produtos que você mais gosta para salvá-los aqui!</p>
+                <a href="#" class="nav-link inline-block bg-primary hover:bg-orange-700 text-white py-3 px-8 rounded-lg font-bold transition duration-300" data-page="home">
+                    <i class="fas fa-search mr-2"></i> Ver Produtos
+                </a>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Sua lista de favoritos está vazia</h2>
-            <p class="text-gray-600 mb-6">Clique no coração <i class="fas fa-heart text-red-400"></i> nos produtos para guardá-los aqui!</p>
-            <button class="nav-link bg-primary text-white font-bold py-3 px-8 rounded-full hover:bg-orange-700 transition-transform hover:scale-105" data-page="home">
-                Explorar Produtos
-            </button>
+
         </div>
     </div>
 </div>
