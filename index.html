@@ -83,11 +83,25 @@
 <a href="https://wa.me/message/UWELXKHLLEPLM1" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 transition duration-300 z-50">
     <i class="fab fa-whatsapp"></i>
 </a>
-    
+    <div id="mobile-search-modal" class="mobile-search-overlay">
+    <div class="mobile-search-container">
+        <form id="mobile-search-form" class="w-full flex items-center relative">
+            <input type="text" id="mobile-search-input" placeholder="O que seu pet precisa hoje?" class="mobile-search-input" autocomplete="off">
+            <button type="submit" class="mobile-search-submit-btn">
+                <i class="fas fa-search"></i>
+            </button>
+            <button type="button" id="mobile-search-close-btn" class="mobile-search-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        </div>
+</div>
+
     <script src="assets/js/main.js" type="module" defer></script>
 
 </body>
 </html>
+
 
 
 
