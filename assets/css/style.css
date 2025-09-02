@@ -2366,3 +2366,106 @@ input[type='number'] {
     color: #FF6B00; /* Sua cor primária */
 }
 /* ========== FIM: ESTILOS OPCIONAIS PARA PÁGINA DE BUSCA ========== */
+
+/* ========== INÍCIO: ESTILOS DO MODAL DE BUSCA MOBILE ========== */
+
+/* O fundo desfocado que cobre a tela */
+.mobile-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none; /* Começa escondido */
+    justify-content: flex-start; /* Alinha no topo */
+    align-items: center;
+    padding-top: 15vh; /* Distância do topo */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px); /* Suporte para Safari */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Mostra o overlay quando a classe 'active' é adicionada */
+.mobile-search-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* O contêiner da barra de busca */
+.mobile-search-container {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobile-search-overlay.active .mobile-search-container {
+    transform: translateY(0);
+}
+
+/* A barra de busca em si */
+.mobile-search-input {
+    width: 100%;
+    height: 50px;
+    padding: 0 50px 0 20px; /* Espaço para os botões */
+    border: 2px solid var(--primary-color);
+    border-radius: 9999px;
+    font-size: 1rem;
+    background-color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.4);
+}
+
+/* Botão de submeter a busca (dentro da barra) */
+.mobile-search-submit-btn {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* Botão de fechar o modal (dentro da barra) */
+.mobile-search-close-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #e5e7eb; /* gray-200 */
+    color: #4b5563; /* gray-600 */
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.mobile-search-close-btn:hover {
+    background-color: #d1d5db; /* gray-300 */
+    color: #1f2937; /* gray-800 */
+}
+
+/* Oculta o modal de busca em telas de desktop */
+@media (min-width: 768px) {
+    #mobile-search-modal {
+        display: none !important;
+    }
+}
+/* ========== FIM: ESTILOS DO MODAL DE BUSCA MOBILE ========== */
