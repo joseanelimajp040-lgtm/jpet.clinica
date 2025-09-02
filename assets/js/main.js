@@ -566,7 +566,7 @@ async function renderBuscaPage(params) {
     const countEl = document.getElementById('products-count');
     const titleEl = document.querySelector('#app-root h1');
 
-    if (grid) grid.innerHTML = '<p class="col-span-full text-center py-8">Carregando filtros...</p>';
+    if (grid) grid.innerHTML = '<p class="col-span-full text-center py-8">Buscando produtos...</p>';
     if (countEl) countEl.textContent = '...';
 
     try {
@@ -577,11 +577,20 @@ async function renderBuscaPage(params) {
         if (searchTerm) {
             if (titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
             const lowerCaseTerm = searchTerm.toLowerCase();
+            
             initialProducts = currentSearchResults.filter(p => {
-                const nameMatch = (p.nome || "").toLowerCase().includes(lowerCaseTerm);
+                let nameMatch = false;
+                if (typeof p.nome === 'string') {
+                    nameMatch = p.nome.toLowerCase().includes(lowerCaseTerm);
+                } 
+                else if (Array.isArray(p.nome)) {
+                    nameMatch = p.nome.some(name => typeof name === 'string' && name.toLowerCase().includes(lowerCaseTerm));
+                }
+
                 const keywordMatch = Array.isArray(p.search_keywords) && p.search_keywords.some(k => 
                     typeof k === 'string' && k.toLowerCase().includes(lowerCaseTerm)
                 );
+
                 return nameMatch || keywordMatch;
             });
         } else {
@@ -1137,7 +1146,6 @@ async function initializeApp() {
             });
         }
         
-        // --- LÓGICA DO CHECKOUT (CORRIGIDO) ---
         if (target.closest('#checkout-btn')) {
             e.preventDefault();
             if (state.cart.length === 0) {
