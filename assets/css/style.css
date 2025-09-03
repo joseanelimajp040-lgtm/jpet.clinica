@@ -2472,98 +2472,163 @@ input[type='number'] {
 
 /* style.css */
 
-/* ========== INÍCIO: ESTILOS DA PÁGINA DE RASTREIO ========== */
+/* ================================================================== */
+/* ESTILOS PARA AS PÁGINAS DE PEDIDOS E RASTREIO           */
+/* ================================================================== */
 
-/* Estilo do container principal da linha do tempo */
-.timeline {
-  position: relative;
-  padding-left: 50px; /* Espaço para a linha vertical */
-}
-
-/* A linha vertical da timeline */
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 19px; /* Centraliza a linha com o ícone */
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #e2e8f0; /* slate-200 */
-  border-radius: 2px;
+/* --- Variáveis de Cor (Ajuste para as cores exatas do seu site) --- */
+:root {
+    --cor-primaria: #f97316; /* Laranja da sua marca */
+    --cor-secundaria: #14b8a6; /* Verde-azulado da sua marca */
+    --cor-borda: #e5e7eb;
+    --cor-fundo-card: #ffffff;
+    --cor-fundo-pagina: #f9fafb;
 }
 
-/* Container de cada item na timeline */
-.timeline-item {
-  position: relative;
-  margin-bottom: 2.5rem; /* 40px */
+/* --- Página: Meus Pedidos --- */
+
+.order-card {
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 0.75rem; /* 12px */
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
-.timeline-item:last-child {
-  margin-bottom: 0;
+.order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Ícone de cada item */
-.timeline-icon {
-  position: absolute;
-  left: -32px; /* Move o ícone para a esquerda sobre a linha */
-  top: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem; /* 20px */
-  border: 4px solid #f8fafc; /* bg-slate-50, para criar um espaçamento */
-  z-index: 10;
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--cor-borda);
 }
 
-/* Cores dos ícones baseadas no status */
-.timeline-icon.completed {
-  background-color: #00A8A8; /* secondary */
-  color: white;
-}
-.timeline-icon.current {
-  background-color: #FF6B00; /* primary */
-  color: white;
-  animation: pulse-glow 2s infinite;
-}
-.timeline-icon.pending {
-  background-color: #e2e8f0; /* slate-200 */
-  color: #64748b; /* slate-500 */
+.order-card-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
 }
 
-/* Conteúdo de cada item (título, descrição) */
-.timeline-content {
-  padding-top: 0.25rem; /* 4px */
+
+/* --- Página: Acompanhar Entrega --- */
+
+/* Estilo para os botões "Comprar Novamente", etc. */
+.btn-secondary-outline {
+    background-color: transparent;
+    border: 2px solid var(--cor-secundaria);
+    color: var(--cor-secundaria);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 9999px; /* Pílula */
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.timeline-content .status-title {
-  font-weight: 700;
-  font-size: 1.125rem; /* 18px */
-  color: #1e293b; /* slate-800 */
-  margin-bottom: 0.25rem;
+.btn-secondary-outline:hover {
+    background-color: var(--cor-secundaria);
+    color: white;
 }
 
-.timeline-content .status-time {
-  font-size: 0.875rem; /* 14px */
-  color: #64748b; /* slate-500 */
-  margin-bottom: 0.5rem;
+/* Estrutura da Timeline de Progresso */
+#tracking-timeline-container {
+    position: relative;
+    padding: 2.5rem 0; /* Espaço para os textos acima e abaixo da barra */
 }
 
-.timeline-content .status-description {
-  font-size: 1rem; /* 16px */
-  color: #475569; /* slate-600 */
+/* Barra de fundo (cinza) */
+.progress-bar-background {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 8px;
+    background-color: var(--cor-borda);
+    border-radius: 4px;
 }
 
-/* Animação de brilho para o status atual */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 107, 0, 0);
-  }
+/* Barra de progresso (colorida) */
+.progress-bar-foreground {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 8px;
+    background-color: var(--cor-secundaria);
+    border-radius: 4px;
+    transition: width 0.8s ease-in-out;
 }
 
-/* ========== FIM: ESTILOS DA PÁGINA DE RASTREIO ========== */
+/* Container para os textos de status (Pedido feito, Enviado, etc.) */
+.timeline-steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Cada passo individual na timeline */
+.timeline-step {
+    text-align: center;
+    font-size: 0.875rem; /* 14px */
+    color: #9ca3af; /* Cinza para status pendente */
+}
+
+.timeline-step span {
+    display: block;
+    margin-top: -30px; /* Posiciona o texto acima do círculo */
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* O círculo visual para cada passo */
+.timeline-step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%; /* Centraliza o círculo no seu container */
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background-color: #d1d5db; /* Círculo cinza por padrão */
+    border-radius: 50%;
+    border: 2px solid var(--cor-fundo-pagina);
+    z-index: 10;
+    transition: all 0.4s ease;
+}
+
+/* Estilizando o primeiro e último círculo para alinhar com as pontas da barra */
+.timeline-step:first-child::after { left: 0; transform: translateY(-50%); }
+.timeline-step:last-child::after { left: 100%; transform: translate(-100%, -50%); }
+
+
+/* --- Estados dos Passos (completed, current, pending) --- */
+
+/* Status COMPLETO (já passou) */
+.timeline-step.completed span {
+    color: #374151; /* Cinza mais escuro */
+    font-weight: 600;
+}
+.timeline-step.completed::after {
+    background-color: var(--cor-secundaria);
+}
+
+/* Status ATUAL (onde o pedido está agora) */
+.timeline-step.current span {
+    color: var(--cor-secundaria);
+    font-weight: 700;
+}
+.timeline-step.current::after {
+    width: 24px;
+    height: 24px;
+    background-color: var(--cor-fundo-card);
+    border: 5px solid var(--cor-secundaria);
+}
