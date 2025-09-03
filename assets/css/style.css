@@ -2469,3 +2469,101 @@ input[type='number'] {
     }
 }
 /* ========== FIM: ESTILOS DO MODAL DE BUSCA MOBILE ========== */
+
+/* style.css */
+
+/* ========== INÍCIO: ESTILOS DA PÁGINA DE RASTREIO ========== */
+
+/* Estilo do container principal da linha do tempo */
+.timeline {
+  position: relative;
+  padding-left: 50px; /* Espaço para a linha vertical */
+}
+
+/* A linha vertical da timeline */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 19px; /* Centraliza a linha com o ícone */
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #e2e8f0; /* slate-200 */
+  border-radius: 2px;
+}
+
+/* Container de cada item na timeline */
+.timeline-item {
+  position: relative;
+  margin-bottom: 2.5rem; /* 40px */
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Ícone de cada item */
+.timeline-icon {
+  position: absolute;
+  left: -32px; /* Move o ícone para a esquerda sobre a linha */
+  top: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem; /* 20px */
+  border: 4px solid #f8fafc; /* bg-slate-50, para criar um espaçamento */
+  z-index: 10;
+}
+
+/* Cores dos ícones baseadas no status */
+.timeline-icon.completed {
+  background-color: #00A8A8; /* secondary */
+  color: white;
+}
+.timeline-icon.current {
+  background-color: #FF6B00; /* primary */
+  color: white;
+  animation: pulse-glow 2s infinite;
+}
+.timeline-icon.pending {
+  background-color: #e2e8f0; /* slate-200 */
+  color: #64748b; /* slate-500 */
+}
+
+/* Conteúdo de cada item (título, descrição) */
+.timeline-content {
+  padding-top: 0.25rem; /* 4px */
+}
+
+.timeline-content .status-title {
+  font-weight: 700;
+  font-size: 1.125rem; /* 18px */
+  color: #1e293b; /* slate-800 */
+  margin-bottom: 0.25rem;
+}
+
+.timeline-content .status-time {
+  font-size: 0.875rem; /* 14px */
+  color: #64748b; /* slate-500 */
+  margin-bottom: 0.5rem;
+}
+
+.timeline-content .status-description {
+  font-size: 1rem; /* 16px */
+  color: #475569; /* slate-600 */
+}
+
+/* Animação de brilho para o status atual */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 0, 0);
+  }
+}
+
+/* ========== FIM: ESTILOS DA PÁGINA DE RASTREIO ========== */
