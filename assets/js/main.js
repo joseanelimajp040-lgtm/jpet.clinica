@@ -14,17 +14,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-/* --- SERVICE WORKER (Mantido desativado por segurança) --- */
-/*
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/jpet.clinica/sw.js')
-            .then(registration => console.log('Service Worker registrado com sucesso:', registration))
-            .catch(error => console.log('Falha ao registrar o Service Worker:', error));
-    });
-}
-*/
-
 // --- VARIÁVEIS GLOBAIS E ESTADO DA APLICAÇÃO ---
 let state = {};
 let db, auth;
@@ -38,6 +27,7 @@ const save = {
     cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
     favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
     appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
+    orders: () => localStorage.setItem('orders', JSON.stringify(state.orders)), // NOVO: Salva os pedidos
 };
 
 function showAnimation(overlayId, duration, callback) {
@@ -251,7 +241,7 @@ async function renderFavoritesPage() {
     const summaryEl = document.getElementById('favorites-summary');
 
     if (!container || !emptyState || !clearBtn || !summaryEl) {
-        console.error("ERRO: Elementos essenciais da página de favoritos não foram encontrados no HTML. Verifique se os IDs 'favorites-items-container', 'favorites-empty-state', 'clear-favorites-btn' e 'favorites-summary' existem em pages/favorites.html");
+        console.error("ERRO: Elementos essenciais da página de favoritos não foram encontrados no HTML.");
         return;
     }
 
@@ -304,7 +294,7 @@ function renderCalendar() {
     const agendaGrid = document.getElementById('agenda-grid');
     if (!agendaGrid) return;
     agendaGrid.innerHTML = '';
-    const today = new Date('2025-08-15T10:00:00'); // Data fixa para consistência
+    const today = new Date('2025-08-15T10:00:00');
     const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
     agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
@@ -372,7 +362,6 @@ async function renderProductPage(productId) {
         const categoryForReviews = productData.category || 'geral';
         const reviews = generateRealisticReviews(productId, categoryForReviews);
 
-        // Renderização segura dos elementos da página
         const el = (id) => document.getElementById(id);
         if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
         if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
@@ -492,11 +481,11 @@ function generateRealisticReviews(productId, productCategory) {
             { nome: "Sofia A.", pet: "Paçoca", raca: "Gato Siamês" }, { nome: "Rafael B.", pet: "Rocky", raca: "Vira-lata Caramelo" }
         ],
         templatesPorCategoria: {
-            ração: ["O {pet}, meu {raca}, devorou essa ração! Notei o pelo dele até mais brilhante.", "Excelente! Ajudou muito na digestão do {pet}. Ótimo custo-benefício.", "Meu {raca} se adaptou super bem. Os grãos são de um tamanho bom.", "Qualidade premium. Dá pra ver pelos ingredientes. O {pet} fica ansioso pela hora de comer."],
-            brinquedo: ["Este brinquedo é o novo favorito do {pet}! Super resistente às mordidas do meu {raca}.", "Mantém o {pet} entretido por horas! O material parece ser de boa qualidade.", "A {pet} ficou doida com o barulhinho que faz! Fácil de achar pela casa.", "Ótimo para a saúde dental do {pet}. Ele passa um bom tempo roendo."],
-            higiene: ["Usei este shampoo no {pet} e o resultado foi incrível. Deixou o pelo super macio e cheiroso.", "Meu {raca} tem a pele sensível e este produto não causou nenhuma irritação.", "O perfume é muito bom, não é forte demais. O pelo da {pet} ficou fácil de escovar.", "Prático e eficiente para limpeza das patinhas do {pet} depois do passeio."],
-            farmacia: ["Foi muito fácil de administrar para o {pet}. O efeito foi rápido e ele melhorou visivelmente.", "Produto recomendado pelo nosso veterinário. Cumpriu o que prometia.", "Aliviou o desconforto do meu {raca} quase que imediatamente.", "O aplicador facilita muito o uso. Consegui dar o remédio para o {pet} sem estresse."],
-            geral: ["Produto de excelente qualidade. O {pet} se adaptou super bem. A entrega foi rápida!", "Estou muito satisfeito com a compra. O item é exatamente como descrito.", "Recomendo! Um dos melhores produtos que já comprei para o {pet}."]
+            ração: ["O {pet}, meu {raca}, devorou essa ração! Notei o pelo dele até mais brilhante.", "Excelente! Ajudou muito na digestão do {pet}. Ótimo custo-benefício.", "Meu {raca} se adaptou super bem.", "Qualidade premium. O {pet} fica ansioso pela hora de comer."],
+            brinquedo: ["Este brinquedo é o novo favorito do {pet}! Super resistente.", "Mantém o {pet} entretido por horas!", "A {pet} ficou doida com o barulhinho que faz!", "Ótimo para a saúde dental do {pet}."],
+            higiene: ["Usei este shampoo no {pet} e o resultado foi incrível. Deixou o pelo super macio e cheiroso.", "Meu {raca} tem a pele sensível e este produto não causou nenhuma irritação.", "O perfume é muito bom, não é forte demais.", "Prático e eficiente para limpeza das patinhas."],
+            farmacia: ["Foi muito fácil de administrar para o {pet}. O efeito foi rápido.", "Produto recomendado pelo nosso veterinário. Cumpriu o que prometia.", "Aliviou o desconforto do meu {raca} quase que imediatamente.", "O aplicador facilita muito o uso."],
+            geral: ["Produto de excelente qualidade. O {pet} se adaptou super bem.", "Estou muito satisfeito com a compra.", "Recomendo! Um dos melhores produtos que já comprei para o {pet}."]
         }
     };
     const getCategoriaRelevante = (cat) => {
@@ -600,27 +589,19 @@ async function renderBuscaPage(params) {
             const lowerCaseTerm = searchTerm.toLowerCase();
             
             initialProducts = currentSearchResults.filter(p => {
-                // 1. Busca no nome principal (seja string ou array)
                 let nameMatch = false;
                 if (typeof p.nome === 'string') {
                     nameMatch = p.nome.toLowerCase().includes(lowerCaseTerm);
                 } else if (Array.isArray(p.nome)) {
                     nameMatch = p.nome.some(name => typeof name === 'string' && name.toLowerCase().includes(lowerCaseTerm));
                 }
-
-                // 2. Busca na marca do produto
                 const brandMatch = (p.brand || "").toLowerCase().includes(lowerCaseTerm);
-
-                // 3. Busca nas palavras-chave
                 const keywordMatch = Array.isArray(p.search_keywords) && p.search_keywords.some(k => 
                     typeof k === 'string' && k.toLowerCase().includes(lowerCaseTerm)
                 );
-
-                // 4. Busca nos nomes completos de cada variação
                 const variationMatch = Array.isArray(p.variations) && p.variations.some(v =>
                     (v.fullName || "").toLowerCase().includes(lowerCaseTerm)
                 );
-
                 return nameMatch || brandMatch || keywordMatch || variationMatch;
             });
         } else {
@@ -752,7 +733,6 @@ function handleFavoriteToggle(event) {
         state.favorites.splice(favoriteIndex, 1);
         showAnimation('unfavorite-animation-overlay', 1500);
     } else {
-        // Agora salvamos apenas o ID, que é mais seguro e leve.
         state.favorites.push({ id: productId });
     }
     
@@ -760,7 +740,6 @@ function handleFavoriteToggle(event) {
     updateCounters();
     updateAllHeartIcons();
 
-    // Se estivermos na página de favoritos, atualiza a lista de itens.
     if (document.getElementById('favorites-items-container')) {
         renderFavoritesPage();
     }
@@ -905,7 +884,6 @@ export async function loadPage(pageName, params = {}) {
         if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
         appRoot.innerHTML = await response.text();
 
-        // Lógica do botão "Voltar para o início"
         if (pageName !== 'home') {
             const backButtonHTML = `
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -924,13 +902,11 @@ export async function loadPage(pageName, params = {}) {
             });
         }
             
-        // Controla elementos globais
         const topBanner = document.getElementById('top-banner');
         if (topBanner) topBanner.classList.toggle('hidden', pageName !== 'home');
         const mainNavBar = document.getElementById('main-nav-bar');
         if (mainNavBar) mainNavBar.classList.toggle('hidden', pageName !== 'home');
 
-        // Executa scripts e listeners específicos da página
         switch (pageName) {
             case 'home':
                 initSlider();
@@ -963,8 +939,16 @@ export async function loadPage(pageName, params = {}) {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
-            case 'acompanhar-entrega':
-                initTrackingPageListeners();
+            case 'meus-pedidos': // NOVO
+                await renderMyOrdersPage();
+                break;
+            case 'acompanhar-entrega': // MODIFICADO
+                if (params.id) {
+                    await renderTrackingPage(params.id);
+                } else {
+                    // Se nenhum ID for fornecido, redireciona para a página de "Meus Pedidos"
+                    await renderMyOrdersPage(); 
+                }
                 break;
             case 'adocao-caes':
             case 'adocao-gatos':
@@ -1066,75 +1050,103 @@ function initBanhoTosaEventListeners() {
     }
 }
 
-// --- FUNÇÕES DA PÁGINA DE RASTREIO ---
-function initTrackingPageListeners() {
-  const form = document.getElementById('tracking-form');
-  if (!form) return;
+// --- FUNÇÕES DE PEDIDOS E RASTREIO ---
+async function renderMyOrdersPage() {
+    const container = document.getElementById('my-orders-container');
+    const emptyState = document.getElementById('orders-empty-state');
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = document.getElementById('tracking-code-input');
-    const resultsContainer = document.getElementById('tracking-results-container');
-    const initialMessage = document.getElementById('tracking-initial-message');
+    if (!container || !emptyState) {
+        console.error("ERRO: Elementos da página 'Meus Pedidos' não encontrados.");
+        return;
+    }
     
-    const code = input.value.trim();
-    if (!code) {
-      alert("Por favor, insira um código de rastreio.");
-      return;
+    if (state.orders.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+    } else {
+        container.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        
+        let ordersHTML = '';
+        // Mostra os pedidos mais recentes primeiro
+        [...state.orders].reverse().forEach(order => {
+            const orderDate = new Date(order.orderDate).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+            const productsHTML = order.items.map(item => `
+                <div class="p-2 border border-gray-200 rounded-lg bg-white">
+                    <img src="${item.image}" alt="${item.name}" class="w-24 h-24 object-contain">
+                </div>
+            `).join('');
+
+            ordersHTML += `
+                <a href="#" class="order-card nav-link" data-page="acompanhar-entrega" data-id="${order.id}">
+                    <div class="order-card-header">
+                        <div>
+                            <p class="font-semibold text-gray-800">Pedido #${order.id.slice(-6).toUpperCase()}</p>
+                            <p class="text-sm text-gray-500">Feito em ${orderDate}</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </div>
+                    <div class="order-card-body">
+                        ${productsHTML}
+                    </div>
+                </a>
+            `;
+        });
+        container.innerHTML = ordersHTML;
+    }
+}
+
+async function renderTrackingPage(orderId) {
+    const order = state.orders.find(o => o.id === orderId);
+
+    if (!order) {
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Pedido não encontrado.</p>`;
+        return;
     }
 
-    // Oculta a mensagem inicial e mostra o container de resultados
-    initialMessage.classList.add('hidden');
-    resultsContainer.classList.remove('hidden');
-    resultsContainer.innerHTML = `
-        <div class="flex items-center justify-center py-8">
-            <div class="loader-spinner"></div>
-            <p class="ml-4 text-gray-600">Buscando informações do pedido...</p>
-        </div>`;
+    const mainProduct = order.items[0]; // Pega o primeiro produto para exibição principal
+    document.getElementById('tracking-product-image').src = mainProduct.image;
+    document.getElementById('tracking-product-name').textContent = mainProduct.name + (order.items.length > 1 ? ` e mais ${order.items.length - 1} item(ns)` : '');
+    
+    // Simulação de status de entrega baseado no tempo
+    const statuses = ['Pedido Realizado', 'Pagamento Confirmado', 'Em Separação', 'Saiu para Entrega', 'Entregue'];
+    const timeSinceOrder = Date.now() - order.orderDate; // em milissegundos
+    
+    let currentStatusIndex = 0;
+    if (timeSinceOrder > 3 * 60 * 1000) currentStatusIndex = 4; // 3 minutos para Entregue
+    else if (timeSinceOrder > 2 * 60 * 1000) currentStatusIndex = 3; // 2 minutos para Saiu para Entrega
+    else if (timeSinceOrder > 1 * 60 * 1000) currentStatusIndex = 2; // 1 minuto para Em Separação
+    else if (timeSinceOrder > 30 * 1000) currentStatusIndex = 1; // 30 segundos para Pagamento Confirmado
+    
+    const deliveryDate = new Date(order.orderDate);
+    deliveryDate.setDate(deliveryDate.getDate() + 5); // Simula entrega em 5 dias
+    document.getElementById('tracking-delivery-estimate').textContent = `Chega ${deliveryDate.toLocaleDateString('pt-BR', { weekday: 'long' })}, ${deliveryDate.toLocaleDateString('pt-BR')}`;
+    
+    const timelineContainer = document.getElementById('tracking-timeline-container');
+    let timelineHTML = '';
+    
+    statuses.forEach((status, index) => {
+        let statusClass = 'pending';
+        if (index < currentStatusIndex) {
+            statusClass = 'completed';
+        } else if (index === currentStatusIndex) {
+            statusClass = 'current';
+        }
 
-    // Simula uma chamada de API (atraso de 1.5 segundos)
-    setTimeout(() => {
-      renderTrackingResults(code);
-    }, 1500);
-  });
-}
+        timelineHTML += `<div class="timeline-step ${statusClass}"><span>${status}</span></div>`;
+    });
 
-function renderTrackingResults(code) {
-  const resultsContainer = document.getElementById('tracking-results-container');
-  
-  // Dados de exemplo (simulação)
-  const trackingData = [
-    { status: 'Pedido Realizado', time: '01 de Setembro, 2025 - 14:30', description: 'Seu pedido foi recebido e está sendo processado.', icon: 'fa-receipt', state: 'completed' },
-    { status: 'Pagamento Confirmado', time: '01 de Setembro, 2025 - 14:35', description: 'O pagamento foi aprovado com sucesso.', icon: 'fa-credit-card', state: 'completed' },
-    { status: 'Pedido em Separação', time: '02 de Setembro, 2025 - 09:12', description: 'Estamos separando e embalando seus produtos com todo o cuidado.', icon: 'fa-box', state: 'completed' },
-    { status: 'Saiu para Entrega', time: '02 de Setembro, 2025 - 11:45', description: 'Seu pedido está a caminho! O entregador já saiu do nosso centro de distribuição.', icon: 'fa-truck', state: 'current' },
-    { status: 'Entregue', time: 'Pendente', description: 'O pedido será entregue no seu endereço.', icon: 'fa-check-circle', state: 'pending' },
-  ];
-
-  let timelineHTML = `
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">Status do Pedido: <span class="text-primary">${code.toUpperCase()}</span></h2>
-    </div>
-    <div class="timeline">`;
-
-  trackingData.forEach(item => {
-    timelineHTML += `
-      <div class="timeline-item">
-        <div class="timeline-icon ${item.state}">
-          <i class="fas ${item.icon}"></i>
+    const progressPercentage = (currentStatusIndex / (statuses.length - 1)) * 100;
+    
+    timelineContainer.innerHTML = `
+        <div class="progress-bar-background">
+            <div class="progress-bar-foreground" style="width: ${progressPercentage}%;"></div>
         </div>
-        <div class="timeline-content">
-          <h3 class="status-title">${item.status}</h3>
-          <p class="status-time">${item.time}</p>
-          <p class="status-description">${item.description}</p>
+        <div class="timeline-steps">
+            ${timelineHTML}
         </div>
-      </div>`;
-  });
-
-  timelineHTML += `</div>`;
-  resultsContainer.innerHTML = timelineHTML;
+    `;
 }
-
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 async function initializeApp() {
@@ -1144,8 +1156,6 @@ async function initializeApp() {
     ]);
 
     // --- LISTENERS GLOBAIS ---
-
-    // --- INÍCIO: LÓGICA DO MODAL DE BUSCA MOBILE ---
     const mobileSearchIcon = document.getElementById('mobile-search-icon');
     const mobileSearchModal = document.getElementById('mobile-search-modal');
     const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
@@ -1156,7 +1166,6 @@ async function initializeApp() {
         mobileSearchIcon.addEventListener('click', (e) => {
             e.preventDefault();
             mobileSearchModal.classList.add('active');
-            // Foco automático no campo de input ao abrir
             setTimeout(() => mobileSearchInput.focus(), 100); 
         });
     }
@@ -1167,7 +1176,6 @@ async function initializeApp() {
         });
     }
 
-    // Fecha o modal se clicar no fundo desfocado
     if (mobileSearchModal) {
         mobileSearchModal.addEventListener('click', (e) => {
             if (e.target === mobileSearchModal) {
@@ -1187,19 +1195,16 @@ async function initializeApp() {
             }
         });
     }
-    // --- FIM: LÓGICA DO MODAL DE BUSCA MOBILE ---
 
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // Navegação principal
         const navLink = target.closest('.nav-link');
         if (navLink && navLink.dataset.page) {
             e.preventDefault();
             loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
-        // Lógica de Variação de Produto
         const variationBtn = target.closest('.variation-btn');
         if (variationBtn) {
             e.preventDefault();
@@ -1208,7 +1213,7 @@ async function initializeApp() {
             variationBtn.classList.add('selected');
 
             const card = variationBtn.closest('.product-card');
-            if (card) { // Lógica para o card
+            if (card) { 
                 const priceContainer = card.querySelector('.product-price-container');
                 const addToCartBtn = card.querySelector('.add-to-cart-btn');
                 const cardImage = card.querySelector('.product-card-image');
@@ -1229,7 +1234,7 @@ async function initializeApp() {
                 addToCartBtn.dataset.image = data.image;
                 addToCartBtn.dataset.name = data.fullName;
 
-            } else { // Lógica para a página de produto
+            } else {
                 const el = (id) => document.getElementById(id);
                 renderStockStatus(parseInt(data.stock));
                 if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
@@ -1262,7 +1267,6 @@ async function initializeApp() {
             }
         }
 
-        // Outros botões de ação
         if (target.closest('.logout-btn')) handleLogout();
         if (target.closest('#google-login-btn')) handleSocialLogin('google');
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -1309,12 +1313,27 @@ async function initializeApp() {
         }
 
         if (target.closest('#confirm-purchase-btn')) {
-            alert('Compra confirmada com sucesso! Obrigado.');
+            // MODIFICADO: Cria o pedido e redireciona
+            const newOrder = {
+                id: `JPET-${Date.now()}`,
+                orderDate: Date.now(),
+                items: [...state.cart],
+                shipping: { ...state.shipping },
+                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0)
+            };
+            state.orders.push(newOrder);
+            save.orders();
+
+            // Limpa o carrinho
             state.cart = [];
             state.shipping = { fee: 0, neighborhood: '' };
             save.cart();
             updateCounters();
-            loadPage('home');
+
+            // Mostra animação de sucesso e vai para "Meus Pedidos"
+            showAnimation('success-animation-overlay', 2000, () => {
+                loadPage('meus-pedidos');
+            });
         }
 
     });
@@ -1347,7 +1366,6 @@ async function initializeApp() {
         updateTotals();
     });
 
-    // Lógica do Chatbot e Plaquinha
     const marrieButton = document.getElementById('marrie-chat-button');
     const marrieWindow = document.getElementById('marrie-chat-window');
     const chatInput = document.getElementById('marrie-chat-input');
@@ -1387,29 +1405,26 @@ async function initializeApp() {
         chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
     }
 
-    // Carga Inicial da Aplicação
     updateCounters();
     await loadPage('home');
 }
 
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Instâncias Globais
     auth = firebase.auth();
     db = firebase.firestore();
 
-    // Estado e Referências do DOM
     state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [], // NOVO
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
-    // Monitora o estado de autenticação
     auth.onAuthStateChanged(user => {
         state.loggedInUser = user ? { email: user.email, uid: user.uid, displayName: user.displayName } : null;
         updateLoginStatus();
