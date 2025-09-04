@@ -2658,3 +2658,10 @@ input[type='number'] {
     display: block; /* Remove qualquer espaço extra que imagens inline possam ter */
     margin: auto; /* Uma forma alternativa de centralizar se o flexbox não for suficiente, mas o flexbox já faz isso */
 }
+
+/* ========== ESTILOS PARA NOVA LOGO NO CABEÇALHO ========== */
+
+.header-logo-img {
+    height: 45px;  /* Você pode ajustar este valor para o tamanho que preferir */
+    width: auto;   /* Mantém a proporção da imagem */
+}
