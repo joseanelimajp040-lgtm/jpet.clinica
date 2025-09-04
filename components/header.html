@@ -16,20 +16,41 @@
 
 <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3">
-        <div id="main-header-content" class="flex items-center justify-between">
-            
-            <div class="flex items-center">
-                <a href="#" class="nav-link text-3xl font-bold logo-link flex items-center" data-page="home">
-                    
-                    <img src="https://i.postimg.cc/x8gx2zTH/IMG-4959.png" alt="Descrição da nova imagem" class="logo-parceiro">
-                    
-                    <img src="https://i.postimg.cc/YqVmjCVw/IMG-4956.png" alt="Logo J.A" class="header-logo-img mr-2">
-                    <span class="text-gray-800">Clínica</span>
+        <div class="flex items-center justify-between">
 
+            <a href="#" class="nav-link font-bold logo-link flex items-center" data-page="home">
+                <img src="https://i.postimg.cc/x8gx2zTH/IMG-4959.png" alt="Logo Parceiro" class="h-12 mr-3">
+                
+                <img src="https://i.postimg.cc/YqVmjCVw/IMG-4956.png" alt="Logo J.A" class="h-10">
+                
+                <span class="text-gray-800 ml-2 text-2xl">Clínica</span>
+            </a>
+
+            <div class="flex-1 mx-8 relative hidden md:flex">
+                <form id="search-form" class="relative w-full">
+                    <input type="text" id="search-input" placeholder="O que seu pet precisa hoje?" class="w-full py-2 px-4 border border-gray-300 rounded-full focus:outline-none search-bar">
+                    <button type="submit" id="search-button" class="absolute right-0 top-0 h-full bg-primary text-white px-6 rounded-r-full hover:bg-orange-700">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                <div id="search-error" class="search-error hidden">Por favor, digite algo para pesquisar</div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <a href="#" id="mobile-search-icon" class="text-2xl text-primary md:hidden">
+                    <i class="fas fa-search"></i>
+                </a>
+                <a href="#" class="nav-link relative" data-page="favorites">
+                    <i class="fas fa-heart text-2xl text-gray-700"></i>
+                    <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <a href="#" class="nav-link relative" data-page="cart">
+                    <i class="fas fa-shopping-cart text-2xl text-gray-700"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-secondary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </a>
             </div>
 
-            </div>
+        </div>
     </div>
 </header>
             
@@ -92,6 +113,7 @@
         </div>
     </div>
 </nav>
+
 
 
 
