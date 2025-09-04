@@ -2632,3 +2632,29 @@ input[type='number'] {
     background-color: var(--cor-fundo-card);
     border: 5px solid var(--cor-secundaria);
 }
+
+/* ========== AJUSTE PARA LOGO NO SMARTPHONE (MAIOR E CENTRALIZADA) ========== */
+
+.phone-logo {
+    /* Removendo propriedades de texto, já que agora é uma imagem */
+    /* font-size: 3rem; */
+    /* font-weight: 700; */
+    /* text-shadow: 0 2px 5px rgba(0,0,0,0.3); */
+
+    display: flex; /* Essencial para usar flexbox para centralizar */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    width: 100%; /* Ocupa toda a largura disponível do contêiner pai */
+    height: 100%; /* Ocupa toda a altura disponível do contêiner pai */
+    overflow: hidden; /* Garante que nada transborde */
+}
+
+.phone-logo img {
+    max-width: 95%; /* Aumentamos o tamanho máximo da imagem */
+    max-height: 95%; /* Define a altura máxima para a imagem */
+    width: auto; /* Mantém a largura automática para preservar proporções */
+    height: auto; /* Mantém a altura automática para preservar proporções */
+    object-fit: contain; /* Garante que a imagem inteira seja visível sem ser cortada */
+    display: block; /* Remove qualquer espaço extra que imagens inline possam ter */
+    margin: auto; /* Uma forma alternativa de centralizar se o flexbox não for suficiente, mas o flexbox já faz isso */
+}
