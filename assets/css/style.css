@@ -2675,5 +2675,8 @@ input[type='number'] {
   width: auto;   /* Mantém a proporção da imagem para não distorcer */
 }
 
+/* ========== DEFINE UMA ALTURA FIXA PARA O CABEÇALHO ========== */
 
-
+#main-header-content {
+  height: 80px; /* <<-- AQUI VOCÊ CONTROLA A ALTURA DA BARRA! */
+}
