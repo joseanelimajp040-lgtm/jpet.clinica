@@ -2665,3 +2665,10 @@ input[type='number'] {
     height: 45px;  /* Você pode ajustar este valor para o tamanho que preferir */
     width: auto;   /* Mantém a proporção da imagem */
 }
+
+/* ========== ESTILO PARA IMAGEM ADICIONAL (SELO) NO CABEÇALHO ========== */
+
+.header-badge-img {
+    height: 40px;  /* Altura um pouco menor que a logo principal para criar hierarquia. Ajuste como preferir! */
+    width: auto;   /* Mantém a proporção da imagem */
+}
