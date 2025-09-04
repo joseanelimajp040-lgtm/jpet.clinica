@@ -2659,40 +2659,33 @@ input[type='number'] {
     margin: auto; /* Uma forma alternativa de centralizar se o flexbox não for suficiente, mas o flexbox já faz isso */
 }
 
-/* ========== ESTILOS PARA NOVA LOGO NO CABEÇALHO ========== */
+/* ========== ESTILOS FINAIS DO CABEÇALHO ========== */
 
-.logo-parceiro {
-  height: 120px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
-  width: auto;   /* A largura se ajusta automaticamente para não distorcer */
-  margin-right: 8px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
-  object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
+/* 1. Define a altura fixa da barra do header */
+#main-header-content {
+  height: 80px; /* Sua altura fixa para a barra (pode ajustar) */
 }
 
-/* ========== AJUSTE DE TAMANHO PARA LOGO PRINCIPAL ========== */
+/* 2. Define o tamanho das logos */
+.logo-parceiro {
+  height: 65px;  /* Tamanho da primeira logo (pode ajustar) */
+  width: auto;
+  margin-right: 8px; /* Espaço entre as logos (pode ajustar) */
+  object-fit: contain; 
+}
 
 .header-logo-img {
-  height: 45px;  /* <-- Você pode ajustar este valor como preferir (ex: 50px, 55px) */
-  width: auto;   /* Mantém a proporção da imagem para não distorcer */
+  height: 55px;  /* Tamanho da segunda logo (pode ajustar) */
+  width: auto;
 }
 
-/* ========== DEFINE UMA ALTURA FIXA PARA O CABEÇALHO ========== */
-
-#main-header-content {
-  height: 80px; /* <<-- AQUI VOCÊ CONTROLA A ALTURA DA BARRA! */
-}
-
-/* ========== CORRIGE O ESPAÇAMENTO DAS LOGOS NO MOBILE ========== */
-
+/* 3. CORREÇÃO MOBILE: Adiciona padding (espaço lateral) */
+/* Este código só funciona em telas menores (celulares) */
 @media (max-width: 767px) {
-  /* Alvo: O link que envolve as duas logos */
-  .logo-link {
-    /* Força as duas logos a ficarem juntas no início (esquerda) do seu contêiner */
-    justify-content: flex-start; 
-  }
-
-  /* Opcional: Adiciona um pequeno espaço da borda da tela */
+  
+  /* Alvo: O container que tem o ID que você adicionou */
   #main-header-content {
-      padding-left: 1rem;  /* 16px de espaço à esquerda */
-      padding-right: 1rem; /* 16px de espaço à direita */
+      padding-left: 1rem !important;  /* Adiciona 16px de espaço na esquerda */
+      padding-right: 1rem !important; /* Adiciona 16px de espaço na direita */
   }
 }
