@@ -2661,20 +2661,9 @@ input[type='number'] {
 
 /* ========== ESTILOS PARA NOVA LOGO NO CABEÇALHO ========== */
 
-.header-logo-img {
-    height: 45px;  /* Você pode ajustar este valor para o tamanho que preferir */
-    width: auto;   /* Mantém a proporção da imagem */
-}
-
-#main-header-content {
-  height: 80px; /* Define uma altura fixa para a faixa do cabeçalho */
-  /* A classe 'items-center' do Tailwind já deve funcionar com a altura fixa,
-     mas podemos reforçar o alinhamento aqui se necessário. */
-}
-
 .logo-parceiro {
   height: 60px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
   width: auto;   /* A largura se ajusta automaticamente para não distorcer */
-  margin-right: 16px; /* Adiciona um espaçamento à direita (equivale ao mr-4) */
+  margin-right: 16px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
   object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
 }
