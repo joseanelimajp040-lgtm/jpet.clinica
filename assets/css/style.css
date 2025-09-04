@@ -2666,9 +2666,15 @@ input[type='number'] {
     width: auto;   /* Mantém a proporção da imagem */
 }
 
-/* ========== ESTILO PARA IMAGEM ADICIONAL (SELO) NO CABEÇALHO ========== */
+#main-header-content {
+  height: 80px; /* Define uma altura fixa para a faixa do cabeçalho */
+  /* A classe 'items-center' do Tailwind já deve funcionar com a altura fixa,
+     mas podemos reforçar o alinhamento aqui se necessário. */
+}
 
-.header-badge-img {
-    height: 40px;  /* Altura um pouco menor que a logo principal para criar hierarquia. Ajuste como preferir! */
-    width: auto;   /* Mantém a proporção da imagem */
+.logo-parceiro {
+  height: 60px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
+  width: auto;   /* A largura se ajusta automaticamente para não distorcer */
+  margin-right: 16px; /* Adiciona um espaçamento à direita (equivale ao mr-4) */
+  object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
 }
