@@ -2664,7 +2664,7 @@ input[type='number'] {
 .logo-parceiro {
   height: 120px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
   width: auto;   /* A largura se ajusta automaticamente para não distorcer */
-  margin-right: 18px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
+  margin-right: 10px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
   object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
 }
 
@@ -2673,7 +2673,6 @@ input[type='number'] {
 .header-logo-img {
   height: 45px;  /* <-- Você pode ajustar este valor como preferir (ex: 50px, 55px) */
   width: auto;   /* Mantém a proporção da imagem para não distorcer */
-  margin-left: 18px;
 }
 
 /* ========== DEFINE UMA ALTURA FIXA PARA O CABEÇALHO ========== */
@@ -2681,4 +2680,5 @@ input[type='number'] {
 #main-header-content {
   height: 80px; /* <<-- AQUI VOCÊ CONTROLA A ALTURA DA BARRA! */
 }
+
 
