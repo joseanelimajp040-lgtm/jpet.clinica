@@ -202,7 +202,7 @@ function createProductCardHTML(productData, productId) {
             <div class="p-4 flex flex-col flex-grow">
                 <h3 class="font-medium text-gray-800 mb-2 min-h-[3.5rem] product-name-display">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="product-price-container mb-2">${priceHTML}</div>
-                <div class="variations-container mb-4">${variationsHTML}</div>
+                <div class="variations-container mb-4 flex flex-wrap justify-center gap-2">${variationsHTML}</div>
                 <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
                     data-id="${productId}"
                     data-name="${defaultVariation.fullName || productData.nome}"
@@ -1439,4 +1439,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeApp();
 });
+
 
