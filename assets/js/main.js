@@ -80,7 +80,6 @@ function updateCounters() {
     }
     if (favCountEl) favCountEl.textContent = state.favorites.length;
 }
-
 function updateLoginStatus() {
     const desktopPlaceholder = document.getElementById('login-placeholder-desktop');
     const mobilePlaceholder = document.getElementById('login-placeholder-mobile');
@@ -88,27 +87,33 @@ function updateLoginStatus() {
     placeholders.forEach(placeholder => {
         if (!placeholder) return;
         if (state.loggedInUser) {
-            const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-            const firstName = fullName.split(' ')[0];
-            placeholder.innerHTML = `
-                <div class="relative user-menu-container">
-                    <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-user-check"></i>
-                            <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
-                            <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
-                        </div>
-                    </div>
-                    <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
-                        <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
-                        <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
-                        <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
-                        <div class="border-t border-gray-100"></div>
-                        <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
-                    </div>
-                </div>`;
-        } else {
-            placeholder.innerHTML = `
+    const fullName = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    const firstName = fullName.split(' ')[0];
+
+    // NOVO: Gera o link do painel de admin SE o usuário for admin
+    const adminLinkHTML = state.loggedInUser.role === 'admin' 
+        ? `<a href="#" class="user-menu-item nav-link" data-page="admin"><i class="fas fa-user-shield"></i><span>Painel Admin</span></a>` 
+        : '';
+
+    placeholder.innerHTML = `
+        <div class="relative user-menu-container">
+            <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-check"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
+                    <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
+                </div>
+            </div>
+            <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                ${adminLinkHTML} <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
+                <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
+                <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
+                <div class="border-t border-gray-100"></div>
+                <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
+            </div>
+        </div>`;
+} else {
+      nerHTML = `
                 <a href="#" class="nav-link flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-teal-700" data-page="login">
                     <i class="fas fa-user"></i>
                     <span class="whitespace-nowrap text-sm">Entre ou Cadastre-se</span>
@@ -986,6 +991,27 @@ async function loadComponent(url, placeholderId) {
 }
 
 export async function loadPage(pageName, params = {}) {
+if (pageName === 'admin') {
+        if (!state.loggedInUser || state.loggedInUser.role !== 'admin') {
+            appRoot.innerHTML = `<div class="text-center py-20">
+                <h1 class="text-3xl font-bold text-red-500">Acesso Negado</h1>
+                <p class="text-gray-600 mt-2">Você não tem permissão para acessar esta página.</p>
+                <a href="#" class="nav-link inline-block mt-4 bg-primary text-white font-bold py-2 px-6 rounded-full" data-page="home">Voltar para o Início</a>
+            </div>`;
+            loadingOverlay.style.display = 'none';
+            return; // Interrompe a execução da função aqui
+        }
+        // Se for admin, adiciona uma classe ao body para esconder header/footer normais
+        document.body.classList.add('admin-view');
+    } else {
+        // Garante que a classe seja removida ao sair da página de admin
+        document.body.classList.remove('admin-view');
+    }
+
+    managePageStyles(pageName);
+    loadingOverlay.style.display = 'flex';
+
+    try {
     managePageStyles(pageName);
     loadingOverlay.style.display = 'flex';
 
@@ -1059,11 +1085,18 @@ export async function loadPage(pageName, params = {}) {
                     await renderMyOrdersPage(); 
                 }
                 break;
+            case 'admin':
+                // Lógica específica da página de admin (se houver)
+                document.getElementById('admin-user-name').textContent = `Logado como: ${state.loggedInUser.displayName || state.loggedInUser.email}`;
+                document.querySelector('#admin-logout-btn').addEventListener('click', handleLogout);
+                break;
+        }
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
             case 'instalar-ios':
             case 'farmacia':
+            case 'admin':
                 break;
         }
 
@@ -1432,12 +1465,25 @@ document.addEventListener('DOMContentLoaded', () => {
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
-    auth.onAuthStateChanged(user => {
-        state.loggedInUser = user ? { email: user.email, uid: user.uid, displayName: user.displayName } : null;
-        updateLoginStatus();
-    });
+    auth.onAuthStateChanged(async (user) => {
+if (user) {
+       const userDoc = await db.collection('users').doc(user.uid).get();
+        const userData = userDoc.exists ? userDoc.data() : {};
+
+        state.loggedInUser = {
+            email: user.email,
+            uid: user.uid,
+            displayName: user.displayName,
+            role: userData.role || 'user' // Define o 'role' ou 'user' como padrão
+        };
+    } else {
+        state.loggedInUser = null;
+    }
+    updateLoginStatus();
+});
 
     initializeApp();
 });
+
 
 
