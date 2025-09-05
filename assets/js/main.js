@@ -183,9 +183,10 @@ function createProductCardHTML(productData, productId) {
             </div>`;
         const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
         discountBadgeHTML = `<div class="product-discount-display absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
-    } else {
-        priceHTML = `<div class="h-[48px] flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span></div>`;
-    }
+    
+} else {
+    priceHTML = `<div class="flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span></div>`;
+}
 
     return `
         <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-product-id="${productId}">
@@ -199,7 +200,7 @@ function createProductCardHTML(productData, productId) {
                 </a>
             </div>
             <div class="p-4 flex flex-col flex-grow">
-                <h3 class="font-medium text-gray-800 mb-2 h-12 product-name-display">${defaultVariation.fullName || productData.nome}</h3>
+                <h3 class="font-medium text-gray-800 mb-2 min-h-[3.5rem] product-name-display">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="product-price-container mb-2">${priceHTML}</div>
                 <div class="variations-container mb-4">${variationsHTML}</div>
                 <button class="add-to-cart-btn w-full bg-secondary text-white py-2 rounded-lg font-medium mt-auto"
@@ -1438,3 +1439,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeApp();
 });
+
