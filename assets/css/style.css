@@ -2736,36 +2736,3 @@ input[type='number'] {
     }
 }
 
-/* ========== AJUSTES PARA BANNER SUPERIOR NO MOBILE ========== */
-
-@media (max-width: 767px) {
-  /* Alvo: Apenas telas de celular */
-
-  #top-banner {
-    padding-top: 4px;    /* Reduz o espaçamento vertical */
-    padding-bottom: 4px; /* Reduz o espaçamento vertical */
-    order: -1;           /* Move o banner para cima do logo, se necessário */
-    background-color: #f8f9fa; /* Um fundo leve para diferenciar */
-  }
-
-  #top-banner .flex.items-center.space-x-4 {
-    gap: 0.75rem; /* Controla o espaço entre os itens (12px) */
-  }
-
-  #top-banner i.fa-stethoscope {
-    font-size: 1.125rem; /* Diminui o ícone do estetoscópio (18px) */
-  }
-
-  #top-banner span,
-  #top-banner a {
-    font-size: 0.75rem; /* Diminui o tamanho da fonte (12px) */
-    white-space: nowrap; /* Impede a quebra de linha do texto */
-  }
-  
-  /* Garante que o cabeçalho principal e a barra de navegação se ajustem */
-  #main-header-content {
-      height: auto; /* Permite que a altura seja flexível */
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-  }
-}
