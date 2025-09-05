@@ -1082,9 +1082,29 @@ export async function loadPage(pageName, params = {}) {
                 }
                 break;
             case 'admin':
-                document.getElementById('admin-user-name').textContent = `Logado como: ${state.loggedInUser.displayName || state.loggedInUser.email}`;
-                document.querySelector('#admin-logout-btn').addEventListener('click', handleLogout);
-                break;
+    // Popula o nome do usuário na nova sidebar
+    const adminUserNameEl = document.getElementById('admin-user-name');
+    if (adminUserNameEl) {
+        adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    }
+    
+    // Adiciona o evento de clique para o novo botão de logout
+    const adminLogoutBtn = document.querySelector('#admin-user-profile .logout-btn');
+    if(adminLogoutBtn) {
+        adminLogoutBtn.addEventListener('click', handleLogout);
+    }
+
+    // Lógica para navegação interna do painel (próximos passos)
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            // Aqui você carregaria o conteúdo específico (ex: tabela de clientes)
+            console.log(`Navegando para a seção admin: ${link.dataset.adminPage}`);
+        });
+    });
+    break;
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -1477,6 +1497,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
