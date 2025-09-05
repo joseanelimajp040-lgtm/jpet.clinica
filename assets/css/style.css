@@ -2664,7 +2664,7 @@ input[type='number'] {
 .logo-parceiro {
   height: 120px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
   width: auto;   /* A largura se ajusta automaticamente para não distorcer */
-  margin-right: 4px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
+  margin-right: 2px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
   object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
 }
 
@@ -2733,26 +2733,5 @@ input[type='number'] {
     
     .header-logo-img {
         height: 35px;
-    }
-}
-
-/* ========== CORREÇÃO PARA LOGOS DESKTOP E MOBILE (ADICIONE AO SEU CSS) ========== */
-
-/* Correção específica para o link que contém as duas logos */
-.logo-link {
-    display: flex;
-    align-items: center;
-    gap: 4px; /* Espaço mínimo entre as duas logos */
-}
-
-/* Ajustes específicos para desktop (telas grandes) */
-@media (min-width: 769px) {
-    .logo-link {
-        gap: 2px; /* Espaço muito pequeno entre as logos no desktop */
-    }
-    
-    /* Remove margem extra da logo parceiro no desktop se houver */
-    .logo-parceiro {
-        margin-right: 2px; /* Reduz o margin-right existente */
     }
 }
