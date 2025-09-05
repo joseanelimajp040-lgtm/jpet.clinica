@@ -991,7 +991,8 @@ async function loadComponent(url, placeholderId) {
 }
 
 export async function loadPage(pageName, params = {}) {
-if (pageName === 'admin') {
+    // Bloco de verificação de acesso para a página de admin
+    if (pageName === 'admin') {
         if (!state.loggedInUser || state.loggedInUser.role !== 'admin') {
             appRoot.innerHTML = `<div class="text-center py-20">
                 <h1 class="text-3xl font-bold text-red-500">Acesso Negado</h1>
@@ -999,19 +1000,13 @@ if (pageName === 'admin') {
                 <a href="#" class="nav-link inline-block mt-4 bg-primary text-white font-bold py-2 px-6 rounded-full" data-page="home">Voltar para o Início</a>
             </div>`;
             loadingOverlay.style.display = 'none';
-            return; // Interrompe a execução da função aqui
+            return; // Interrompe a execução
         }
-        // Se for admin, adiciona uma classe ao body para esconder header/footer normais
         document.body.classList.add('admin-view');
     } else {
-        // Garante que a classe seja removida ao sair da página de admin
         document.body.classList.remove('admin-view');
     }
 
-    managePageStyles(pageName);
-    loadingOverlay.style.display = 'flex';
-
-    try {
     managePageStyles(pageName);
     loadingOverlay.style.display = 'flex';
 
@@ -1021,14 +1016,12 @@ if (pageName === 'admin') {
         appRoot.innerHTML = await response.text();
 
         if (pageName !== 'home') {
-            const backButtonHTML = `
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
-                        <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
-                    </a>
-                </div>`;
+            const backButtonHTML = `<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
+                    <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
+                </a>
+            </div>`;
             appRoot.insertAdjacentHTML('afterbegin', backButtonHTML);
-            
             appRoot.querySelectorAll('a, button').forEach(element => {
                 const hasText = element.textContent.trim().includes('Voltar para o início');
                 const isOurButton = element.hasAttribute('data-dynamic-back-button');
@@ -1037,7 +1030,7 @@ if (pageName === 'admin') {
                 }
             });
         }
-            
+
         const topBanner = document.getElementById('top-banner');
         if (topBanner) topBanner.classList.toggle('hidden', pageName !== 'home');
         const mainNavBar = document.getElementById('main-nav-bar');
@@ -1075,7 +1068,7 @@ if (pageName === 'admin') {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
-             case 'meus-pedidos':
+            case 'meus-pedidos':
                 await renderMyOrdersPage();
                 break;
             case 'acompanhar-entrega':
@@ -1084,22 +1077,16 @@ if (pageName === 'admin') {
                 } else {
                     await renderMyOrdersPage();
                 }
-                break; // Este break é crucial!
-            
-            // --- CÓDIGO DO ADMIN ADICIONADO CORRETAMENTE ---
+                break;
             case 'admin':
-                // Lógica específica da página de admin (se houver)
                 document.getElementById('admin-user-name').textContent = `Logado como: ${state.loggedInUser.displayName || state.loggedInUser.email}`;
                 document.querySelector('#admin-logout-btn').addEventListener('click', handleLogout);
                 break;
-            // ----------------------------------------------------
-
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
             case 'instalar-ios':
             case 'farmacia':
-                // Estes cases não fazem nada, então compartilham o mesmo break.
                 break;
         } // Fim do switch
 
@@ -1487,6 +1474,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
