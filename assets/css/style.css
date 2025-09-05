@@ -2756,3 +2756,52 @@ input[type='number'] {
     padding-right: 12px;
   }
 }
+
+/* Estilos específicos para o painel de admin */
+#admin-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#admin-main {
+    flex-grow: 1;
+}
+
+#admin-footer {
+    background-color: #f8fafc; /* Um branco levemente acinzentado */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.admin-nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #4b5563; /* text-gray-600 */
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    width: 120px; /* Largura fixa para espaçamento */
+}
+
+.admin-nav-button i {
+    margin-bottom: 4px;
+    transition: transform 0.2s ease;
+}
+
+.admin-nav-button:hover {
+    background-color: #f0fdf4; /* green-50 */
+    color: #00A8A8; /* text-secondary */
+}
+
+.admin-nav-button:hover i {
+    transform: scale(1.1);
+}
+
+/* Esconde o header e footer principal quando no admin */
+.admin-view #header-placeholder,
+.admin-view #footer-placeholder {
+    display: none;
+}
