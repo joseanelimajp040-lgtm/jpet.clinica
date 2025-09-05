@@ -1075,29 +1075,33 @@ if (pageName === 'admin') {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
-            case 'meus-pedidos':
+             case 'meus-pedidos':
                 await renderMyOrdersPage();
                 break;
             case 'acompanhar-entrega':
                 if (params.id) {
                     await renderTrackingPage(params.id);
                 } else {
-                    await renderMyOrdersPage(); 
+                    await renderMyOrdersPage();
                 }
-                break;
+                break; // Este break é crucial!
+            
+            // --- CÓDIGO DO ADMIN ADICIONADO CORRETAMENTE ---
             case 'admin':
                 // Lógica específica da página de admin (se houver)
                 document.getElementById('admin-user-name').textContent = `Logado como: ${state.loggedInUser.displayName || state.loggedInUser.email}`;
                 document.querySelector('#admin-logout-btn').addEventListener('click', handleLogout);
                 break;
-        } 
+            // ----------------------------------------------------
+
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
             case 'instalar-ios':
             case 'farmacia':
+                // Estes cases não fazem nada, então compartilham o mesmo break.
                 break;
-        } 
+        } // Fim do switch
 
         initPageModals();
         updateLoginStatus();
@@ -1483,6 +1487,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
