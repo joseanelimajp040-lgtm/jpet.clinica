@@ -2664,7 +2664,7 @@ input[type='number'] {
 .logo-parceiro {
   height: 120px;  /* <<-- AJUSTE A ALTURA DA IMAGEM AQUI */
   width: auto;   /* A largura se ajusta automaticamente para não distorcer */
-  margin-right: -10px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
+  margin-right: -15px; /* Adiciona um espaçamento à direita (equivale ao mr-4 do Tailwind) */
   object-fit: contain; /* Garante que a imagem seja redimensionada sem ser cortada ou esticada */
 }
 
@@ -2735,6 +2735,7 @@ input[type='number'] {
         height: 35px;
     }
 }
+
 
 
 
