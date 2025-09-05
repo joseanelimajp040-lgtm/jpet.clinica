@@ -2687,7 +2687,7 @@ input[type='number'] {
 .logo-link {
     display: flex;
     align-items: center;
-    gap: 8px; /* Espaço controlado entre as duas logos */
+    gap: 6px; /* Espaço controlado entre as duas logos */
 }
 
 /* Ajustes específicos para telas mobile */
@@ -2735,4 +2735,5 @@ input[type='number'] {
         height: 35px;
     }
 }
+
 
