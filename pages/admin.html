@@ -1,0 +1,44 @@
+<div id="admin-container" class="flex flex-col min-h-screen bg-gray-100">
+
+    <header id="admin-header" class="bg-white shadow-md p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-gray-700">Painel do Administrador</h1>
+        <div class="flex items-center space-x-4">
+            <span id="admin-user-name" class="font-medium text-gray-600"></span>
+            <button id="admin-logout-btn" class="logout-btn text-red-500 hover:text-red-700 font-bold">
+                <i class="fas fa-sign-out-alt mr-1"></i>Sair
+            </button>
+        </div>
+    </header>
+
+    <main id="admin-main" class="flex-grow flex flex-col items-center justify-center p-8">
+        <img src="https://i.postimg.cc/W3sTdM7Q/IMG-4949.png" alt="Logo J.A Pet" class="h-32 w-auto mb-4">
+        <h2 class="text-3xl font-bold text-gray-800">Bem-vindo(a) ao seu Painel!</h2>
+        <p class="text-gray-500 mt-2">Use o menu abaixo para gerenciar o site.</p>
+    </main>
+
+    <footer id="admin-footer" class="bg-white shadow-lg border-t-2 border-gray-200 p-2">
+        <nav class="flex justify-around items-center max-w-4xl mx-auto">
+            <a href="#" class="admin-nav-button" data-admin-page="clientes">
+                <i class="fas fa-users text-2xl"></i>
+                <span class="text-xs font-medium">Clientes</span>
+            </a>
+            <a href="#" class="admin-nav-button" data-admin-page="entregas">
+                <i class="fas fa-truck text-2xl"></i>
+                <span class="text-xs font-medium">Atualizar Entregas</span>
+            </a>
+            <a href="#" class="admin-nav-button" data-admin-page="produtos">
+                <i class="fas fa-tags text-2xl"></i>
+                <span class="text-xs font-medium">Alterar Custos</span>
+            </a>
+            <a href="#" class="admin-nav-button" data-admin-page="pendencias">
+                <i class="fas fa-exclamation-circle text-2xl"></i>
+                <span class="text-xs font-medium">Pendências</span>
+            </a>
+            <a href="#" class="admin-nav-button" data-admin-page="historico">
+                <i class="fas fa-history text-2xl"></i>
+                <span class="text-xs font-medium">Histórico</span>
+            </a>
+        </nav>
+    </footer>
+
+</div>
