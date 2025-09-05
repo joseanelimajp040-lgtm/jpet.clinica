@@ -2757,51 +2757,90 @@ input[type='number'] {
   }
 }
 
-/* Estilos específicos para o painel de admin */
-#admin-container {
+/* Layout principal do Dashboard com CSS Grid */
+.admin-dashboard-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr; /* Largura da sidebar e o resto para o conteúdo */
+    height: 100vh;
+}
+
+#admin-sidebar {
+    grid-column: 1 / 2;
+    transition: transform 0.3s ease-in-out;
+}
+
+#admin-content {
+    grid-column: 2 / 3;
+    background-color: #f1f5f9; /* slate-100 */
+}
+
+/* Estilo dos links da barra lateral */
+.admin-nav-link {
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    color: #d1d5db; /* gray-300 */
 }
 
-#admin-main {
-    flex-grow: 1;
+.admin-nav-link:hover {
+    background-color: #374151; /* gray-700 */
+    color: #ffffff;
 }
 
-#admin-footer {
-    background-color: #f8fafc; /* Um branco levemente acinzentado */
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+/* Estilo para o link ativo */
+.admin-nav-link.active {
+    background-color: #00A8A8; /* Sua cor secundária */
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 168, 168, 0.2);
 }
 
-.admin-nav-button {
+/* Cards de Estatísticas */
+.stat-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
-    border-radius: 8px;
-    color: #4b5563; /* text-gray-600 */
-    transition: all 0.2s ease-in-out;
-    text-decoration: none;
-    width: 120px; /* Largura fixa para espaçamento */
 }
 
-.admin-nav-button i {
-    margin-bottom: 4px;
-    transition: transform 0.2s ease;
-}
-
-.admin-nav-button:hover {
-    background-color: #f0fdf4; /* green-50 */
-    color: #00A8A8; /* text-secondary */
-}
-
-.admin-nav-button:hover i {
-    transform: scale(1.1);
-}
-
-/* Esconde o header e footer principal quando no admin */
+/* Esconde o header/footer padrão quando estiver no admin */
 .admin-view #header-placeholder,
 .admin-view #footer-placeholder {
     display: none;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .admin-dashboard-layout {
+        grid-template-columns: 1fr; /* Coluna única */
+    }
+    #admin-sidebar {
+       display: none; /* Em um projeto real, isso viraria um menu hamburguer */
+    }
+    #admin-content {
+        grid-column: 1 / -1;
+    }
 }
