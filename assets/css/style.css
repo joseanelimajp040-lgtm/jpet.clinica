@@ -9,6 +9,7 @@ body {
     min-height: 100vh; /* Garante altura mínima da tela */
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 html {
     height: 100%;
@@ -2735,4 +2736,5 @@ input[type='number'] {
         height: 35px;
     }
 }
+
 
