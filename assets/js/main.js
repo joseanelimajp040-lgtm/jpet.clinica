@@ -1096,7 +1096,6 @@ if (pageName === 'admin') {
             case 'como-baixar-app':
             case 'instalar-ios':
             case 'farmacia':
-            case 'admin':
                 break;
         }
 
@@ -1484,6 +1483,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
