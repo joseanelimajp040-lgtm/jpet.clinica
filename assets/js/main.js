@@ -1090,7 +1090,6 @@ if (pageName === 'admin') {
                 document.getElementById('admin-user-name').textContent = `Logado como: ${state.loggedInUser.displayName || state.loggedInUser.email}`;
                 document.querySelector('#admin-logout-btn').addEventListener('click', handleLogout);
                 break;
-        }
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -1483,6 +1482,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
