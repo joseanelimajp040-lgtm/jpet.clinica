@@ -2681,20 +2681,57 @@ input[type='number'] {
   height: 80px; /* <<-- AQUI VOCÊ CONTROLA A ALTURA DA BARRA! */
 }
 
-/* ========== CORRIGE O ESPAÇAMENTO DAS LOGOS NO MOBILE ========== */
+/* ========== CORREÇÃO PARA LOGOS NO MOBILE (ADICIONE AO SEU CSS) ========== */
 
-@media (max-width: 767px) {
-  /* Alvo: O link que envolve as duas logos */
-  .logo-link {
-    /* Força as duas logos a ficarem juntas no início (esquerda) do seu contêiner */
-    justify-content: flex-start; 
-  }
-
-  /* Opcional: Adiciona um pequeno espaço da borda da tela */
-  #main-header-content {
-      padding-left: 1rem;  /* 16px de espaço à esquerda */
-      padding-right: 1rem; /* 16px de espaço à direita */
-  }
+/* Correção específica para o link que contém as duas logos */
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço controlado entre as duas logos */
 }
 
+/* Ajustes específicos para telas mobile */
+@media (max-width: 768px) {
+    
+    /* Remove qualquer espaço extra no contêiner principal do header */
+    #main-header-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Força o link das logos a ocupar apenas o espaço necessário */
+    .logo-link {
+        flex-shrink: 0; /* Não permite que o elemento encolha */
+        justify-content: flex-start; /* Alinha no início */
+        gap: 4px; /* Reduz ainda mais o espaço entre as logos no mobile */
+    }
+    
+    /* Reduz ligeiramente o tamanho das logos no mobile se necessário */
+    .logo-parceiro {
+        height: 100px; /* Reduzido de 120px para mobile */
+    }
+    
+    .header-logo-img {
+        height: 40px; /* Reduzido de 45px para mobile */
+    }
+    
+    /* Garante que o contêiner flex do header use o espaço eficientemente */
+    .flex.items-center.justify-between {
+        gap: 1rem; /* Adiciona um espaço controlado entre os elementos */
+    }
+}
 
+/* Correção adicional se ainda houver problemas */
+@media (max-width: 480px) {
+    .logo-link {
+        gap: 2px; /* Espaço mínimo entre as logos em telas muito pequenas */
+    }
+    
+    .logo-parceiro {
+        height: 80px;
+    }
+    
+    .header-logo-img {
+        height: 35px;
+    }
+}
