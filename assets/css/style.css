@@ -2737,4 +2737,22 @@ input[type='number'] {
     }
 }
 
+/* ========== CORREÇÃO BOTÃO LOGIN/CADASTRO NO MOBILE ========== */
 
+@media (max-width: 380px) {
+  /* Alvo: Telas muito estreitas onde o botão geralmente quebra */
+
+  #login-placeholder-mobile .nav-link span,
+  #login-placeholder-desktop .nav-link span {
+    white-space: normal; /* Permite que o texto quebre em duas linhas */
+    text-align: center;  /* Centraliza o texto quando ele quebra */
+    line-height: 1.2;    /* Melhora o espaçamento entre as linhas */
+  }
+
+  #login-placeholder-mobile .nav-link,
+  #login-placeholder-desktop .nav-link {
+    /* Ajusta o padding para acomodar o texto em duas linhas */
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
