@@ -155,6 +155,107 @@ function updateAllHeartIcons() {
 }
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
+async function renderAdminOrdersView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    // 1. Define a estrutura básica da página
+    adminContent.innerHTML = `
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Pedidos e Entregas</h1>
+            <p class="text-gray-500">Visualize e atualize o status de todos os pedidos do site.</p>
+        </header>
+        <div id="admin-orders-list" class="space-y-4">
+            <p>Carregando pedidos...</p>
+        </div>
+    `;
+
+    // 2. Busca todos os pedidos no Firestore, ordenados pelos mais recentes
+    const ordersSnapshot = await db.collection('orders').orderBy('orderDate', 'desc').get();
+    const ordersListEl = document.getElementById('admin-orders-list');
+
+    if (ordersSnapshot.empty) {
+        ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
+        return;
+    }
+
+    // 3. Gera o HTML para cada pedido
+    ordersListEl.innerHTML = ordersSnapshot.docs.map(doc => {
+        const order = doc.data();
+        const orderId = doc.id;
+        const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
+
+        // O <select> é a chave para a edição do status
+        const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
+            .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+            .join('');
+
+        return `
+            <div class="bg-white p-4 rounded-lg shadow-md border">
+                <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
+                    <div>
+                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
+                    </div>
+                    <p class="text-sm text-gray-500">Data: ${orderDate}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
+                        <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
+                            ${statusOptions}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Previsão de Entrega</label>
+                        <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
+                    </div>
+
+                    <button class="update-order-btn bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
+                        <i class="fas fa-save mr-2"></i> Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // 4. Adiciona o listener para os botões "Salvar"
+    ordersListEl.addEventListener('click', async (e) => {
+        if (e.target.closest('.update-order-btn')) {
+            const button = e.target.closest('.update-order-btn');
+            const orderId = button.dataset.orderId;
+
+            const newStatus = document.getElementById(`status-${orderId}`).value;
+            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+
+            button.textContent = 'Salvando...';
+            button.disabled = true;
+
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: newStatus,
+                    estimatedDelivery: newDeliveryEstimate
+                });
+                button.textContent = 'Salvo!';
+                button.classList.remove('bg-secondary');
+                button.classList.add('bg-green-500');
+                setTimeout(() => {
+                    button.textContent = 'Salvar Alterações';
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-secondary');
+                    button.disabled = false;
+                }, 2000);
+            } catch (error) {
+                console.error("Erro ao atualizar o pedido: ", error);
+                alert('Não foi possível salvar as alterações.');
+                button.textContent = 'Salvar Alterações';
+                button.disabled = false;
+            }
+        }
+    });
+}
 function createProductCardHTML(productData, productId) {
     if (!productData.variations || productData.variations.length === 0) {
         console.warn(`O produto "${productData.nome}" (ID: ${productId}) não possui a estrutura de 'variations' e não será exibido.`);
@@ -705,7 +806,64 @@ function displayProducts(products) {
     grid.innerHTML = products.map(p => createProductCardHTML(p, p.id)).join('');
     updateAllHeartIcons();
 }
+async function renderMyOrdersPage() {
+    const container = document.getElementById('my-orders-container');
+    const emptyState = document.getElementById('orders-empty-state');
+    if (!container || !emptyState) return;
 
+    // 1. Verifica se há um usuário logado
+    if (!state.loggedInUser) {
+        container.innerHTML = '<p>Você precisa estar logado para ver seus pedidos.</p>';
+        return;
+    }
+
+    // 2. Usa onSnapshot para ouvir por mudanças em tempo real!
+    db.collection('orders')
+      .where('userId', '==', state.loggedInUser.uid)
+      .orderBy('orderDate', 'desc')
+      .onSnapshot(querySnapshot => {
+        
+        if (querySnapshot.empty) {
+            container.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        container.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+
+        let ordersHTML = '';
+        querySnapshot.forEach(doc => {
+            const order = doc.data();
+            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Carregando...';
+            const productsHTML = order.items.map(item => `
+                <div class="p-2">
+                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-contain">
+                </div>
+            `).join('');
+
+            // NOVO: Exibe o Status e a Previsão de Entrega vindos do Firestore
+            ordersHTML += `
+                <a href="#" class="order-card nav-link" data-page="acompanhar-entrega" data-id="${doc.id}">
+                    <div class="order-card-header bg-gray-50">
+                        <div>
+                            <p class="font-semibold text-gray-800">Pedido #${doc.id.slice(-6).toUpperCase()}</p>
+                            <p class="text-sm text-gray-500">Feito em ${orderDate}</p>
+                        </div>
+                        <div class="text-right">
+                           <p class="font-semibold text-secondary">${order.status}</p>
+                           <p class="text-sm text-gray-500">${order.estimatedDelivery || ''}</p>
+                        </div>
+                    </div>
+                    <div class="order-card-body flex-wrap gap-2">
+                        ${productsHTML}
+                    </div>
+                </a>
+            `;
+        });
+        container.innerHTML = ordersHTML;
+    });
+}
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
     const button = event.target.closest('.add-to-cart-btn');
@@ -1094,16 +1252,27 @@ export async function loadPage(pageName, params = {}) {
         adminLogoutBtn.addEventListener('click', handleLogout);
     }
 
-    // Lógica para navegação interna do painel (próximos passos)
-    document.querySelectorAll('.admin-nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-            // Aqui você carregaria o conteúdo específico (ex: tabela de clientes)
-            console.log(`Navegando para a seção admin: ${link.dataset.adminPage}`);
-        });
+    // Lógica para navegação interna do painel
+document.querySelectorAll('.admin-nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        
+        const adminPage = link.dataset.adminPage;
+        
+        // NOVO: Verifica qual link foi clicado
+        if (adminPage === 'pedidos') {
+            renderAdminOrdersView(); // Chama nossa nova função
+        } else if (adminPage === 'dashboard') {
+            // Recarrega o conteúdo principal do dashboard se necessário
+            loadPage('admin'); 
+        } else {
+            // Para outras páginas (Clientes, Produtos, etc.)
+            document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
+        }
     });
+});
     break;
             case 'adocao-caes':
             case 'adocao-gatos':
@@ -1370,27 +1539,47 @@ async function initializeApp() {
         }
 
         if (target.closest('#confirm-purchase-btn')) {
-            const newOrder = {
-                id: `JPET-${Date.now()}`,
-                orderDate: Date.now(),
-                items: [...state.cart],
-                shipping: { ...state.shipping },
-                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0)
-            };
-            state.orders.push(newOrder);
-            save.orders();
+    // 1. Verifica se o usuário está logado antes de continuar
+    if (!state.loggedInUser) {
+        alert('Você precisa estar logado para finalizar um pedido!');
+        loadPage('login');
+        return;
+    }
 
+    // 2. Prepara o objeto do pedido com informações extras
+    const newOrder = {
+        userId: state.loggedInUser.uid, // ID do usuário que fez o pedido
+        userEmail: state.loggedInUser.email, // Email para referência
+        userName: state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0], // Nome do usuário
+        orderDate: firebase.firestore.FieldValue.serverTimestamp(), // Data do pedido
+        items: [...state.cart],
+        shipping: { ...state.shipping },
+        total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
+        status: 'Processando', // NOVO: Status inicial do pedido
+        estimatedDelivery: '' // NOVO: Campo para o admin preencher
+    };
+
+    // 3. Salva o pedido na coleção 'orders' do Firestore
+    db.collection('orders').add(newOrder)
+        .then(docRef => {
+            console.log("Pedido salvo no Firestore com ID: ", docRef.id);
+
+            // 4. Limpa o carrinho e o estado local
             state.cart = [];
             state.shipping = { fee: 0, neighborhood: '' };
             save.cart();
             updateCounters();
 
+            // 5. Mostra animação de sucesso e redireciona
             showAnimation('success-animation-overlay', 2000, () => {
                 loadPage('meus-pedidos');
             });
-        }
-    });
-
+        })
+        .catch(error => {
+            console.error("Erro ao salvar o pedido no Firestore: ", error);
+            alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
+        });
+}
     document.body.addEventListener('submit', e => {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
@@ -1497,6 +1686,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
