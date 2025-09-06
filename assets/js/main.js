@@ -806,64 +806,6 @@ function displayProducts(products) {
     grid.innerHTML = products.map(p => createProductCardHTML(p, p.id)).join('');
     updateAllHeartIcons();
 }
-async function renderMyOrdersPage() {
-    const container = document.getElementById('my-orders-container');
-    const emptyState = document.getElementById('orders-empty-state');
-    if (!container || !emptyState) return;
-
-    // 1. Verifica se há um usuário logado
-    if (!state.loggedInUser) {
-        container.innerHTML = '<p>Você precisa estar logado para ver seus pedidos.</p>';
-        return;
-    }
-
-    // 2. Usa onSnapshot para ouvir por mudanças em tempo real!
-    db.collection('orders')
-      .where('userId', '==', state.loggedInUser.uid)
-      .orderBy('orderDate', 'desc')
-      .onSnapshot(querySnapshot => {
-        
-        if (querySnapshot.empty) {
-            container.classList.add('hidden');
-            emptyState.classList.remove('hidden');
-            return;
-        }
-
-        container.classList.remove('hidden');
-        emptyState.classList.add('hidden');
-
-        let ordersHTML = '';
-        querySnapshot.forEach(doc => {
-            const order = doc.data();
-            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Carregando...';
-            const productsHTML = order.items.map(item => `
-                <div class="p-2">
-                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-contain">
-                </div>
-            `).join('');
-
-            // NOVO: Exibe o Status e a Previsão de Entrega vindos do Firestore
-            ordersHTML += `
-                <a href="#" class="order-card nav-link" data-page="acompanhar-entrega" data-id="${doc.id}">
-                    <div class="order-card-header bg-gray-50">
-                        <div>
-                            <p class="font-semibold text-gray-800">Pedido #${doc.id.slice(-6).toUpperCase()}</p>
-                            <p class="text-sm text-gray-500">Feito em ${orderDate}</p>
-                        </div>
-                        <div class="text-right">
-                           <p class="font-semibold text-secondary">${order.status}</p>
-                           <p class="text-sm text-gray-500">${order.estimatedDelivery || ''}</p>
-                        </div>
-                    </div>
-                    <div class="order-card-body flex-wrap gap-2">
-                        ${productsHTML}
-                    </div>
-                </a>
-            `;
-        });
-        container.innerHTML = ordersHTML;
-    });
-}
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
     const button = event.target.closest('.add-to-cart-btn');
@@ -1045,46 +987,60 @@ async function handleSendMessage() {
 async function renderMyOrdersPage() {
     const container = document.getElementById('my-orders-container');
     const emptyState = document.getElementById('orders-empty-state');
+    if (!container || !emptyState) return;
 
-    if (!container || !emptyState) {
-        console.error("ERRO: Elementos da página 'Meus Pedidos' não encontrados.");
+    // 1. Verifica se há um usuário logado
+    if (!state.loggedInUser) {
+        container.innerHTML = '<p>Você precisa estar logado para ver seus pedidos.</p>';
         return;
     }
-    
-    if (state.orders.length === 0) {
-        container.classList.add('hidden');
-        emptyState.classList.remove('hidden');
-    } else {
+
+    // 2. Usa onSnapshot para ouvir por mudanças em tempo real!
+    db.collection('orders')
+      .where('userId', '==', state.loggedInUser.uid)
+      .orderBy('orderDate', 'desc')
+      .onSnapshot(querySnapshot => {
+        
+        if (querySnapshot.empty) {
+            container.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
         container.classList.remove('hidden');
         emptyState.classList.add('hidden');
-        
+
         let ordersHTML = '';
-        // Mostra os pedidos mais recentes primeiro
-        [...state.orders].reverse().forEach(order => {
-            const orderDate = new Date(order.orderDate).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+        querySnapshot.forEach(doc => {
+            const order = doc.data();
+            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Carregando...';
             const productsHTML = order.items.map(item => `
-                <div class="p-2 border border-gray-200 rounded-lg bg-white">
-                    <img src="${item.image}" alt="${item.name}" class="w-24 h-24 object-contain">
+                <div class="p-2">
+                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-contain">
                 </div>
             `).join('');
 
+            // NOVO: Exibe o Status e a Previsão de Entrega vindos do Firestore
             ordersHTML += `
-                <a href="#" class="order-card nav-link" data-page="acompanhar-entrega" data-id="${order.id}">
-                    <div class="order-card-header">
+                <a href="#" class="order-card nav-link" data-page="acompanhar-entrega" data-id="${doc.id}">
+                    <div class="order-card-header bg-gray-50">
                         <div>
-                            <p class="font-semibold text-gray-800">Pedido #${order.id.slice(-6).toUpperCase()}</p>
+                            <p class="font-semibold text-gray-800">Pedido #${doc.id.slice(-6).toUpperCase()}</p>
                             <p class="text-sm text-gray-500">Feito em ${orderDate}</p>
                         </div>
-                        <i class="fas fa-chevron-right text-gray-400"></i>
+                        <div class="text-right">
+                           <p class="font-semibold text-secondary">${order.status}</p>
+                           <p class="text-sm text-gray-500">${order.estimatedDelivery || ''}</p>
+                        </div>
                     </div>
-                    <div class="order-card-body">
+                    <div class="order-card-body flex-wrap gap-2">
                         ${productsHTML}
                     </div>
                 </a>
             `;
         });
         container.innerHTML = ordersHTML;
-    }
+    });
 }
 
 async function renderTrackingPage(orderId) {
@@ -1686,6 +1642,7 @@ if (user) {
 
     initializeApp();
 });
+
 
 
 
