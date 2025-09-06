@@ -1329,7 +1329,7 @@ function initBanhoTosaEventListeners() {
 }
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
-async function initializeApp() {
+async function initApp() { ... }
     await Promise.all([
         loadComponent('components/header.html', 'header-placeholder'),
         loadComponent('components/footer.html', 'footer-placeholder')
