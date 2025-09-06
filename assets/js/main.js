@@ -2,7 +2,7 @@
 // Importações do Firebase SDK v9
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldValue, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
@@ -392,7 +392,7 @@ async function renderFavoritesPage() {
         const favoriteProductDocs = await Promise.all(favoriteProductPromises);
         let productsHTML = '';
         favoriteProductDocs.forEach(doc => {
-            if (doc.exists) {
+            if (doc.exists()) {
                 productsHTML += createProductCardHTML(doc.data(), doc.id);
             } else {
                 console.warn(`Produto favoritado com ID ${doc.id} não foi encontrado.`);
@@ -473,7 +473,7 @@ async function renderProductPage(productId) {
     try {
         const docRef = doc(db, 'produtos', productId);
         const docSnap = await getDoc(docRef);
-        if (!docSnap.exists) {
+        if (!docSnap.exists()) {
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
             return;
         }
