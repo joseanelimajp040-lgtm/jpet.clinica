@@ -452,7 +452,7 @@ async function renderFeaturedProducts() {
     const container = document.getElementById('featured-products-container');
     if (!container) return;
     try {
-        const snapshot = await getDocs(query(collection(db, 'produtos'), where('featured', '==', true), query(db, 'produtos', where('featured', '==', true), limit(8))));
+        const snapshot = await getDocs(query(collection(db, 'produtos'), where('featured', '==', true)));
         if (snapshot.empty) {
             container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhum produto em destaque no momento.</p>';
             return;
@@ -704,7 +704,7 @@ async function renderBuscaPage(params) {
     if (countEl) countEl.textContent = '...';
 
     try {
-        const snapshot = await getDocs(collection(db, 'produtos'));
+        const snapshot = await getDocs(query(collection(db, 'produtos'), where('featured', '==', true)));
         currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         let initialProducts = currentSearchResults;
@@ -1104,7 +1104,8 @@ async function loadComponent(url, placeholderId) {
     }
 }
 
-export async function loadPage(pageName, params = {}) {
+// Renomeando a função para evitar conflito com o Firebase SDK
+export async function initApp(pageName, params = {}) {
     // Bloco de verificação de acesso para a página de admin
     if (pageName === 'admin') {
         if (!state.loggedInUser || state.loggedInUser.role !== 'admin') {
@@ -1219,7 +1220,7 @@ document.querySelectorAll('.admin-nav-link').forEach(link => {
             renderAdminOrdersView(); // Chama nossa nova função
         } else if (adminPage === 'dashboard') {
             // Recarrega o conteúdo principal do dashboard se necessário
-            loadPage('admin'); 
+            initApp('admin'); 
         } else {
             // Para outras páginas (Clientes, Produtos, etc.)
             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
@@ -1368,7 +1369,7 @@ async function initializeApp() {
             e.preventDefault();
             const searchTerm = mobileSearchInput.value.trim();
             if (searchTerm) {
-                loadPage('busca', { query: searchTerm });
+                initApp('busca', { query: searchTerm });
                 mobileSearchModal.classList.remove('active');
                 mobileSearchInput.value = '';
             }
@@ -1381,7 +1382,7 @@ async function initializeApp() {
         const navLink = target.closest('.nav-link');
         if (navLink && navLink.dataset.page) {
             e.preventDefault();
-            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
+            initApp(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
         const variationBtn = target.closest('.variation-btn');
@@ -1488,14 +1489,14 @@ async function initializeApp() {
                 if (shippingModal) shippingModal.style.display = 'flex';
                 return;
             }
-            loadPage('checkout');
+            initApp('checkout');
         }
 
         if (target.closest('#confirm-purchase-btn')) {
     // 1. Verifica se o usuário está logado antes de continuar
     if (!state.loggedInUser) {
         alert('Você precisa estar logado para finalizar um pedido!');
-        loadPage('login');
+        initApp('login');
         return;
     }
 
@@ -1525,7 +1526,7 @@ async function initializeApp() {
 
             // 5. Mostra animação de sucesso e redireciona
             showAnimation('success-animation-overlay', 2000, () => {
-                loadPage('meus-pedidos');
+                initApp('meus-pedidos');
             });
         })
         .catch(error => {
@@ -1549,7 +1550,7 @@ async function initializeApp() {
                         searchInput.classList.remove('animate-shake');
                     }, 2000);
                 } else {
-                    loadPage('busca', { query: searchTerm });
+                    initApp('busca', { query: searchTerm });
                     searchInput.value = '';
                 }
             }
@@ -1601,7 +1602,7 @@ async function initializeApp() {
         }
 
         updateCounters();
-        await loadPage('home');
+        await initApp('home');
     }
 }
 
@@ -1638,5 +1639,5 @@ if (user) {
     updateLoginStatus();
 });
 
-    initializeApp();
+    initApp();
 });
