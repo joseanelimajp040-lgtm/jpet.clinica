@@ -1105,7 +1105,7 @@ async function loadComponent(url, placeholderId) {
 }
 
 // Renomeando a função para evitar conflito com o Firebase SDK
-export async function initApp(pageName, params = {}) {
+export async function loadPage(pageName, params = {}) {
     // Bloco de verificação de acesso para a página de admin
     if (pageName === 'admin') {
         if (!state.loggedInUser || state.loggedInUser.role !== 'admin') {
@@ -1220,7 +1220,7 @@ document.querySelectorAll('.admin-nav-link').forEach(link => {
             renderAdminOrdersView(); // Chama nossa nova função
         } else if (adminPage === 'dashboard') {
             // Recarrega o conteúdo principal do dashboard se necessário
-            initApp('admin'); 
+            loadPage('admin'); 
         } else {
             // Para outras páginas (Clientes, Produtos, etc.)
             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
@@ -1256,80 +1256,8 @@ document.querySelectorAll('.admin-nav-link').forEach(link => {
     }
 }
 
-// --- INICIALIZAÇÃO DE LISTENERS ---
-function initProductPageListeners() {
-    const tabContainer = document.getElementById('info-tabs');
-    if (tabContainer) {
-        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
-        tabContainer.addEventListener('click', (e) => {
-            const clickedTab = e.target.closest('.tab-btn');
-            if (!clickedTab) return;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
-            clickedTab.classList.add('active');
-            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
-        });
-    }
-
-    const quantityInput = document.getElementById('product-quantity');
-    const minusBtn = document.getElementById('quantity-minus');
-    const plusBtn = document.getElementById('quantity-plus');
-    if (minusBtn && plusBtn && quantityInput) {
-        minusBtn.addEventListener('click', () => {
-            let val = parseInt(quantityInput.value);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        plusBtn.addEventListener('click', () => {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
-        });
-    }
-}
-
-function initBanhoTosaEventListeners() {
-    const pageContainer = document.getElementById('app-root');
-    if (!pageContainer) return;
-    pageContainer.addEventListener('click', e => {
-        const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
-
-        const availableSlot = e.target.closest('.time-slot.available');
-        if (availableSlot) {
-            if (state.loggedInUser) {
-                const bookingModal = document.getElementById('booking-modal');
-                const day = availableSlot.dataset.day;
-                const time = availableSlot.dataset.time;
-                document.getElementById('booking-info').textContent = `${day} às ${time}`;
-                document.getElementById('booking-day').value = day;
-                document.getElementById('booking-time').value = time;
-                openModal(bookingModal);
-            } else {
-                openModal(document.getElementById('login-required-modal'));
-            }
-        }
-    });
-
-    const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const newAppointment = {
-                day: document.getElementById('booking-day').value,
-                time: document.getElementById('booking-time').value,
-                tutorName: document.getElementById('booking-tutor-name').value,
-                petName: document.getElementById('booking-pet-name').value,
-                phoneNumber: document.getElementById('booking-phone-number').value
-            };
-            state.appointments.push(newAppointment);
-            save.appointments();
-            document.getElementById('booking-modal').style.display = 'none';
-            showAnimation('success-animation-overlay', 1500);
-            renderCalendar();
-        });
-    }
-}
-
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
-async function initApp() { ... }
+async function startApplication() {
     await Promise.all([
         loadComponent('components/header.html', 'header-placeholder'),
         loadComponent('components/footer.html', 'footer-placeholder')
@@ -1369,7 +1297,7 @@ async function initApp() { ... }
             e.preventDefault();
             const searchTerm = mobileSearchInput.value.trim();
             if (searchTerm) {
-                initApp('busca', { query: searchTerm });
+                loadPage('busca', { query: searchTerm });
                 mobileSearchModal.classList.remove('active');
                 mobileSearchInput.value = '';
             }
@@ -1382,7 +1310,7 @@ async function initApp() { ... }
         const navLink = target.closest('.nav-link');
         if (navLink && navLink.dataset.page) {
             e.preventDefault();
-            initApp(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
+            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
         const variationBtn = target.closest('.variation-btn');
@@ -1489,14 +1417,14 @@ async function initApp() { ... }
                 if (shippingModal) shippingModal.style.display = 'flex';
                 return;
             }
-            initApp('checkout');
+            loadPage('checkout');
         }
 
         if (target.closest('#confirm-purchase-btn')) {
     // 1. Verifica se o usuário está logado antes de continuar
     if (!state.loggedInUser) {
         alert('Você precisa estar logado para finalizar um pedido!');
-        initApp('login');
+        loadPage('login');
         return;
     }
 
@@ -1526,7 +1454,7 @@ async function initApp() { ... }
 
             // 5. Mostra animação de sucesso e redireciona
             showAnimation('success-animation-overlay', 2000, () => {
-                initApp('meus-pedidos');
+                loadPage('meus-pedidos');
             });
         })
         .catch(error => {
@@ -1550,7 +1478,7 @@ async function initApp() { ... }
                         searchInput.classList.remove('animate-shake');
                     }, 2000);
                 } else {
-                    initApp('busca', { query: searchTerm });
+                    loadPage('busca', { query: searchTerm });
                     searchInput.value = '';
                 }
             }
@@ -1602,7 +1530,285 @@ async function initApp() { ... }
         }
 
         updateCounters();
-        await initApp('home');
+        await loadPage('home');
+    }
+}
+
+// --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
+async function startApplication() {
+    await Promise.all([
+        loadComponent('components/header.html', 'header-placeholder'),
+        loadComponent('components/footer.html', 'footer-placeholder')
+    ]);
+
+    // --- LISTENERS GLOBAIS ---
+    const mobileSearchIcon = document.getElementById('mobile-search-icon');
+    const mobileSearchModal = document.getElementById('mobile-search-modal');
+    const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
+    const mobileSearchForm = document.getElementById('mobile-search-form');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+
+    if (mobileSearchIcon && mobileSearchModal) {
+        mobileSearchIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            mobileSearchModal.classList.add('active');
+            setTimeout(() => mobileSearchInput.focus(), 100); 
+        });
+    }
+
+    if (mobileSearchCloseBtn) {
+        mobileSearchCloseBtn.addEventListener('click', () => {
+            mobileSearchModal.classList.remove('active');
+        });
+    }
+
+    if (mobileSearchModal) {
+        mobileSearchModal.addEventListener('click', (e) => {
+            if (e.target === mobileSearchModal) {
+                mobileSearchModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (mobileSearchForm) {
+        mobileSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchTerm = mobileSearchInput.value.trim();
+            if (searchTerm) {
+                loadPage('busca', { query: searchTerm });
+                mobileSearchModal.classList.remove('active');
+                mobileSearchInput.value = '';
+            }
+        });
+    }
+
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
+
+        const navLink = target.closest('.nav-link');
+        if (navLink && navLink.dataset.page) {
+            e.preventDefault();
+            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
+        }
+
+        const variationBtn = target.closest('.variation-btn');
+        if (variationBtn) {
+            e.preventDefault();
+            const data = variationBtn.dataset;
+            variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+            variationBtn.classList.add('selected');
+
+            const card = variationBtn.closest('.product-card');
+            if (card) { 
+                const priceContainer = card.querySelector('.product-price-container');
+                const addToCartBtn = card.querySelector('.add-to-cart-btn');
+                const cardImage = card.querySelector('.product-card-image');
+                const cardName = card.querySelector('.product-name-display');
+
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    priceContainer.innerHTML = `<div><span class="text-sm text-gray-400 line-through">${formatCurrency(data.originalPrice)}</span><span class="text-primary font-bold text-lg block">${formatCurrency(data.price)}</span></div>`;
+                } else {
+                    priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="text-primary font-bold text-lg">${formatCurrency(data.price)}</span></div>`;
+                }
+                if (cardImage && data.image && cardImage.src !== data.image) {
+                    cardImage.style.opacity = '0';
+                    setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
+                }
+                if (cardName && data.fullName) cardName.textContent = data.fullName;
+                addToCartBtn.dataset.price = data.price;
+                addToCartBtn.dataset.weight = data.weight;
+                addToCartBtn.dataset.image = data.image;
+                addToCartBtn.dataset.name = data.fullName;
+
+            } else { // Lógica para a página de produto
+                const el = (id) => document.getElementById(id);
+                renderStockStatus(parseInt(data.stock));
+                if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+                const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
+                if (originalPrice && discountBadge) {
+                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                        originalPrice.textContent = formatCurrency(data.originalPrice);
+                        const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
+                        discountBadge.textContent = `-${discount}%`;
+                        originalPrice.classList.remove('hidden');
+                        discountBadge.classList.remove('hidden');
+                    } else {
+                        originalPrice.classList.add('hidden');
+                        discountBadge.classList.add('hidden');
+                    }
+                }
+                const pageImage = el('main-product-image');
+                if (pageImage && data.image && pageImage.src !== data.image) {
+                    pageImage.style.opacity = '0';
+                    setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
+                }
+                if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
+                const pageCartBtn = el('add-to-cart-product-page');
+                if (pageCartBtn) {
+                    pageCartBtn.dataset.price = data.price;
+                    pageCartBtn.dataset.weight = data.weight;
+                    pageCartBtn.dataset.image = data.image;
+                    pageCartBtn.dataset.name = data.fullName;
+                }
+            }
+        }
+
+        if (target.closest('.logout-btn')) handleLogout();
+        if (target.closest('#google-login-btn')) handleSocialLogin('google');
+        if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
+        if (target.closest('.add-to-cart-btn')) handleAddToCart(e);
+        if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
+
+        if (target.closest('.remove-from-cart')) {
+            state.cart = state.cart.filter(item => item.id !== target.closest('.remove-from-cart').dataset.id);
+            save.cart(); updateCounters(); renderCart();
+        }
+        if (target.closest('.quantity-change')) {
+            const btn = target.closest('.quantity-change');
+            const item = state.cart.find(i => i.id === btn.dataset.id);
+            if (item) {
+                item.quantity += parseInt(btn.dataset.change);
+                if (item.quantity < 1) item.quantity = 1;
+                save.cart(); updateCounters(); renderCart();
+            }
+        }
+        if (target.closest('#clear-cart-btn') && confirm('Limpar o carrinho?')) {
+            showAnimation('clear-cart-animation-overlay', 5800, () => {
+                state.cart = []; save.cart(); updateCounters(); renderCart();
+            });
+        }
+        if (target.closest('#clear-favorites-btn') && confirm('Limpar favoritos?')) {
+            showAnimation('unfavorite-animation-overlay', 1500, () => {
+                state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
+            });
+        }
+            
+        if (target.closest('#checkout-btn')) {
+            e.preventDefault();
+            if (state.cart.length === 0) {
+                alert("Seu carrinho está vazio.");
+                return;
+            }
+            if (!state.shipping.neighborhood) {
+                alert("Por favor, selecione uma taxa de entrega antes de prosseguir.");
+                const shippingModal = document.getElementById('shipping-modal');
+                if (shippingModal) shippingModal.style.display = 'flex';
+                return;
+            }
+            loadPage('checkout');
+        }
+
+        if (target.closest('#confirm-purchase-btn')) {
+    // 1. Verifica se o usuário está logado antes de continuar
+    if (!state.loggedInUser) {
+        alert('Você precisa estar logado para finalizar um pedido!');
+        loadPage('login');
+        return;
+    }
+
+    // 2. Prepara o objeto do pedido com informações extras
+    const newOrder = {
+        userId: state.loggedInUser.uid, // ID do usuário que fez o pedido
+        userEmail: state.loggedInUser.email, // Email para referência
+        userName: state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0], // Nome do usuário
+        orderDate: serverTimestamp(), // Data do pedido
+        items: [...state.cart],
+        shipping: { ...state.shipping },
+        total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
+        status: 'Processando', // NOVO: Status inicial do pedido
+        estimatedDelivery: '' // NOVO: Campo para o admin preencher
+    };
+
+    // 3. Salva o pedido na coleção 'orders' do Firestore
+    addDoc(collection(db, 'orders'), newOrder)
+        .then(docRef => {
+            console.log("Pedido salvo no Firestore com ID: ", docRef.id);
+
+            // 4. Limpa o carrinho e o estado local
+            state.cart = [];
+            state.shipping = { fee: 0, neighborhood: '' };
+            save.cart();
+            updateCounters();
+
+            // 5. Mostra animação de sucesso e redireciona
+            showAnimation('success-animation-overlay', 2000, () => {
+                loadPage('meus-pedidos');
+            });
+        })
+        .catch(error => {
+            console.error("Erro ao salvar o pedido no Firestore: ", error);
+            alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
+        });
+}
+        document.body.addEventListener('submit', e => {
+            if (e.target.id === 'login-form') handleLogin(e);
+            if (e.target.id === 'create-account-form') handleCreateAccount(e);
+            if (e.target.id === 'search-form') {
+                e.preventDefault();
+                const searchInput = document.getElementById('search-input');
+                const searchTerm = searchInput.value.trim();
+                const searchError = document.getElementById('search-error');
+                if (!searchTerm) {
+                    searchError.classList.remove('hidden');
+                    searchInput.classList.add('animate-shake');
+                    setTimeout(() => {
+                        searchError.classList.add('hidden');
+                        searchInput.classList.remove('animate-shake');
+                    }, 2000);
+                } else {
+                    loadPage('busca', { query: searchTerm });
+                    searchInput.value = '';
+                }
+            }
+        });
+
+        document.addEventListener('shippingSelected', (e) => {
+            state.shipping = e.detail;
+            document.getElementById('shipping-modal').style.display = 'none';
+            updateTotals();
+        });
+
+        const marrieButton = document.getElementById('marrie-chat-button');
+        const marrieWindow = document.getElementById('marrie-chat-window');
+        const chatInput = document.getElementById('marrie-chat-input');
+        const chatSendButton = document.getElementById('marrie-chat-send');
+        const plaqueContainer = document.getElementById('marrie-plaque-container');
+
+        if (plaqueContainer && marrieButton) {
+            let plaqueTimer;
+            const showPlaque = () => {
+                plaqueContainer.classList.add('active');
+                plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
+            };
+            setTimeout(showPlaque, 2000);
+            const hidePlaque = () => {
+                clearTimeout(plaqueTimer);
+                plaqueContainer.classList.remove('active');
+                marrieButton.removeEventListener('click', hidePlaque);
+            };
+            marrieButton.addEventListener('click', hidePlaque);
+        }
+
+        if (marrieButton && marrieWindow) {
+            const toggleChat = () => {
+                marrieWindow.classList.toggle('active');
+                if (marrieWindow.classList.contains('active')) {
+                    marrieWindow.classList.remove('hidden');
+                } else {
+                    setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+                }
+            };
+            marrieButton.addEventListener('click', toggleChat);
+            document.getElementById('marrie-chat-close')?.addEventListener('click', toggleChat);
+        }
+
+        if (chatInput && chatSendButton) {
+            chatSendButton.addEventListener('click', handleSendMessage);
+            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+        }
+
+        updateCounters();
+        await loadPage('home');
     }
 }
 
@@ -1639,5 +1845,5 @@ if (user) {
     updateLoginStatus();
 });
 
-    initApp();
+    startApplication();
 });
