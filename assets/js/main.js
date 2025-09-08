@@ -1,11 +1,8 @@
 // --- IMPORTAÇÕES DE MÓDULOS ---
 // Importações do Firebase SDK v9 (modular)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-import { getStorage } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js';
-import { getMessaging } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
@@ -13,18 +10,15 @@ import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
 // --- INICIALIZAÇÃO DO FIREBASE ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
-  authDomain: "banco-de-dados-japet.firebaseapp.com",
-  projectId: "banco-de-dados-japet",
-  storageBucket: "banco-de-dados-japet.firebasestorage.app",
-  messagingSenderId: "548299221616",
-  appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
-  measurementId: "G-BRLFJ3BBLC"
+    apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
+    authDomain: "banco-de-dados-japet.firebaseapp.com",
+    projectId: "banco-de-dados-japet",
+    storageBucket: "banco-de-dados-japet.appspot.com",
+    messagingSenderId: "548299221616",
+    appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 // --- SERVICE WORKER (Mantido desativado por segurança) ---
@@ -1591,37 +1585,27 @@ document.addEventListener('DOMContentLoaded', () => {
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
     onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        const userData = userDoc.exists() ? userDoc.data() : {};
-        state.loggedInUser = {
-            email: user.email,
-            uid: user.uid,
-            displayName: user.displayName,
-            role: userData.role || 'user'
-        };
+        if (user) {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.exists() ? userDoc.data() : {};
+            state.loggedInUser = {
+                email: user.email,
+                uid: user.uid,
+                displayName: user.displayName,
+                role: userData.role || 'user'
+            };
+        } else {
+            state.loggedInUser = null;
+        }
+        updateLoginStatus();
+    });
 
-        // NOVO: Carrega os pedidos do usuário a partir do Firestore
-        const ordersSnapshot = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid), orderBy('orderDate', 'desc')));
-        state.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    } else {
-        state.loggedInUser = null;
-        state.orders = []; // Limpa os pedidos quando o usuário faz logout
-    }
-    updateLoginStatus();
-    // Se o usuário estiver na página 'meus-pedidos', renderize-a
-    const currentPage = window.location.hash.replace('#', '');
-    if (currentPage === 'meus-pedidos') {
-        renderMyOrdersPage();
-    }
-  });
+    startApplication();
 });
-
-
