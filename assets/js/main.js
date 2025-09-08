@@ -1615,4 +1615,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentPage === 'meus-pedidos') {
         renderMyOrdersPage();
     }
+  });
 });
