@@ -1578,78 +1578,6 @@ async function startApplication() {
     await loadPage('home');
 }
 
-// --- INICIALIZAÇÃO DE LISTENERS ---
-function initProductPageListeners() {
-    const tabContainer = document.getElementById('info-tabs');
-    if (tabContainer) {
-        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
-        tabContainer.addEventListener('click', (e) => {
-            const clickedTab = e.target.closest('.tab-btn');
-            if (!clickedTab) return;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
-            clickedTab.classList.add('active');
-            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
-        });
-    }
-
-    const quantityInput = document.getElementById('product-quantity');
-    const minusBtn = document.getElementById('quantity-minus');
-    const plusBtn = document.getElementById('quantity-plus');
-    if (minusBtn && plusBtn && quantityInput) {
-        minusBtn.addEventListener('click', () => {
-            let val = parseInt(quantityInput.value);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        plusBtn.addEventListener('click', () => {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
-        });
-    }
-}
-
-function initBanhoTosaEventListeners() {
-    const pageContainer = document.getElementById('app-root');
-    if (!pageContainer) return;
-    pageContainer.addEventListener('click', e => {
-        const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
-
-        const availableSlot = e.target.closest('.time-slot.available');
-        if (availableSlot) {
-            if (state.loggedInUser) {
-                const bookingModal = document.getElementById('booking-modal');
-                const day = availableSlot.dataset.day;
-                const time = availableSlot.dataset.time;
-                document.getElementById('booking-info').textContent = `${day} às ${time}`;
-                document.getElementById('booking-day').value = day;
-                document.getElementById('booking-time').value = time;
-                openModal(bookingModal);
-            } else {
-                openModal(document.getElementById('login-required-modal'));
-            }
-        }
-    });
-
-    const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const newAppointment = {
-                day: document.getElementById('booking-day').value,
-                time: document.getElementById('booking-time').value,
-                tutorName: document.getElementById('booking-tutor-name').value,
-                petName: document.getElementById('booking-pet-name').value,
-                phoneNumber: document.getElementById('booking-phone-number').value
-            };
-            state.appointments.push(newAppointment);
-            save.appointments();
-            document.getElementById('booking-modal').style.display = 'none';
-            showAnimation('success-animation-overlay', 1500);
-            renderCalendar();
-        });
-    }
-}
-
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     state = {
@@ -1657,14 +1585,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
-        // REMOVEMOS: orders: JSON.parse(localStorage.getItem('orders')) || [],
-        orders: [], // Definimos como um array vazio para ser preenchido pelo Firestore
+        orders: [],
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
-    // CORRIGIDO: Este bloco agora preenche 'state.orders' com os dados do Firestore
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -1676,16 +1602,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 role: userData.role || 'user'
             };
 
-            // NOVO: Carrega os pedidos do usuário a partir do Firestore
             const ordersSnapshot = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid), orderBy('orderDate', 'desc')));
             state.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         } else {
             state.loggedInUser = null;
-            state.orders = []; // Limpa os pedidos quando o usuário faz logout
+            state.orders = [];
         }
         updateLoginStatus();
-        // Se o usuário estiver na página 'meus-pedidos', renderize-a
         const currentPage = window.location.hash.replace('#', '');
         if (currentPage === 'meus-pedidos') {
             renderMyOrdersPage();
