@@ -1,8 +1,11 @@
 // --- IMPORTAÇÕES DE MÓDULOS ---
 // Importações do Firebase SDK v9 (modular)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js';
+import { getMessaging } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js';
 
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
@@ -1620,4 +1623,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
