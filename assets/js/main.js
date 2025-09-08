@@ -684,7 +684,6 @@ function renderStarRating(reviews) {
     for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="far fa-star"></i>';
     container.innerHTML = `${starsHTML} <span class="review-count">(${reviewCount} avaliações)</span>`;
 }
-
 // --- Funções da Página de Busca ---
 async function renderBuscaPage(params) {
     const searchTerm = params.query || '';
@@ -696,7 +695,8 @@ async function renderBuscaPage(params) {
     if (countEl) countEl.textContent = '...';
 
     try {
-        const snapshot = await getDocs(query(collection(db, 'produtos'), where('featured', '==', true)));
+        // CORREÇÃO: Remova a cláusula 'where' para buscar todos os produtos
+        const snapshot = await getDocs(collection(db, 'produtos'));
         currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         let initialProducts = currentSearchResults;
@@ -735,7 +735,6 @@ async function renderBuscaPage(params) {
         if (grid) grid.innerHTML = '<p class="col-span-full text-red-500 text-center">Não foi possível carregar os produtos.</p>';
     }
 }
-
 function generateFilters(products) {
     const container = document.getElementById('filters-container');
     if (!container) return;
@@ -1609,3 +1608,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
