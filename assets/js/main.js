@@ -1585,27 +1585,34 @@ document.addEventListener('DOMContentLoaded', () => {
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
-        orders: JSON.parse(localStorage.getItem('orders')) || [],
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.exists() ? userDoc.data() : {};
-            state.loggedInUser = {
-                email: user.email,
-                uid: user.uid,
-                displayName: user.displayName,
-                role: userData.role || 'user'
-            };
-        } else {
-            state.loggedInUser = null;
-        }
-        updateLoginStatus();
-    });
+    if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        state.loggedInUser = {
+            email: user.email,
+            uid: user.uid,
+            displayName: user.displayName,
+            role: userData.role || 'user'
+        };
 
-    startApplication();
+        // NOVO: Carrega os pedidos do usuário a partir do Firestore
+        const ordersSnapshot = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid), orderBy('orderDate', 'desc')));
+        state.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    } else {
+        state.loggedInUser = null;
+        state.orders = []; // Limpa os pedidos quando o usuário faz logout
+    }
+    updateLoginStatus();
+    // Se o usuário estiver na página 'meus-pedidos', renderize-a
+    const currentPage = window.location.hash.replace('#', '');
+    if (currentPage === 'meus-pedidos') {
+        renderMyOrdersPage();
+    }
 });
