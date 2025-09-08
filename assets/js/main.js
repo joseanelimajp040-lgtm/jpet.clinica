@@ -1585,7 +1585,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
-        orders: [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
@@ -1601,19 +1601,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayName: user.displayName,
                 role: userData.role || 'user'
             };
-
-            const ordersSnapshot = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid), orderBy('orderDate', 'desc')));
-            state.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         } else {
             state.loggedInUser = null;
-            state.orders = [];
         }
         updateLoginStatus();
-        const currentPage = window.location.hash.replace('#', '');
-        if (currentPage === 'meus-pedidos') {
-            renderMyOrdersPage();
-        }
     });
 
     startApplication();
