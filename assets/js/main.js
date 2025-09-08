@@ -568,18 +568,34 @@ function renderProductSpecs(specs = {}) {
 async function renderRelatedProducts(category, currentProductId) {
     const container = document.getElementById('related-products-container');
     if (!container) return;
-    try {
-        const snapshot = await getDocs(query(collection(db, 'produtos'), where('category', '==', category), where(FieldPath.documentId(), '!=', currentProductId), limit(4)));
+    
+    // Se a categoria não existir, não faz a busca
+    if (!category) {
+        container.innerHTML = '<p class="col-span-full">Categoria não definida para este produto.</p>';
+        return;
+    }
 
-        if (snapshot.empty) {
+    try {
+        // Passo 1: Busca TODOS os produtos da mesma categoria
+        const snapshot = await getDocs(query(collection(db, 'produtos'), where('category', '==', category)));
+
+        // Passo 2: Filtra no JavaScript para remover o produto atual
+        const relatedProducts = snapshot.docs
+            .filter(doc => doc.id !== currentProductId) // Filtra o produto atual
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .slice(0, 4); // Limita para exibir apenas 4 produtos
+
+        if (relatedProducts.length === 0) {
             container.innerHTML = '<p class="col-span-full">Nenhum outro produto encontrado nesta categoria.</p>';
             return;
         }
+
         container.innerHTML = '';
-        snapshot.forEach(doc => {
-            container.insertAdjacentHTML('beforeend', createProductCardHTML(doc.data(), doc.id));
+        relatedProducts.forEach(product => {
+            container.insertAdjacentHTML('beforeend', createProductCardHTML(product, product.id));
         });
         updateAllHeartIcons();
+
     } catch (error) {
         console.error("Erro ao buscar produtos relacionados: ", error);
         container.innerHTML = '<p class="col-span-full text-red-500">Não foi possível carregar produtos relacionados.</p>';
@@ -1608,4 +1624,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
