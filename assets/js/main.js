@@ -1,5 +1,5 @@
 // --- IMPORTAÇÕES DE MÓDULOS ---
-// Importações do Firebase SDK v9 (Modular)
+// Importações do Firebase SDK v9 (modular)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
@@ -18,6 +18,8 @@ const firebaseConfig = {
     appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
 };
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // --- SERVICE WORKER (Mantido desativado por segurança) ---
 /*
@@ -32,7 +34,6 @@ if ('serviceWorker' in navigator) {
 
 // --- VARIÁVEIS GLOBAIS E ESTADO DA APLICAÇÃO ---
 let state = {};
-let db, auth;
 let appRoot, loadingOverlay;
 let currentSearchResults = [];
 
@@ -43,7 +44,7 @@ const save = {
     cart: () => localStorage.setItem('cart', JSON.stringify(state.cart)),
     favorites: () => localStorage.setItem('favorites', JSON.stringify(state.favorites)),
     appointments: () => localStorage.setItem('groomingAppointments', JSON.stringify(state.appointments)),
-    orders: () => localStorage.setItem('orders', JSON.stringify(state.orders)), // Mantido para compatibilidade, mas o novo código usa Firestore
+    orders: () => localStorage.setItem('orders', JSON.stringify(state.orders)),
 };
 
 function showAnimation(overlayId, duration, callback) {
@@ -85,6 +86,7 @@ function updateCounters() {
     }
     if (favCountEl) favCountEl.textContent = state.favorites.length;
 }
+
 function updateLoginStatus() {
     const desktopPlaceholder = document.getElementById('login-placeholder-desktop');
     const mobilePlaceholder = document.getElementById('login-placeholder-mobile');
@@ -198,7 +200,6 @@ async function renderAdminOrdersView() {
                     </div>
                     <p class="text-sm text-gray-500">Data: ${orderDate}</p>
                 </div>
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
@@ -206,12 +207,10 @@ async function renderAdminOrdersView() {
                             ${statusOptions}
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Previsão de Entrega</label>
                         <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
                     </div>
-
                     <button class="update-order-btn bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
                         <i class="fas fa-save mr-2"></i> Salvar Alterações
                     </button>
@@ -290,10 +289,10 @@ function createProductCardHTML(productData, productId) {
             </div>`;
         const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
         discountBadgeHTML = `<div class="product-discount-display absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">-${discount}%</div>`;
-    
-} else {
-    priceHTML = `<div class="flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span></div>`;
-}
+
+    } else {
+        priceHTML = `<div class="flex items-center"><span class="product-price-display text-primary font-bold text-lg">${formatCurrency(defaultVariation.price)}</span></div>`;
+    }
 
     return `
         <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-product-id="${productId}">
@@ -464,7 +463,8 @@ async function renderFeaturedProducts() {
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
     try {
-        const docSnap = await getDoc(doc(db, 'produtos', productId));
+        const docRef = doc(db, 'produtos', productId);
+        const docSnap = await getDoc(docRef);
         if (!docSnap.exists()) {
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
             return;
@@ -569,8 +569,8 @@ async function renderRelatedProducts(category, currentProductId) {
     const container = document.getElementById('related-products-container');
     if (!container) return;
     try {
-        const snapshot = await getDocs(query(collection(db, 'produtos'), where('category', '==', category), where(FieldPath.documentId(), '!=', currentProductId)));
-        
+        const snapshot = await getDocs(query(collection(db, 'produtos'), where('category', '==', category), where(FieldPath.documentId(), '!=', currentProductId), limit(4)));
+
         if (snapshot.empty) {
             container.innerHTML = '<p class="col-span-full">Nenhum outro produto encontrado nesta categoria.</p>';
             return;
@@ -703,7 +703,7 @@ async function renderBuscaPage(params) {
         if (searchTerm) {
             if (titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
             const lowerCaseTerm = searchTerm.toLowerCase();
-            
+
             initialProducts = currentSearchResults.filter(p => {
                 let nameMatch = false;
                 if (typeof p.nome === 'string') {
@@ -850,7 +850,7 @@ function handleFavoriteToggle(event) {
     } else {
         state.favorites.push({ id: productId });
     }
-    
+
     save.favorites();
     updateCounters();
     updateAllHeartIcons();
@@ -879,17 +879,17 @@ function handleSocialLogin(providerName) {
             });
         }
     }).then(() => loadPage('home'))
-      .catch(error => {
-        console.error("Erro no login social:", error);
-        if (error.code === 'auth/popup-closed-by-user') return;
-        const msg = error.code === 'auth/account-exists-with-different-credential'
-            ? "Já existe uma conta com este e-mail. Tente o método original."
-            : "Ocorreu um erro ao tentar entrar. Tente novamente.";
-        if (errorEl) {
-            errorEl.textContent = msg;
-            errorEl.classList.remove('hidden');
-        }
-    });
+        .catch(error => {
+            console.error("Erro no login social:", error);
+            if (error.code === 'auth/popup-closed-by-user') return;
+            const msg = error.code === 'auth/account-exists-with-different-credential'
+                ? "Já existe uma conta com este e-mail. Tente o método original."
+                : "Ocorreu um erro ao tentar entrar. Tente novamente.";
+            if (errorEl) {
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+            }
+        });
 }
 
 function handleCreateAccount(event) {
@@ -902,8 +902,8 @@ function handleCreateAccount(event) {
 
     createUserWithEmailAndPassword(auth, email, password)
         .then(cred => setDoc(doc(db, 'users', cred.user.uid), {
-                name: name, email: email, createdAt: serverTimestamp()
-            }))
+            name: name, email: email, createdAt: serverTimestamp()
+        }))
         .then(() => {
             alert(`Conta para ${name} criada com sucesso! Por favor, faça o login.`);
             loadPage('login');
@@ -1030,28 +1030,32 @@ async function renderMyOrdersPage() {
 }
 
 async function renderTrackingPage(orderId) {
-    const orderDoc = await getDoc(doc(db, 'orders', orderId));
-    if (!orderDoc.exists()) {
+    const order = state.orders.find(o => o.id === orderId);
+
+    if (!order) {
         appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Pedido não encontrado.</p>`;
         return;
     }
 
-    const order = orderDoc.data();
-    
     const mainProduct = order.items[0];
     document.getElementById('tracking-product-image').src = mainProduct.image;
     document.getElementById('tracking-product-name').textContent = mainProduct.name + (order.items.length > 1 ? ` e mais ${order.items.length - 1} item(ns)` : '');
-    
-    document.getElementById('tracking-delivery-estimate').textContent = order.estimatedDelivery || 'Previsão de entrega em breve.';
-    document.getElementById('tracking-status-display').textContent = order.status;
-    
-    const timelineContainer = document.getElementById('tracking-timeline-container');
-    const statuses = ['Processando', 'Enviado', 'Entregue'];
-    let currentStatusIndex = statuses.indexOf(order.status);
-    if (currentStatusIndex === -1) currentStatusIndex = 0; // Se o status não for reconhecido, exibe o primeiro.
 
+    const statuses = ['Pedido Realizado', 'Pagamento Confirmado', 'Em Separação', 'Saiu para Entrega', 'Entregue'];
+    const timeSinceOrder = Date.now() - order.orderDate;
+    let currentStatusIndex = 0;
+    if (timeSinceOrder > 3 * 60 * 1000) currentStatusIndex = 4;
+    else if (timeSinceOrder > 2 * 60 * 1000) currentStatusIndex = 3;
+    else if (timeSinceOrder > 1 * 60 * 1000) currentStatusIndex = 2;
+    else if (timeSinceOrder > 30 * 1000) currentStatusIndex = 1;
+
+    const deliveryDate = new Date(order.orderDate);
+    deliveryDate.setDate(deliveryDate.getDate() + 5);
+    document.getElementById('tracking-delivery-estimate').textContent = `Chega ${deliveryDate.toLocaleDateString('pt-BR', { weekday: 'long' })}, ${deliveryDate.toLocaleDateString('pt-BR')}`;
+
+    const timelineContainer = document.getElementById('tracking-timeline-container');
     let timelineHTML = '';
-    
+
     statuses.forEach((status, index) => {
         let statusClass = 'pending';
         if (index < currentStatusIndex) {
@@ -1064,7 +1068,7 @@ async function renderTrackingPage(orderId) {
     });
 
     const progressPercentage = (currentStatusIndex / (statuses.length - 1)) * 100;
-    
+
     timelineContainer.innerHTML = `
         <div class="progress-bar-background">
             <div class="progress-bar-foreground" style="width: ${progressPercentage}%;"></div>
@@ -1074,7 +1078,6 @@ async function renderTrackingPage(orderId) {
         </div>
     `;
 }
-
 
 // --- ROTEDOR E CARREGADOR DE PÁGINAS ---
 async function loadComponent(url, placeholderId) {
@@ -1180,9 +1183,9 @@ async function loadPage(pageName, params = {}) {
                 if (adminUserNameEl) {
                     adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
                 }
-                
+
                 const adminLogoutBtn = document.querySelector('#admin-user-profile .logout-btn');
-                if(adminLogoutBtn) {
+                if (adminLogoutBtn) {
                     adminLogoutBtn.addEventListener('click', handleLogout);
                 }
 
@@ -1191,9 +1194,8 @@ async function loadPage(pageName, params = {}) {
                         e.preventDefault();
                         document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
                         link.classList.add('active');
-                        
+
                         const adminPage = link.dataset.adminPage;
-                        
                         if (adminPage === 'pedidos') {
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
@@ -1452,7 +1454,7 @@ async function startApplication() {
                 state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
             });
         }
-        
+
         if (target.closest('#checkout-btn')) {
             e.preventDefault();
             if (state.cart.length === 0) {
@@ -1490,12 +1492,10 @@ async function startApplication() {
             addDoc(collection(db, 'orders'), newOrder)
                 .then(docRef => {
                     console.log("Pedido salvo no Firestore com ID: ", docRef.id);
-
                     state.cart = [];
                     state.shipping = { fee: 0, neighborhood: '' };
                     save.cart();
                     updateCounters();
-
                     showAnimation('success-animation-overlay', 2000, () => {
                         loadPage('meus-pedidos');
                     });
@@ -1505,88 +1505,87 @@ async function startApplication() {
                     alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
                 });
         }
-        document.body.addEventListener('submit', e => {
-            if (e.target.id === 'login-form') handleLogin(e);
-            if (e.target.id === 'create-account-form') handleCreateAccount(e);
-            if (e.target.id === 'search-form') {
-                e.preventDefault();
-                const searchInput = document.getElementById('search-input');
-                const searchTerm = searchInput.value.trim();
-                const searchError = document.getElementById('search-error');
-                if (!searchTerm) {
-                    searchError.classList.remove('hidden');
-                    searchInput.classList.add('animate-shake');
-                    setTimeout(() => {
-                        searchError.classList.add('hidden');
-                        searchInput.classList.remove('animate-shake');
-                    }, 2000);
-                } else {
-                    loadPage('busca', { query: searchTerm });
-                    searchInput.value = '';
-                }
+    });
+
+    document.body.addEventListener('submit', e => {
+        if (e.target.id === 'login-form') handleLogin(e);
+        if (e.target.id === 'create-account-form') handleCreateAccount(e);
+        if (e.target.id === 'search-form') {
+            e.preventDefault();
+            const searchInput = document.getElementById('search-input');
+            const searchTerm = searchInput.value.trim();
+            const searchError = document.getElementById('search-error');
+            if (!searchTerm) {
+                searchError.classList.remove('hidden');
+                searchInput.classList.add('animate-shake');
+                setTimeout(() => {
+                    searchError.classList.add('hidden');
+                    searchInput.classList.remove('animate-shake');
+                }, 2000);
+            } else {
+                loadPage('busca', { query: searchTerm });
+                searchInput.value = '';
             }
-        });
-
-        document.addEventListener('shippingSelected', (e) => {
-            state.shipping = e.detail;
-            document.getElementById('shipping-modal').style.display = 'none';
-            updateTotals();
-        });
-
-        const marrieButton = document.getElementById('marrie-chat-button');
-        const marrieWindow = document.getElementById('marrie-chat-window');
-        const chatInput = document.getElementById('marrie-chat-input');
-        const chatSendButton = document.getElementById('marrie-chat-send');
-        const plaqueContainer = document.getElementById('marrie-plaque-container');
-
-        if (plaqueContainer && marrieButton) {
-            let plaqueTimer;
-            const showPlaque = () => {
-                plaqueContainer.classList.add('active');
-                plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
-            };
-            setTimeout(showPlaque, 2000);
-            const hidePlaque = () => {
-                clearTimeout(plaqueTimer);
-                plaqueContainer.classList.remove('active');
-                marrieButton.removeEventListener('click', hidePlaque);
-            };
-            marrieButton.addEventListener('click', hidePlaque);
         }
+    });
 
-        if (marrieButton && marrieWindow) {
-            const toggleChat = () => {
-                marrieWindow.classList.toggle('active');
-                if (marrieWindow.classList.contains('active')) {
-                    marrieWindow.classList.remove('hidden');
-                } else {
-                    setTimeout(() => marrieWindow.classList.add('hidden'), 500);
-                }
-            };
-            marrieButton.addEventListener('click', toggleChat);
-            document.getElementById('marrie-chat-close')?.addEventListener('click', toggleChat);
-        }
+    document.addEventListener('shippingSelected', (e) => {
+        state.shipping = e.detail;
+        document.getElementById('shipping-modal').style.display = 'none';
+        updateTotals();
+    });
 
-        if (chatInput && chatSendButton) {
-            chatSendButton.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
-        }
+    const marrieButton = document.getElementById('marrie-chat-button');
+    const marrieWindow = document.getElementById('marrie-chat-window');
+    const chatInput = document.getElementById('marrie-chat-input');
+    const chatSendButton = document.getElementById('marrie-chat-send');
+    const plaqueContainer = document.getElementById('marrie-plaque-container');
 
-        updateCounters();
-        await loadPage('home');
+    if (plaqueContainer && marrieButton) {
+        let plaqueTimer;
+        const showPlaque = () => {
+            plaqueContainer.classList.add('active');
+            plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
+        };
+        setTimeout(showPlaque, 2000);
+        const hidePlaque = () => {
+            clearTimeout(plaqueTimer);
+            plaqueContainer.classList.remove('active');
+            marrieButton.removeEventListener('click', hidePlaque);
+        };
+        marrieButton.addEventListener('click', hidePlaque);
     }
+
+    if (marrieButton && marrieWindow) {
+        const toggleChat = () => {
+            marrieWindow.classList.toggle('active');
+            if (marrieWindow.classList.contains('active')) {
+                marrieWindow.classList.remove('hidden');
+            } else {
+                setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+            }
+        };
+        marrieButton.addEventListener('click', toggleChat);
+        document.getElementById('marrie-chat-close')?.addEventListener('click', toggleChat);
+    }
+
+    if (chatInput && chatSendButton) {
+        chatSendButton.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+    }
+
+    updateCounters();
+    await loadPage('home');
 }
 
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    auth = getAuth(app);
-    db = getFirestore(app);
-
     state = {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
         appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
         shipping: { fee: 0, neighborhood: '' }
     };
     appRoot = document.getElementById('app-root');
@@ -1596,7 +1595,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             const userData = userDoc.exists() ? userDoc.data() : {};
-
             state.loggedInUser = {
                 email: user.email,
                 uid: user.uid,
