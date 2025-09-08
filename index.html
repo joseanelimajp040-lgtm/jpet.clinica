@@ -12,6 +12,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="bg-gray-50">
@@ -47,61 +51,53 @@
     <div id="footer-placeholder"></div>
 
     <button id="marrie-chat-button" class="fixed bottom-24 right-6 bg-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110 z-50">
-    <img src="https://i.postimg.cc/hvZzphbr/Whats-App-Image-2025-08-17-at-16-23-39.jpg" alt="Ícone da Marrie" class="w-10 h-10 object-contain" />
-</button>
+        <img src="https://i.postimg.cc/hvZzphbr/Whats-App-Image-2025-08-17-at-16-23-39.jpg" alt="Ícone da Marrie" class="w-10 h-10 object-contain" />
+    </button>
 
-<div id="marrie-chat-window" class="hidden fixed bottom-24 right-6 w-80 md:w-96 h-[500px] bg-primary shadow-2xl rounded-xl z-50 flex-col overflow-hidden transition-all duration-500 ease-in-out">
-    <div class="flex items-center justify-between p-4 bg-white/20">
-        <div class="text-white">
-            <h3 class="font-bold text-lg">Converse com a Marrie</h3>
-            <p class="text-xs">Inteligência Artificial da J.A Pet</p>
+    <div id="marrie-chat-window" class="hidden fixed bottom-24 right-6 w-80 md:w-96 h-[500px] bg-primary shadow-2xl rounded-xl z-50 flex-col overflow-hidden transition-all duration-500 ease-in-out">
+        <div class="flex items-center justify-between p-4 bg-white/20">
+            <div class="text-white">
+                <h3 class="font-bold text-lg">Converse com a Marrie</h3>
+                <p class="text-xs">Inteligência Artificial da J.A Pet</p>
+            </div>
+            <button id="marrie-chat-close" class="text-white text-2xl hover:opacity-75">&times;</button>
         </div>
-        <button id="marrie-chat-close" class="text-white text-2xl hover:opacity-75">&times;</button>
-    </div>
 
-    <div class="flex-1 p-4 overflow-y-auto bg-gray-50 text-sm">
-        <div class="flex mb-4">
-            <div class="bg-secondary text-white p-3 rounded-lg rounded-bl-none max-w-xs">
-                <p>Olá! 🐾 Eu sou a Marrie, a assistente virtual da J.A Pet. Como posso te ajudar hoje?</p>
+        <div class="flex-1 p-4 overflow-y-auto bg-gray-50 text-sm">
+            <div class="flex mb-4">
+                <div class="bg-secondary text-white p-3 rounded-lg rounded-bl-none max-w-xs">
+                    <p>Olá! 🐾 Eu sou a Marrie, a assistente virtual da J.A Pet. Como posso te ajudar hoje?</p>
+                </div>
             </div>
         </div>
-        </div>
 
-    <div class="p-4 bg-white/20">
-        <div class="flex items-center bg-white rounded-full p-1">
-            <input type="text" id="marrie-chat-input" placeholder="Digite sua dúvida aqui..." class="flex-1 bg-transparent px-3 py-1 focus:outline-none text-gray-700">
-            <button id="marrie-chat-send" class="bg-secondary text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-teal-700 transition-colors">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+        <div class="p-4 bg-white/20">
+            <div class="flex items-center bg-white rounded-full p-1">
+                <input type="text" id="marrie-chat-input" placeholder="Digite sua dúvida aqui..." class="flex-1 bg-transparent px-3 py-1 focus:outline-none text-gray-700">
+                <button id="marrie-chat-send" class="bg-secondary text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-teal-700 transition-colors">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
-</div>
-<a href="https://wa.me/message/UWELXKHLLEPLM1" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 transition duration-300 z-50">
-    <i class="fab fa-whatsapp"></i>
-</a>
+    <a href="https://wa.me/message/UWELXKHLLEPLM1" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-green-600 transition duration-300 z-50">
+        <i class="fab fa-whatsapp"></i>
+    </a>
     <div id="mobile-search-modal" class="mobile-search-overlay">
-    <div class="mobile-search-container">
-        <form id="mobile-search-form" class="w-full flex items-center relative">
-            <input type="text" id="mobile-search-input" placeholder="O que seu pet precisa hoje?" class="mobile-search-input" autocomplete="off">
-            <button type="submit" class="mobile-search-submit-btn">
-                <i class="fas fa-search"></i>
-            </button>
-            <button type="button" id="mobile-search-close-btn" class="mobile-search-close-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </form>
+        <div class="mobile-search-container">
+            <form id="mobile-search-form" class="w-full flex items-center relative">
+                <input type="text" id="mobile-search-input" placeholder="O que seu pet precisa hoje?" class="mobile-search-input" autocomplete="off">
+                <button type="submit" class="mobile-search-submit-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button type="button" id="mobile-search-close-btn" class="mobile-search-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </form>
         </div>
-</div>
+    </div>
 
     <script src="assets/js/main.js" type="module" defer></script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
