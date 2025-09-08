@@ -4,7 +4,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-import { initSlider, initComparisonSlider } from '/assets/js/slider.js';
+import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
@@ -1617,4 +1617,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
