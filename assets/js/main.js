@@ -10,15 +10,18 @@ import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
 // --- INICIALIZAÇÃO DO FIREBASE ---
 const firebaseConfig = {
-    apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
-    authDomain: "banco-de-dados-japet.firebaseapp.com",
-    projectId: "banco-de-dados-japet",
-    storageBucket: "banco-de-dados-japet.appspot.com",
-    messagingSenderId: "548299221616",
-    appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
+  apiKey: "AIzaSyBapMZqOblvGQpqQBTla3e7qn11uoWi6YU",
+  authDomain: "banco-de-dados-japet.firebaseapp.com",
+  projectId: "banco-de-dados-japet",
+  storageBucket: "banco-de-dados-japet.firebasestorage.app",
+  messagingSenderId: "548299221616",
+  appId: "1:548299221616:web:e7d1fea251018a7570e2b5",
+  measurementId: "G-BRLFJ3BBLC"
 };
+
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
 // --- SERVICE WORKER (Mantido desativado por segurança) ---
@@ -1617,3 +1620,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
