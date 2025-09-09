@@ -559,6 +559,58 @@ async function renderFeaturedProducts() {
     }
 }
 
+async function renderProdutosPage() {
+    const container = document.getElementById('products-by-category-container');
+    if (!container) return;
+
+    container.innerHTML = '<p class="text-center text-gray-500 text-lg">Buscando os melhores produtos para o seu pet...</p>';
+
+    try {
+        const snapshot = await getDocs(query(collection(db, 'produtos'), orderBy('nome')));
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhum produto encontrado no momento.</p>';
+            return;
+        }
+
+        const productsByCategory = {};
+
+        // Agrupa todos os produtos por categoria
+        snapshot.forEach(doc => {
+            const product = doc.data();
+            // Se um produto não tiver categoria, ele vai para "Outros"
+            const category = product.category || 'Outros';
+            if (!productsByCategory[category]) {
+                productsByCategory[category] = [];
+            }
+            productsByCategory[category].push({ id: doc.id, ...product });
+        });
+
+        // Ordena as categorias em ordem alfabética para uma exibição consistente
+        const sortedCategories = Object.keys(productsByCategory).sort();
+
+        let finalHtml = '';
+
+        // Cria uma seção para cada categoria
+        for (const category of sortedCategories) {
+            finalHtml += `
+                <section class="category-section">
+                    <h2 class="category-title">${category}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${productsByCategory[category].map(product => createProductCardHTML(product, product.id)).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        container.innerHTML = finalHtml;
+        updateAllHeartIcons(); // Atualiza os ícones de favorito depois de renderizar
+
+    } catch (error) {
+        console.error("Erro ao buscar todos os produtos: ", error);
+        container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar os produtos. Tente novamente mais tarde.</p>';
+    }
+}
+
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
     try {
@@ -1265,6 +1317,9 @@ async function loadPage(pageName, params = {}) {
                 renderCart();
                 initCartPageListeners(state);
                 break;
+            case 'produtos':
+                await renderProdutosPage();
+                break;
             case 'produto':
                 if (params.id) {
                     await renderProductPage(params.id);
@@ -1728,3 +1783,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
