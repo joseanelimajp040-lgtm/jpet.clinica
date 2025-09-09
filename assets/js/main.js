@@ -1097,7 +1097,7 @@ async function handleSendMessage() {
 }
 
 // --- FUNÇÕES DE PEDIDOS E RASTREIO ---
-async function renderMyOrdersPage() {
+async function renderMyOrdersPage(userId) {
     const container = document.getElementById('my-orders-container');
     const emptyState = document.getElementById('orders-empty-state');
     if (!container || !emptyState) return;
@@ -1107,7 +1107,8 @@ async function renderMyOrdersPage() {
         return;
     }
 
-    onSnapshot(query(collection(db, 'orders'), where('userId', '==', state.loggedInUser.uid), orderBy('orderDate', 'desc')), (querySnapshot) => {
+    // 💡 A consulta aqui DEVE ter o filtro 'where'
+    onSnapshot(query(collection(db, 'orders'), where('userId', '==', userId), orderBy('orderDate', 'desc')), (querySnapshot) => {
         if (querySnapshot.empty) {
             container.classList.add('hidden');
             emptyState.classList.remove('hidden');
@@ -1293,16 +1294,19 @@ async function loadPage(pageName, params = {}) {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
+            // 💡 CORREÇÃO AQUI
             case 'meus-pedidos':
-                await renderMyOrdersPage();
+                // A página "Meus Pedidos" tem um filtro de usuário para mostrar apenas os pedidos da conta logada.
+                await renderMyOrdersPage(state.loggedInUser.uid);
                 break;
             case 'acompanhar-entrega':
                 if (params.id) {
                     await renderTrackingPage(params.id);
                 } else {
-                    await renderMyOrdersPage();
+                    await renderMyOrdersPage(state.loggedInUser.uid);
                 }
                 break;
+            // 💡 CORREÇÃO AQUI
             case 'admin':
                 const adminUserNameEl = document.getElementById('admin-user-name');
                 if (adminUserNameEl) {
@@ -1322,6 +1326,7 @@ async function loadPage(pageName, params = {}) {
 
                         const adminPage = link.dataset.adminPage;
                         if (adminPage === 'pedidos') {
+                            // 💡 CORREÇÃO: Chamar a função de renderização correta
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
                             loadPage('admin');
@@ -1330,6 +1335,10 @@ async function loadPage(pageName, params = {}) {
                         }
                     });
                 });
+                
+                // 💡 CORREÇÃO: Carrega a visualização de pedidos por padrão
+                document.querySelector('.admin-nav-link[data-admin-page="pedidos"]')?.classList.add('active');
+                renderAdminOrdersView();
                 break;
             case 'adocao-caes':
             case 'adocao-gatos':
@@ -1358,7 +1367,6 @@ async function loadPage(pageName, params = {}) {
         }
     }
 }
-
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
     const tabContainer = document.getElementById('info-tabs');
@@ -1734,6 +1742,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
