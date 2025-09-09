@@ -161,132 +161,130 @@ function updateAllHeartIcons() {
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderAdminOrdersView() {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
 
-    adminContent.innerHTML = `
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Pedidos e Entregas</h1>
-            <p class="text-gray-500">Visualize e atualize o status de todos os pedidos do site.</p>
-        </header>
-        <div id="admin-orders-list" class="space-y-4">
-            <p>Carregando pedidos...</p>
-        </div>
-    `;
+    adminContent.innerHTML = `
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Pedidos e Entregas</h1>
+            <p class="text-gray-500">Visualize e atualize o status de todos os pedidos do site.</p>
+        </header>
+        <div id="admin-orders-list" class="space-y-4">
+            <p>Carregando pedidos...</p>
+        </div>
+    `;
 
-    const ordersListEl = document.getElementById('admin-orders-list');
+    const ordersListEl = document.getElementById('admin-orders-list');
 
-    const statusMessages = {
-        'Processando': 'O seu pedido está em processamento e será enviado em breve.',
-        'Enviado': 'Seu pedido foi enviado para a transportadora.',
-        'Entregue': 'Seu pedido foi entregue!',
-        'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
-    };
+    const statusMessages = {
+        'Processando': 'O seu pedido está em processamento e será enviado em breve.',
+        'Enviado': 'Seu pedido foi enviado para a transportadora.',
+        'Entregue': 'Seu pedido foi entregue!',
+        'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
+    };
 
-    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
-        if (!ordersListEl) return;
-        
-        if (querySnapshot.empty) {
-            ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
-            return;
-        }
+    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
+        if (!ordersListEl) return;
+        
+        if (querySnapshot.empty) {
+            ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
+            return;
+        }
 
-        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
-            const order = doc.data();
-            const orderId = doc.id;
-            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
+        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
+            const order = doc.data();
+            const orderId = doc.id;
+            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
 
-            const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
-                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
-                .join('');
+            const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
+                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+                .join('');
 
-            return `
-                <div class="bg-white p-4 rounded-lg shadow-md border order-item-card" data-order-id="${orderId}">
-                                        <div class="order-details-trigger cursor-pointer flex flex-wrap justify-between items-center border-b pb-2 mb-3">
-                        <div>
-                            <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
-                            <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
-                        </div>
-                        <p class="text-sm text-gray-500">Data: ${orderDate}</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
-                            <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
-                                ${statusOptions}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Mensagem de Status</label>
-                            <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || statusMessages[order.status] || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
-                        </div>
-                        <div class="flex items-end gap-2">
-                            <button class="update-order-btn flex-1 bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
-                                <i class="fas fa-save mr-2"></i> Salvar Alterações
-                            </button>
-                            <button class="delete-order-btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    });
+            return `
+                <div class="bg-white p-4 rounded-lg shadow-md border order-item-card" data-order-id="${orderId}">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
+                        <div class="order-details-trigger cursor-pointer flex-grow"> <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                            <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
+                        </div>
+                        <p class="text-sm text-gray-500">Data: ${orderDate}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
+                            <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
+                                ${statusOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Mensagem de Status</label>
+                            <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || statusMessages[order.status] || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button class="update-order-btn flex-1 bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
+                                <i class="fas fa-save mr-2"></i> Salvar Alterações
+                            </button>
+                            <button class="delete-order-btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    });
 
-    ordersListEl.addEventListener('click', async (e) => {
-        // ALTERAÇÃO AQUI (2/2): Lógica do 'click' foi ajustada
-        const button = e.target.closest('.update-order-btn');
-        const deleteButton = e.target.closest('.delete-order-btn');
-        const detailsTrigger = e.target.closest('.order-details-trigger');
+    ordersListEl.addEventListener('click', async (e) => {
+        const button = e.target.closest('.update-order-btn');
+        const deleteButton = e.target.closest('.delete-order-btn');
+        const detailsTrigger = e.target.closest('.order-details-trigger');
 
-        if (button) {
-            const orderId = button.dataset.orderId;
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-            
-            button.textContent = 'Salvando...';
-            button.disabled = true;
+        if (button) {
+            const orderId = button.dataset.orderId;
+            const newStatus = document.getElementById(`status-${orderId}`).value;
+            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+            
+            button.textContent = 'Salvando...';
+            button.disabled = true;
 
-            try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: newStatus,
-                    estimatedDelivery: newDeliveryEstimate
-                });
-                button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
-                button.classList.remove('bg-secondary');
-                button.classList.add('bg-green-500');
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-secondary');
-                    button.disabled = false;
-                }, 2000);
-            } catch (error) {
-                console.error("Erro ao atualizar o pedido: ", error);
-                alert('Não foi possível salvar as alterações.');
-                button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
-                button.disabled = false;
-            }
-        } else if (deleteButton) {
-            const orderId = deleteButton.dataset.orderId;
-            if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
-                try {
-                    await deleteDoc(doc(db, 'orders', orderId));
-                    // O onSnapshot irá remover o item da tela automaticamente
-                } catch (error) {
-                    console.error("Erro ao excluir o pedido: ", error);
-                    alert('Não foi possível excluir o pedido.');
-                }
-            }
-        } else if (detailsTrigger) {
-            const orderItem = detailsTrigger.closest('.order-item-card');
-            if (orderItem) {
-                const orderId = orderItem.dataset.orderId;
-                renderDetailedOrderView(orderId);
-            }
-        }
-    });
+            try {
+                await updateDoc(doc(db, 'orders', orderId), {
+                    status: newStatus,
+                    estimatedDelivery: newDeliveryEstimate
+                });
+                button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
+                button.classList.remove('bg-secondary');
+                button.classList.add('bg-green-500');
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-secondary');
+                    button.disabled = false;
+                }, 2000);
+            } catch (error) {
+                console.error("Erro ao atualizar o pedido: ", error);
+                alert('Não foi possível salvar as alterações.');
+                button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+                button.disabled = false;
+            }
+        } else if (deleteButton) {
+            const orderId = deleteButton.dataset.orderId;
+            if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
+                try {
+                    await deleteDoc(doc(db, 'orders', orderId));
+                    // O onSnapshot irá remover o item da tela automaticamente
+                } catch (error) {
+                    console.error("Erro ao excluir o pedido: ", error);
+                    alert('Não foi possível excluir o pedido.');
+                }
+            }
+        } else if (detailsTrigger) {
+            const orderItem = detailsTrigger.closest('.order-item-card');
+            if (orderItem) {
+                const orderId = orderItem.dataset.orderId;
+                renderDetailedOrderView(orderId);
+            }
+        }
+    });
 }
 
 async function renderDetailedOrderView(orderId) {
@@ -1730,6 +1728,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
