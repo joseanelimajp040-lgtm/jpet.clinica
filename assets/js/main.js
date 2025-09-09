@@ -174,11 +174,51 @@ async function renderAdminOrdersView() {
         </div>
     `;
 
-    // 💡 CORREÇÃO: Usar onSnapshot para atualizações em tempo real
-    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
-        const ordersListEl = document.getElementById('admin-orders-list');
-        if (!ordersListEl) return;
+    // 💡 CORREÇÃO: Adicionando o ouvinte de clique no elemento pai.
+    const ordersListEl = document.getElementById('admin-orders-list');
+    
+    // Certifique-se de que o ouvinte de eventos não está duplicado
+    const existingListener = ordersListEl.dataset.listenerAdded;
+    if (!existingListener) {
+        ordersListEl.addEventListener('click', async (e) => {
+            const button = e.target.closest('.update-order-btn');
+            if (button) {
+                const orderId = button.dataset.orderId;
+                const newStatus = document.getElementById(`status-${orderId}`).value;
+                const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
 
+                button.textContent = 'Salvando...';
+                button.disabled = true;
+
+                try {
+                    await updateDoc(doc(db, 'orders', orderId), {
+                        status: newStatus,
+                        estimatedDelivery: newDeliveryEstimate
+                    });
+                    button.textContent = 'Salvo!';
+                    button.classList.remove('bg-secondary');
+                    button.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        button.textContent = 'Salvar Alterações';
+                        button.classList.remove('bg-green-500');
+                        button.classList.add('bg-secondary');
+                        button.disabled = false;
+                    }, 2000);
+                } catch (error) {
+                    console.error("Erro ao atualizar o pedido: ", error);
+                    alert('Não foi possível salvar as alterações.');
+                    button.textContent = 'Salvar Alterações';
+                    button.disabled = false;
+                }
+            }
+        });
+        ordersListEl.dataset.listenerAdded = 'true';
+    }
+
+    // Usar onSnapshot para atualizações em tempo real
+    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
+        if (!ordersListEl) return;
+        
         if (querySnapshot.empty) {
             ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
             return;
@@ -220,41 +260,6 @@ async function renderAdminOrdersView() {
                 </div>
             `;
         }).join('');
-
-        // 💡 CORREÇÃO: Remover o ouvinte de clique existente e adicioná-lo ao elemento pai
-        ordersListEl.addEventListener('click', async (e) => {
-            if (e.target.closest('.update-order-btn')) {
-                const button = e.target.closest('.update-order-btn');
-                const orderId = button.dataset.orderId;
-
-                const newStatus = document.getElementById(`status-${orderId}`).value;
-                const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-
-                button.textContent = 'Salvando...';
-                button.disabled = true;
-
-                try {
-                    await updateDoc(doc(db, 'orders', orderId), {
-                        status: newStatus,
-                        estimatedDelivery: newDeliveryEstimate
-                    });
-                    button.textContent = 'Salvo!';
-                    button.classList.remove('bg-secondary');
-                    button.classList.add('bg-green-500');
-                    setTimeout(() => {
-                        button.textContent = 'Salvar Alterações';
-                        button.classList.remove('bg-green-500');
-                        button.classList.add('bg-secondary');
-                        button.disabled = false;
-                    }, 2000);
-                } catch (error) {
-                    console.error("Erro ao atualizar o pedido: ", error);
-                    alert('Não foi possível salvar as alterações.');
-                    button.textContent = 'Salvar Alterações';
-                    button.disabled = false;
-                }
-            }
-        }, { once: true });
     });
 }
 function createProductCardHTML(productData, productId) {
@@ -1633,3 +1638,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
