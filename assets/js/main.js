@@ -176,6 +176,7 @@ async function renderAdminOrdersView() {
 
     const ordersListEl = document.getElementById('admin-orders-list');
 
+    // Mapeamento de estado para a mensagem de status na interface
     const statusMessages = {
         'Processando': 'O seu pedido está em processamento e será enviado em breve.',
         'Enviado': 'Seu pedido foi enviado para a transportadora.',
@@ -183,17 +184,16 @@ async function renderAdminOrdersView() {
         'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
     };
 
+    // 💡 CORREÇÃO: Removido o filtro 'where' para buscar todos os pedidos.
     onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
         if (!ordersListEl) return;
         
-        const validOrders = querySnapshot.docs.filter(doc => doc.data().userId && doc.data().userName);
-        
-        if (validOrders.length === 0) {
+        if (querySnapshot.empty) {
             ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
             return;
         }
 
-        ordersListEl.innerHTML = validOrders.map(doc => {
+        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
             const order = doc.data();
             const orderId = doc.id;
             const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
@@ -236,6 +236,7 @@ async function renderAdminOrdersView() {
         }).join('');
     });
 
+    // Certifique-se de que o ouvinte de eventos não está duplicado
     const existingListener = ordersListEl.dataset.listenerAdded;
     if (!existingListener) {
         ordersListEl.addEventListener('click', async (e) => {
@@ -358,6 +359,71 @@ async function renderDetailedOrderView(orderId) {
     }
 }
 
+async function renderDetailedOrderView(orderId) {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    try {
+        const orderDoc = await getDoc(doc(db, 'orders', orderId));
+        if (!orderDoc.exists()) {
+            adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Pedido não encontrado.</p>';
+            return;
+        }
+
+        const order = orderDoc.data();
+        const orderDate = order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const itemsHtml = order.items.map(item => `
+            <li class="flex items-center space-x-4 py-2 border-b last:border-b-0">
+                <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-800">${item.name}</p>
+                    <p class="text-sm text-gray-500">Quantidade: ${item.quantity}</p>
+                </div>
+                <p class="font-bold text-gray-800">${formatCurrency(item.price)}</p>
+            </li>
+        `).join('');
+
+        adminContent.innerHTML = `
+            <header class="mb-8">
+                <a href="#" class="admin-nav-link text-primary hover:underline mb-4 inline-block" data-admin-page="pedidos">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista de pedidos
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800">Detalhes do Pedido #${orderId.substring(0, 6).toUpperCase()}</h1>
+                <p class="text-gray-500">Informações detalhadas sobre o pedido do cliente.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Informações do Cliente</h2>
+                    <p><strong>Nome:</strong> ${order.userName || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${order.userEmail || 'N/A'}</p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Detalhes da Entrega</h2>
+                    <p><strong>Endereço:</strong> ${order.shipping.address || 'N/A'}</p>
+                    <p><strong>Bairro:</strong> ${order.shipping.neighborhood || 'N/A'}</p>
+                    <p><strong>Telefone:</strong> ${order.shipping.phone || 'N/A'}</p>
+                    <p><strong>Taxa de Entrega:</strong> ${formatCurrency(order.shipping.fee || 0)}</p>
+                </div>
+
+                <div class="md:col-span-2">
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Itens do Pedido</h2>
+                    <ul class="space-y-2">
+                        ${itemsHtml}
+                    </ul>
+                    <div class="flex justify-end mt-4">
+                        <p class="text-lg font-bold">Total: ${formatCurrency(order.total || 0)}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Erro ao carregar detalhes do pedido:", error);
+        adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Não foi possível carregar os detalhes do pedido.</p>';
+    }
+}
 function createProductCardHTML(productData, productId) {
     if (!productData.variations || productData.variations.length === 0) {
         console.warn(`O produto "${productData.nome}" (ID: ${productId}) não possui a estrutura de 'variations' e não será exibido.`);
@@ -1097,7 +1163,7 @@ async function handleSendMessage() {
 }
 
 // --- FUNÇÕES DE PEDIDOS E RASTREIO ---
-async function renderMyOrdersPage(userId) {
+async function renderMyOrdersPage() {
     const container = document.getElementById('my-orders-container');
     const emptyState = document.getElementById('orders-empty-state');
     if (!container || !emptyState) return;
@@ -1107,8 +1173,7 @@ async function renderMyOrdersPage(userId) {
         return;
     }
 
-    // 💡 A consulta aqui DEVE ter o filtro 'where'
-    onSnapshot(query(collection(db, 'orders'), where('userId', '==', userId), orderBy('orderDate', 'desc')), (querySnapshot) => {
+    onSnapshot(query(collection(db, 'orders'), where('userId', '==', state.loggedInUser.uid), orderBy('orderDate', 'desc')), (querySnapshot) => {
         if (querySnapshot.empty) {
             container.classList.add('hidden');
             emptyState.classList.remove('hidden');
@@ -1294,19 +1359,16 @@ async function loadPage(pageName, params = {}) {
                 renderCalendar();
                 initBanhoTosaEventListeners();
                 break;
-            // 💡 CORREÇÃO AQUI
             case 'meus-pedidos':
-                // A página "Meus Pedidos" tem um filtro de usuário para mostrar apenas os pedidos da conta logada.
-                await renderMyOrdersPage(state.loggedInUser.uid);
+                await renderMyOrdersPage();
                 break;
             case 'acompanhar-entrega':
                 if (params.id) {
                     await renderTrackingPage(params.id);
                 } else {
-                    await renderMyOrdersPage(state.loggedInUser.uid);
+                    await renderMyOrdersPage();
                 }
                 break;
-            // 💡 CORREÇÃO AQUI
             case 'admin':
                 const adminUserNameEl = document.getElementById('admin-user-name');
                 if (adminUserNameEl) {
@@ -1326,7 +1388,6 @@ async function loadPage(pageName, params = {}) {
 
                         const adminPage = link.dataset.adminPage;
                         if (adminPage === 'pedidos') {
-                            // 💡 CORREÇÃO: Chamar a função de renderização correta
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
                             loadPage('admin');
@@ -1335,10 +1396,6 @@ async function loadPage(pageName, params = {}) {
                         }
                     });
                 });
-                
-                // 💡 CORREÇÃO: Carrega a visualização de pedidos por padrão
-                document.querySelector('.admin-nav-link[data-admin-page="pedidos"]')?.classList.add('active');
-                renderAdminOrdersView();
                 break;
             case 'adocao-caes':
             case 'adocao-gatos':
@@ -1367,6 +1424,7 @@ async function loadPage(pageName, params = {}) {
         }
     }
 }
+
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
     const tabContainer = document.getElementById('info-tabs');
@@ -1742,7 +1800,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
-
-
