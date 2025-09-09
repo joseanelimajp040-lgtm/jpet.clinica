@@ -174,83 +174,87 @@ async function renderAdminOrdersView() {
         </div>
     `;
 
-    const ordersSnapshot = await getDocs(query(collection(db, 'orders'), orderBy('orderDate', 'desc')));
-    const ordersListEl = document.getElementById('admin-orders-list');
+    // 💡 CORREÇÃO: Usar onSnapshot para atualizações em tempo real
+    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
+        const ordersListEl = document.getElementById('admin-orders-list');
+        if (!ordersListEl) return;
 
-    if (ordersSnapshot.empty) {
-        ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
-        return;
-    }
-
-    ordersListEl.innerHTML = ordersSnapshot.docs.map(doc => {
-        const order = doc.data();
-        const orderId = doc.id;
-        const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
-
-        const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
-            .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
-            .join('');
-
-        return `
-            <div class="bg-white p-4 rounded-lg shadow-md border">
-                <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
-                    <div>
-                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
-                        <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
-                    </div>
-                    <p class="text-sm text-gray-500">Data: ${orderDate}</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
-                        <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
-                            ${statusOptions}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Previsão de Entrega</label>
-                        <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
-                    </div>
-                    <button class="update-order-btn bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
-                        <i class="fas fa-save mr-2"></i> Salvar Alterações
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    ordersListEl.addEventListener('click', async (e) => {
-        if (e.target.closest('.update-order-btn')) {
-            const button = e.target.closest('.update-order-btn');
-            const orderId = button.dataset.orderId;
-
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-
-            button.textContent = 'Salvando...';
-            button.disabled = true;
-
-            try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: newStatus,
-                    estimatedDelivery: newDeliveryEstimate
-                });
-                button.textContent = 'Salvo!';
-                button.classList.remove('bg-secondary');
-                button.classList.add('bg-green-500');
-                setTimeout(() => {
-                    button.textContent = 'Salvar Alterações';
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-secondary');
-                    button.disabled = false;
-                }, 2000);
-            } catch (error) {
-                console.error("Erro ao atualizar o pedido: ", error);
-                alert('Não foi possível salvar as alterações.');
-                button.textContent = 'Salvar Alterações';
-                button.disabled = false;
-            }
+        if (querySnapshot.empty) {
+            ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
+            return;
         }
+
+        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
+            const order = doc.data();
+            const orderId = doc.id;
+            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
+
+            const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
+                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+                .join('');
+
+            return `
+                <div class="bg-white p-4 rounded-lg shadow-md border" data-order-id="${orderId}">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
+                        <div>
+                            <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                            <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
+                        </div>
+                        <p class="text-sm text-gray-500">Data: ${orderDate}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
+                            <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
+                                ${statusOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Previsão de Entrega</label>
+                            <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
+                        </div>
+                        <button class="update-order-btn bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
+                            <i class="fas fa-save mr-2"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // 💡 CORREÇÃO: Remover o ouvinte de clique existente e adicioná-lo ao elemento pai
+        ordersListEl.addEventListener('click', async (e) => {
+            if (e.target.closest('.update-order-btn')) {
+                const button = e.target.closest('.update-order-btn');
+                const orderId = button.dataset.orderId;
+
+                const newStatus = document.getElementById(`status-${orderId}`).value;
+                const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+
+                button.textContent = 'Salvando...';
+                button.disabled = true;
+
+                try {
+                    await updateDoc(doc(db, 'orders', orderId), {
+                        status: newStatus,
+                        estimatedDelivery: newDeliveryEstimate
+                    });
+                    button.textContent = 'Salvo!';
+                    button.classList.remove('bg-secondary');
+                    button.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        button.textContent = 'Salvar Alterações';
+                        button.classList.remove('bg-green-500');
+                        button.classList.add('bg-secondary');
+                        button.disabled = false;
+                    }, 2000);
+                } catch (error) {
+                    console.error("Erro ao atualizar o pedido: ", error);
+                    alert('Não foi possível salvar as alterações.');
+                    button.textContent = 'Salvar Alterações';
+                    button.disabled = false;
+                }
+            }
+        }, { once: true });
     });
 }
 function createProductCardHTML(productData, productId) {
@@ -1045,53 +1049,58 @@ async function renderMyOrdersPage() {
 }
 
 async function renderTrackingPage(orderId) {
-    const order = state.orders.find(o => o.id === orderId);
+    const orderDocRef = doc(db, 'orders', orderId);
 
-    if (!order) {
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Pedido não encontrado.</p>`;
-        return;
-    }
-
-    const mainProduct = order.items[0];
-    document.getElementById('tracking-product-image').src = mainProduct.image;
-    document.getElementById('tracking-product-name').textContent = mainProduct.name + (order.items.length > 1 ? ` e mais ${order.items.length - 1} item(ns)` : '');
-
-    const statuses = ['Pedido Realizado', 'Pagamento Confirmado', 'Em Separação', 'Saiu para Entrega', 'Entregue'];
-    const timeSinceOrder = Date.now() - order.orderDate;
-    let currentStatusIndex = 0;
-    if (timeSinceOrder > 3 * 60 * 1000) currentStatusIndex = 4;
-    else if (timeSinceOrder > 2 * 60 * 1000) currentStatusIndex = 3;
-    else if (timeSinceOrder > 1 * 60 * 1000) currentStatusIndex = 2;
-    else if (timeSinceOrder > 30 * 1000) currentStatusIndex = 1;
-
-    const deliveryDate = new Date(order.orderDate);
-    deliveryDate.setDate(deliveryDate.getDate() + 5);
-    document.getElementById('tracking-delivery-estimate').textContent = `Chega ${deliveryDate.toLocaleDateString('pt-BR', { weekday: 'long' })}, ${deliveryDate.toLocaleDateString('pt-BR')}`;
-
-    const timelineContainer = document.getElementById('tracking-timeline-container');
-    let timelineHTML = '';
-
-    statuses.forEach((status, index) => {
-        let statusClass = 'pending';
-        if (index < currentStatusIndex) {
-            statusClass = 'completed';
-        } else if (index === currentStatusIndex) {
-            statusClass = 'current';
+    // 💡 CORREÇÃO: Usar onSnapshot para obter o status em tempo real do Firestore
+    onSnapshot(orderDocRef, (docSnap) => {
+        if (!docSnap.exists()) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Pedido não encontrado.</p>`;
+            return;
         }
 
-        timelineHTML += `<div class="timeline-step ${statusClass}"><span>${status}</span></div>`;
+        const order = docSnap.data();
+        const mainProduct = order.items[0];
+
+        const trackingProductImageEl = document.getElementById('tracking-product-image');
+        const trackingProductNameEl = document.getElementById('tracking-product-name');
+        const trackingDeliveryEstimateEl = document.getElementById('tracking-delivery-estimate');
+        const timelineContainer = document.getElementById('tracking-timeline-container');
+
+        if (!trackingProductImageEl || !trackingProductNameEl || !trackingDeliveryEstimateEl || !timelineContainer) {
+            console.error("Erro: Elementos da página de rastreamento não encontrados.");
+            return;
+        }
+
+        trackingProductImageEl.src = mainProduct.image;
+        trackingProductNameEl.textContent = mainProduct.name + (order.items.length > 1 ? ` e mais ${order.items.length - 1} item(ns)` : '');
+        trackingDeliveryEstimateEl.textContent = order.estimatedDelivery || 'Previsão de entrega não disponível.';
+
+        const statuses = ['Processando', 'Enviado', 'Entregue']; // Use os mesmos status do painel admin
+        let currentStatusIndex = statuses.indexOf(order.status);
+        if (currentStatusIndex === -1) currentStatusIndex = 0; // Se o status for 'Cancelado', mostramos 'Processando' para evitar erros visuais.
+
+        let timelineHTML = '';
+        statuses.forEach((status, index) => {
+            let statusClass = 'pending';
+            if (index < currentStatusIndex) {
+                statusClass = 'completed';
+            } else if (index === currentStatusIndex) {
+                statusClass = 'current';
+            }
+            timelineHTML += `<div class="timeline-step ${statusClass}"><span>${status}</span></div>`;
+        });
+
+        const progressPercentage = (currentStatusIndex / (statuses.length - 1)) * 100;
+
+        timelineContainer.innerHTML = `
+            <div class="progress-bar-background">
+                <div class="progress-bar-foreground" style="width: ${progressPercentage}%;"></div>
+            </div>
+            <div class="timeline-steps">
+                ${timelineHTML}
+            </div>
+        `;
     });
-
-    const progressPercentage = (currentStatusIndex / (statuses.length - 1)) * 100;
-
-    timelineContainer.innerHTML = `
-        <div class="progress-bar-background">
-            <div class="progress-bar-foreground" style="width: ${progressPercentage}%;"></div>
-        </div>
-        <div class="timeline-steps">
-            ${timelineHTML}
-        </div>
-    `;
 }
 
 // --- ROTEDOR E CARREGADOR DE PÁGINAS ---
@@ -1624,5 +1633,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
