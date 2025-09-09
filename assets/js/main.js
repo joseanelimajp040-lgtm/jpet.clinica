@@ -176,7 +176,6 @@ async function renderAdminOrdersView() {
 
     const ordersListEl = document.getElementById('admin-orders-list');
 
-    // Mapeamento de estado para a mensagem de status na interface
     const statusMessages = {
         'Processando': 'O seu pedido está em processamento e será enviado em breve.',
         'Enviado': 'Seu pedido foi enviado para a transportadora.',
@@ -184,16 +183,17 @@ async function renderAdminOrdersView() {
         'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
     };
 
-    // 💡 CORREÇÃO: Removido o filtro 'where' para buscar todos os pedidos.
     onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
         if (!ordersListEl) return;
         
-        if (querySnapshot.empty) {
+        const validOrders = querySnapshot.docs.filter(doc => doc.data().userId && doc.data().userName);
+        
+        if (validOrders.length === 0) {
             ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
             return;
         }
 
-        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
+        ordersListEl.innerHTML = validOrders.map(doc => {
             const order = doc.data();
             const orderId = doc.id;
             const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
@@ -236,7 +236,6 @@ async function renderAdminOrdersView() {
         }).join('');
     });
 
-    // Certifique-se de que o ouvinte de eventos não está duplicado
     const existingListener = ordersListEl.dataset.listenerAdded;
     if (!existingListener) {
         ordersListEl.addEventListener('click', async (e) => {
@@ -1735,5 +1734,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
