@@ -2844,3 +2844,19 @@ input[type='number'] {
         grid-column: 1 / -1;
     }
 }
+
+/* ========== ESTILOS PARA A PÁGINA DE PRODUTOS POR CATEGORIA ========== */
+
+.category-section {
+    margin-bottom: 4rem; /* 64px, bom espaço entre as categorias */
+}
+
+.category-title {
+    font-size: 2.25rem; /* 36px, título de destaque */
+    font-weight: 700;
+    color: #1f2937; /* Cinza escuro, consistente com seu tema */
+    margin-bottom: 1.5rem; /* 24px */
+    padding-bottom: 0.75rem; /* 12px */
+    border-bottom: 3px solid #FF6B00; /* Borda de destaque com sua cor primária */
+    display: inline-block; /* Faz a borda ter a largura apenas do texto */
+}
