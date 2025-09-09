@@ -176,6 +176,7 @@ async function renderAdminOrdersView() {
 
     const ordersListEl = document.getElementById('admin-orders-list');
 
+    // Mapeamento de estado para a mensagem de status na interface
     const statusMessages = {
         'Processando': 'O seu pedido está em processamento e será enviado em breve.',
         'Enviado': 'Seu pedido foi enviado para a transportadora.',
@@ -183,6 +184,7 @@ async function renderAdminOrdersView() {
         'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
     };
 
+    // 💡 CORREÇÃO: Removido o filtro 'where' para buscar todos os pedidos.
     onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
         if (!ordersListEl) return;
         
@@ -203,7 +205,8 @@ async function renderAdminOrdersView() {
             return `
                 <div class="bg-white p-4 rounded-lg shadow-md border order-item-card" data-order-id="${orderId}">
                     <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
-                        <div class="order-details-trigger cursor-pointer flex-grow"> <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <div>
+                            <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
                             <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
                         </div>
                         <p class="text-sm text-gray-500">Data: ${orderDate}</p>
@@ -233,58 +236,127 @@ async function renderAdminOrdersView() {
         }).join('');
     });
 
-    ordersListEl.addEventListener('click', async (e) => {
-        const button = e.target.closest('.update-order-btn');
-        const deleteButton = e.target.closest('.delete-order-btn');
-        const detailsTrigger = e.target.closest('.order-details-trigger');
-
-        if (button) {
-            const orderId = button.dataset.orderId;
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+    // Certifique-se de que o ouvinte de eventos não está duplicado
+    const existingListener = ordersListEl.dataset.listenerAdded;
+    if (!existingListener) {
+        ordersListEl.addEventListener('click', async (e) => {
+            const button = e.target.closest('.update-order-btn');
+            const deleteButton = e.target.closest('.delete-order-btn');
+            const orderItem = e.target.closest('.order-item-card');
             
-            button.textContent = 'Salvando...';
-            button.disabled = true;
+            if (button) {
+                const orderId = button.dataset.orderId;
+                const newStatus = document.getElementById(`status-${orderId}`).value;
+                const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+                
+                button.textContent = 'Salvando...';
+                button.disabled = true;
 
-            try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: newStatus,
-                    estimatedDelivery: newDeliveryEstimate
-                });
-                button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
-                button.classList.remove('bg-secondary');
-                button.classList.add('bg-green-500');
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-secondary');
-                    button.disabled = false;
-                }, 2000);
-            } catch (error) {
-                console.error("Erro ao atualizar o pedido: ", error);
-                alert('Não foi possível salvar as alterações.');
-                button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
-                button.disabled = false;
-            }
-        } else if (deleteButton) {
-            const orderId = deleteButton.dataset.orderId;
-            if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
                 try {
-                    await deleteDoc(doc(db, 'orders', orderId));
-                    // O onSnapshot irá remover o item da tela automaticamente
+                    await updateDoc(doc(db, 'orders', orderId), {
+                        status: newStatus,
+                        estimatedDelivery: newDeliveryEstimate
+                    });
+                    button.textContent = 'Salvo!';
+                    button.classList.remove('bg-secondary');
+                    button.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        button.textContent = 'Salvar Alterações';
+                        button.classList.remove('bg-green-500');
+                        button.classList.add('bg-secondary');
+                        button.disabled = false;
+                    }, 2000);
                 } catch (error) {
-                    console.error("Erro ao excluir o pedido: ", error);
-                    alert('Não foi possível excluir o pedido.');
+                    console.error("Erro ao atualizar o pedido: ", error);
+                    alert('Não foi possível salvar as alterações.');
+                    button.textContent = 'Salvar Alterações';
+                    button.disabled = false;
                 }
-            }
-        } else if (detailsTrigger) {
-            const orderItem = detailsTrigger.closest('.order-item-card');
-            if (orderItem) {
+            } else if (deleteButton) {
+                const orderId = deleteButton.dataset.orderId;
+                if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
+                    try {
+                        await deleteDoc(doc(db, 'orders', orderId));
+                        alert('Pedido excluído com sucesso.');
+                    } catch (error) {
+                        console.error("Erro ao excluir o pedido: ", error);
+                        alert('Não foi possível excluir o pedido.');
+                    }
+                }
+            } else if (orderItem) {
                 const orderId = orderItem.dataset.orderId;
                 renderDetailedOrderView(orderId);
             }
+        });
+        ordersListEl.dataset.listenerAdded = 'true';
+    }
+}
+
+
+async function renderDetailedOrderView(orderId) {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    try {
+        const orderDoc = await getDoc(doc(db, 'orders', orderId));
+        if (!orderDoc.exists()) {
+            adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Pedido não encontrado.</p>';
+            return;
         }
-    });
+
+        const order = orderDoc.data();
+        const orderDate = order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const itemsHtml = order.items.map(item => `
+            <li class="flex items-center space-x-4 py-2 border-b last:border-b-0">
+                <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-800">${item.name}</p>
+                    <p class="text-sm text-gray-500">Quantidade: ${item.quantity}</p>
+                </div>
+                <p class="font-bold text-gray-800">${formatCurrency(item.price)}</p>
+            </li>
+        `).join('');
+
+        adminContent.innerHTML = `
+            <header class="mb-8">
+                <a href="#" class="admin-nav-link text-primary hover:underline mb-4 inline-block" data-admin-page="pedidos">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista de pedidos
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800">Detalhes do Pedido #${orderId.substring(0, 6).toUpperCase()}</h1>
+                <p class="text-gray-500">Informações detalhadas sobre o pedido do cliente.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Informações do Cliente</h2>
+                    <p><strong>Nome:</strong> ${order.userName || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${order.userEmail || 'N/A'}</p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Detalhes da Entrega</h2>
+                    <p><strong>Endereço:</strong> ${order.shipping.address || 'N/A'}</p>
+                    <p><strong>Bairro:</strong> ${order.shipping.neighborhood || 'N/A'}</p>
+                    <p><strong>Telefone:</strong> ${order.shipping.phone || 'N/A'}</p>
+                    <p><strong>Taxa de Entrega:</strong> ${formatCurrency(order.shipping.fee || 0)}</p>
+                </div>
+
+                <div class="md:col-span-2">
+                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Itens do Pedido</h2>
+                    <ul class="space-y-2">
+                        ${itemsHtml}
+                    </ul>
+                    <div class="flex justify-end mt-4">
+                        <p class="text-lg font-bold">Total: ${formatCurrency(order.total || 0)}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Erro ao carregar detalhes do pedido:", error);
+        adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Não foi possível carregar os detalhes do pedido.</p>';
+    }
 }
 
 async function renderDetailedOrderView(orderId) {
@@ -1728,3 +1800,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
