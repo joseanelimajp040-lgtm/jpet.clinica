@@ -102,8 +102,8 @@ function updateLoginStatus() {
                 ? `<a href="#" class="user-menu-item nav-link" data-page="admin"><i class="fas fa-user-shield"></i><span>Painel Admin</span></a>`
                 : '';
 
-            placeholder.innerHTML = `
-                <div class="relative user-menu-container">
+             placeholder.innerHTML = `
+                <div class="relative user-menu-container group">
                     <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-user-check"></i>
@@ -111,7 +111,7 @@ function updateLoginStatus() {
                             <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
                         </div>
                     </div>
-                    <div class="user-menu-dropdown absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                    <div class="user-menu-dropdown hidden group-hover:block absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
                         ${adminLinkHTML}
                         <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
                         <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
@@ -1800,4 +1800,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
