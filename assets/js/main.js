@@ -2,7 +2,7 @@
 // Importações do Firebase SDK v9 (modular)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
 import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
@@ -1373,12 +1373,19 @@ async function loadPage(pageName, params = {}) {
                         if (adminPage === 'pedidos') {
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
-                            loadPage('admin');
+                            document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Dashboard em construção...</h1>`;
                         } else {
                             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
                         }
                     });
                 });
+
+                // Define "Pedidos e Entregas" como a aba ativa por padrão
+                document.querySelector('.admin-nav-link[data-admin-page="pedidos"]')?.classList.add('active');
+                
+                // Carrega a visualização de pedidos assim que a página admin é aberta
+                renderAdminOrdersView();
+                
                 break;
             case 'adocao-caes':
             case 'adocao-gatos':
@@ -1783,4 +1790,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
