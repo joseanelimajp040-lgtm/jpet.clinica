@@ -1364,7 +1364,7 @@ async function loadPage(pageName, params = {}) {
                     await renderMyOrdersPage();
                 }
                 break;
-            case 'admin':
+             case 'admin':
                 const adminUserNameEl = document.getElementById('admin-user-name');
                 if (adminUserNameEl) {
                     adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
@@ -1376,10 +1376,8 @@ async function loadPage(pageName, params = {}) {
                 }
                 
                 // Define o Dashboard como a aba ativa por padrão ao carregar
+                // O conteúdo do Dashboard já estará no HTML carregado, então não mexemos nele.
                 document.querySelector('.admin-nav-link[data-admin-page="dashboard"]')?.classList.add('active');
-                // Exibe a mensagem do Dashboard como conteúdo inicial
-                document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Dashboard em construção...</h1>`;
-
 
                 document.querySelectorAll('.admin-nav-link').forEach(link => {
                     link.addEventListener('click', (e) => {
@@ -1391,8 +1389,8 @@ async function loadPage(pageName, params = {}) {
                         if (adminPage === 'pedidos') {
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
-                            // Ao clicar no dashboard, mostramos a mensagem novamente
-                            document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Dashboard em construção...</h1>`;
+                            // Ao clicar no dashboard, recarregamos a página de admin para restaurar o estado inicial
+                            loadPage('admin'); 
                         } else {
                             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
                         }
@@ -1802,3 +1800,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
