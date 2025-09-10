@@ -1,4 +1,4 @@
-// --- IMPORTAÇÕES DE MÓDULOS ---
+// --- IMPORTAÇÕES DE MÓDulos ---
 // Importações do Firebase SDK v9 (modular)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
@@ -175,6 +175,7 @@ async function renderAdminOrdersView() {
     `;
 
     const ordersListEl = document.getElementById('admin-orders-list');
+    if (!ordersListEl) return;
 
     const statusMessages = {
         'Processando': 'O seu pedido está em processamento e será enviado em breve.',
@@ -183,15 +184,13 @@ async function renderAdminOrdersView() {
         'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
     };
 
-    onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (querySnapshot) => {
-        if (!ordersListEl) return;
-        
-        if (querySnapshot.empty) {
+    // Função auxiliar para renderizar a lista, evitando duplicação de código
+    const renderList = (docs) => {
+        if (docs.length === 0) {
             ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
             return;
         }
-
-        ordersListEl.innerHTML = querySnapshot.docs.map(doc => {
+        ordersListEl.innerHTML = docs.map(doc => {
             const order = doc.data();
             const orderId = doc.id;
             const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
@@ -203,7 +202,8 @@ async function renderAdminOrdersView() {
             return `
                 <div class="bg-white p-4 rounded-lg shadow-md border order-item-card" data-order-id="${orderId}">
                     <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
-                        <div class="order-details-trigger cursor-pointer flex-grow"> <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <div class="order-details-trigger cursor-pointer flex-grow">
+                            <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
                             <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
                         </div>
                         <p class="text-sm text-gray-500">Data: ${orderDate}</p>
@@ -231,8 +231,25 @@ async function renderAdminOrdersView() {
                 </div>
             `;
         }).join('');
-    });
+    };
 
+    try {
+        // 1. Busca os dados uma vez para garantir o carregamento inicial
+        const initialSnapshot = await getDocs(query(collection(db, 'orders'), orderBy('orderDate', 'desc')));
+        renderList(initialSnapshot.docs);
+
+        // 2. Depois, anexa o listener para atualizações em tempo real
+        onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (snapshot) => {
+            console.log("Recebida atualização em tempo real dos pedidos.");
+            renderList(snapshot.docs);
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar pedidos:", error);
+        ordersListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os pedidos.</p>';
+    }
+
+    // O listener de eventos de clique permanece o mesmo
     ordersListEl.addEventListener('click', async (e) => {
         const button = e.target.closest('.update-order-btn');
         const deleteButton = e.target.closest('.delete-order-btn');
@@ -242,7 +259,7 @@ async function renderAdminOrdersView() {
             const orderId = button.dataset.orderId;
             const newStatus = document.getElementById(`status-${orderId}`).value;
             const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-            
+
             button.textContent = 'Salvando...';
             button.disabled = true;
 
@@ -271,7 +288,6 @@ async function renderAdminOrdersView() {
             if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
                 try {
                     await deleteDoc(doc(db, 'orders', orderId));
-                    // O onSnapshot irá remover o item da tela automaticamente
                 } catch (error) {
                     console.error("Erro ao excluir o pedido: ", error);
                     alert('Não foi possível excluir o pedido.');
@@ -286,6 +302,7 @@ async function renderAdminOrdersView() {
         }
     });
 }
+
 
 async function renderDetailedOrderView(orderId) {
     const adminContent = document.getElementById('admin-content');
@@ -720,21 +737,18 @@ async function renderRelatedProducts(category, currentProductId) {
     const container = document.getElementById('related-products-container');
     if (!container) return;
     
-    // Se a categoria não existir, não faz a busca
     if (!category) {
         container.innerHTML = '<p class="col-span-full">Categoria não definida para este produto.</p>';
         return;
     }
 
     try {
-        // Passo 1: Busca TODOS os produtos da mesma categoria
         const snapshot = await getDocs(query(collection(db, 'produtos'), where('category', '==', category)));
 
-        // Passo 2: Filtra no JavaScript para remover o produto atual
         const relatedProducts = snapshot.docs
-            .filter(doc => doc.id !== currentProductId) // Filtra o produto atual
+            .filter(doc => doc.id !== currentProductId)
             .map(doc => ({ id: doc.id, ...doc.data() }))
-            .slice(0, 4); // Limita para exibir apenas 4 produtos
+            .slice(0, 4);
 
         if (relatedProducts.length === 0) {
             container.innerHTML = '<p class="col-span-full">Nenhum outro produto encontrado nesta categoria.</p>';
@@ -862,7 +876,6 @@ async function renderBuscaPage(params) {
     if (countEl) countEl.textContent = '...';
 
     try {
-        // CORREÇÃO: Remova a cláusula 'where' para buscar todos os produtos
         const snapshot = await getDocs(collection(db, 'produtos'));
         currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -1198,7 +1211,6 @@ async function renderMyOrdersPage() {
 async function renderTrackingPage(orderId) {
     const orderDocRef = doc(db, 'orders', orderId);
 
-    // 💡 CORREÇÃO: Usar onSnapshot para obter o status em tempo real do Firestore
     onSnapshot(orderDocRef, (docSnap) => {
         if (!docSnap.exists()) {
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Pedido não encontrado.</p>`;
@@ -1222,9 +1234,9 @@ async function renderTrackingPage(orderId) {
         trackingProductNameEl.textContent = mainProduct.name + (order.items.length > 1 ? ` e mais ${order.items.length - 1} item(ns)` : '');
         trackingDeliveryEstimateEl.textContent = order.estimatedDelivery || 'Previsão de entrega não disponível.';
 
-        const statuses = ['Processando', 'Enviado', 'Entregue']; // Use os mesmos status do painel admin
+        const statuses = ['Processando', 'Enviado', 'Entregue'];
         let currentStatusIndex = statuses.indexOf(order.status);
-        if (currentStatusIndex === -1) currentStatusIndex = 0; // Se o status for 'Cancelado', mostramos 'Processando' para evitar erros visuais.
+        if (currentStatusIndex === -1) currentStatusIndex = 0;
 
         let timelineHTML = '';
         statuses.forEach((status, index) => {
@@ -1362,6 +1374,12 @@ async function loadPage(pageName, params = {}) {
                 if (adminLogoutBtn) {
                     adminLogoutBtn.addEventListener('click', handleLogout);
                 }
+                
+                // Define o Dashboard como a aba ativa por padrão ao carregar
+                document.querySelector('.admin-nav-link[data-admin-page="dashboard"]')?.classList.add('active');
+                // Exibe a mensagem do Dashboard como conteúdo inicial
+                document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Dashboard em construção...</h1>`;
+
 
                 document.querySelectorAll('.admin-nav-link').forEach(link => {
                     link.addEventListener('click', (e) => {
@@ -1373,19 +1391,13 @@ async function loadPage(pageName, params = {}) {
                         if (adminPage === 'pedidos') {
                             renderAdminOrdersView();
                         } else if (adminPage === 'dashboard') {
+                            // Ao clicar no dashboard, mostramos a mensagem novamente
                             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Dashboard em construção...</h1>`;
                         } else {
                             document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
                         }
                     });
                 });
-
-                // Define "Pedidos e Entregas" como a aba ativa por padrão
-                document.querySelector('.admin-nav-link[data-admin-page="pedidos"]')?.classList.add('active');
-                
-                // Carrega a visualização de pedidos assim que a página admin é aberta
-                renderAdminOrdersView();
-                
                 break;
             case 'adocao-caes':
             case 'adocao-gatos':
