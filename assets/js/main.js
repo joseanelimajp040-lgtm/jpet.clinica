@@ -165,23 +165,26 @@ async function renderAdminOrdersView() {
     if (!adminContent) return;
 
     adminContent.innerHTML = `
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Pedidos e Entregas</h1>
-            <p class="text-gray-500">Visualize e atualize o status de todos os pedidos do site.</p>
+        <header class="admin-header">
+            <h1>Gerenciamento de Pedidos e Entregas</h1>
+            <p>Visualize e atualize o status de todos os pedidos do site.</p>
         </header>
         <div id="admin-orders-list" class="space-y-4">
-            <p>Carregando pedidos...</p>
+             <p>Carregando pedidos...</p>
         </div>
     `;
 
     const ordersListEl = document.getElementById('admin-orders-list');
     if (!ordersListEl) return;
-
-    const statusMessages = {
-        'Processando': 'O seu pedido está em processamento e será enviado em breve.',
-        'Enviado': 'Seu pedido foi enviado para a transportadora.',
-        'Entregue': 'Seu pedido foi entregue!',
-        'Cancelado': 'Seu pedido foi cancelado, e será excluído em breve.'
+    
+    const getStatusClass = (status) => {
+        switch (status.toLowerCase()) {
+            case 'processando': return 'status-processando';
+            case 'enviado': return 'status-enviado';
+            case 'entregue': return 'status-entregue';
+            case 'cancelado': return 'status-cancelado';
+            default: return 'status-cancelado';
+        }
     };
 
     const renderList = (docs) => {
@@ -193,54 +196,48 @@ async function renderAdminOrdersView() {
             const order = doc.data();
             const orderId = doc.id;
             const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
-
             const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
                 .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
                 .join('');
 
             return `
-                <div class="bg-white p-4 rounded-lg shadow-md border order-item-card" data-order-id="${orderId}">
-                    <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3">
-                        <div class="order-details-trigger cursor-pointer flex-grow">
-                            <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
-                            <p class="text-sm text-gray-600">Cliente: ${order.userName} (${order.userEmail})</p>
-                        </div>
-                        <p class="text-sm text-gray-500">Data: ${orderDate}</p>
+            <div class="admin-card order-card" data-order-id="${orderId}">
+                <div class="card-header">
+                    <div>
+                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Status do Pedido</label>
-                            <select id="status-${orderId}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
-                                ${statusOptions}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Mensagem de Status</label>
-                            <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || statusMessages[order.status] || ''}" placeholder="Ex: Chega amanhã" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary">
-                        </div>
-                        <div class="flex items-end gap-2">
-                            <button class="update-order-btn flex-1 bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
-                                <i class="fas fa-save mr-2"></i> Salvar Alterações
-                            </button>
-                            <button class="delete-order-btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition" data-order-id="${orderId}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
+                    <div class="text-right">
+                        <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
+                        <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
                     </div>
                 </div>
+                <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
+                        <select id="status-${orderId}" class="admin-form-select">
+                            ${statusOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status</label>
+                        <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
+                    </div>
+                </div>
+                <div class="card-footer">
+                     <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
+                    <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
+                </div>
+            </div>
             `;
         }).join('');
     };
 
     try {
-        const initialSnapshot = await getDocs(query(collection(db, 'orders'), orderBy('orderDate', 'desc')));
-        renderList(initialSnapshot.docs);
-
         onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (snapshot) => {
             console.log("Recebida atualização em tempo real dos pedidos.");
             renderList(snapshot.docs);
         });
-
     } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
         ordersListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os pedidos.</p>';
@@ -249,120 +246,36 @@ async function renderAdminOrdersView() {
     ordersListEl.addEventListener('click', async (e) => {
         const button = e.target.closest('.update-order-btn');
         const deleteButton = e.target.closest('.delete-order-btn');
-        const detailsTrigger = e.target.closest('.order-details-trigger');
 
         if (button) {
             const orderId = button.dataset.orderId;
             const newStatus = document.getElementById(`status-${orderId}`).value;
             const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-
-            button.textContent = 'Salvando...';
+            button.innerHTML = 'Salvando...';
             button.disabled = true;
-
             try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: newStatus,
-                    estimatedDelivery: newDeliveryEstimate
-                });
-                button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo!';
-                button.classList.remove('bg-secondary');
-                button.classList.add('bg-green-500');
+                await updateDoc(doc(db, 'orders', orderId), { status: newStatus, estimatedDelivery: newDeliveryEstimate });
+                button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
                 setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-secondary');
+                    button.innerHTML = '<i class="fas fa-save"></i> Salvar';
                     button.disabled = false;
                 }, 2000);
             } catch (error) {
-                console.error("Erro ao atualizar o pedido: ", error);
-                alert('Não foi possível salvar as alterações.');
-                button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+                alert('Erro ao salvar.');
+                button.innerHTML = '<i class="fas fa-save"></i> Salvar';
                 button.disabled = false;
             }
         } else if (deleteButton) {
             const orderId = deleteButton.dataset.orderId;
-            if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
+            if (confirm('Tem certeza que deseja excluir este pedido?')) {
                 try {
                     await deleteDoc(doc(db, 'orders', orderId));
                 } catch (error) {
-                    console.error("Erro ao excluir o pedido: ", error);
-                    alert('Não foi possível excluir o pedido.');
+                    alert('Erro ao excluir o pedido.');
                 }
-            }
-        } else if (detailsTrigger) {
-            const orderItem = detailsTrigger.closest('.order-item-card');
-            if (orderItem) {
-                const orderId = orderItem.dataset.orderId;
-                renderDetailedOrderView(orderId);
             }
         }
     });
-}
-
-async function renderDetailedOrderView(orderId) {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
-
-    try {
-        const orderDoc = await getDoc(doc(db, 'orders', orderId));
-        if (!orderDoc.exists()) {
-            adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Pedido não encontrado.</p>';
-            return;
-        }
-
-        const order = orderDoc.data();
-        const orderDate = order.orderDate.toDate().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        const itemsHtml = order.items.map(item => `
-            <li class="flex items-center space-x-4 py-2 border-b last:border-b-0">
-                <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800">${item.name}</p>
-                    <p class="text-sm text-gray-500">Quantidade: ${item.quantity}</p>
-                </div>
-                <p class="font-bold text-gray-800">${formatCurrency(item.price)}</p>
-            </li>
-        `).join('');
-
-        adminContent.innerHTML = `
-            <header class="mb-8">
-                <a href="#" class="admin-nav-link text-primary hover:underline mb-4 inline-block" data-admin-page="pedidos">
-                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista de pedidos
-                </a>
-                <h1 class="text-3xl font-bold text-gray-800">Detalhes do Pedido #${orderId.substring(0, 6).toUpperCase()}</h1>
-                <p class="text-gray-500">Informações detalhadas sobre o pedido do cliente.</p>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Informações do Cliente</h2>
-                    <p><strong>Nome:</strong> ${order.userName || 'N/A'}</p>
-                    <p><strong>Email:</strong> ${order.userEmail || 'N/A'}</p>
-                </div>
-
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Detalhes da Entrega</h2>
-                    <p><strong>Endereço:</strong> ${order.shipping.address || 'N/A'}</p>
-                    <p><strong>Bairro:</strong> ${order.shipping.neighborhood || 'N/A'}</p>
-                    <p><strong>Telefone:</strong> ${order.shipping.phone || 'N/A'}</p>
-                    <p><strong>Taxa de Entrega:</strong> ${formatCurrency(order.shipping.fee || 0)}</p>
-                </div>
-
-                <div class="md:col-span-2">
-                    <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Itens do Pedido</h2>
-                    <ul class="space-y-2">
-                        ${itemsHtml}
-                    </ul>
-                    <div class="flex justify-end mt-4">
-                        <p class="text-lg font-bold">Total: ${formatCurrency(order.total || 0)}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    } catch (error) {
-        console.error("Erro ao carregar detalhes do pedido:", error);
-        adminContent.innerHTML = '<p class="text-center text-red-500 py-8">Não foi possível carregar os detalhes do pedido.</p>';
-    }
 }
 
 async function renderAdminClientsView() {
@@ -370,19 +283,15 @@ async function renderAdminClientsView() {
     if (!adminContent) return;
 
     adminContent.innerHTML = `
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Clientes</h1>
-            <p class="text-gray-500">Visualize e pesquise todos os clientes cadastrados na plataforma.</p>
+        <header class="admin-header">
+            <h1>Gerenciamento de Clientes</h1>
+            <p>Visualize e pesquise todos os clientes cadastrados na plataforma.</p>
         </header>
-        <div class="mb-6">
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="fas fa-search text-gray-400"></i>
-                </span>
-                <input type="search" id="client-search-input" placeholder="Pesquisar por nome ou e-mail..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary">
-            </div>
+        <div class="mb-6 relative">
+             <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="search" id="client-search-input" placeholder="Pesquisar por nome ou e-mail..." class="admin-form-input pl-10">
         </div>
-        <div id="admin-clients-list" class="space-y-4">
+        <div id="admin-clients-list" class="space-y-3">
             <p>Carregando clientes...</p>
         </div>
     `;
@@ -400,13 +309,15 @@ async function renderAdminClientsView() {
         }
         clientsListEl.innerHTML = clients.map(client => {
             const joinDate = client.createdAt ? client.createdAt.toDate().toLocaleDateString('pt-BR') : 'Data Indisponível';
+            const clientInitial = client.name ? client.name[0].toUpperCase() : '?';
             return `
-                <div class="bg-white p-4 rounded-lg shadow-md border flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                    <div>
-                        <p class="font-bold text-primary">${client.name || 'Nome não cadastrado'}</p>
-                        <p class="text-sm text-gray-600">${client.email || 'E-mail não cadastrado'}</p>
+                <div class="admin-card client-card">
+                    <div class="client-avatar">${clientInitial}</div>
+                    <div class="client-info">
+                        <div class="name">${client.name || 'Nome não cadastrado'}</div>
+                        <div class="email">${client.email || 'E-mail não cadastrado'}</div>
                     </div>
-                    <p class="text-sm text-gray-500 text-left sm:text-right">Membro desde: ${joinDate}</p>
+                    <div class="join-date">Membro desde: ${joinDate}</div>
                 </div>
             `;
         }).join('');
@@ -415,59 +326,37 @@ async function renderAdminClientsView() {
     try {
         const querySnapshot = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
         allClients = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         displayClients(allClients);
 
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim().toLowerCase();
-            
-            if (!searchTerm) {
-                displayClients(allClients);
-                return;
-            }
-
             const filteredClients = allClients.filter(client =>
                 (client.name && client.name.toLowerCase().includes(searchTerm)) ||
                 (client.email && client.email.toLowerCase().includes(searchTerm))
             );
-
             displayClients(filteredClients);
         });
-
     } catch (error) {
         console.error("Erro ao buscar clientes:", error);
         clientsListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os clientes.</p>';
     }
 }
 
-// --- INÍCIO: NOVAS FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
-/**
- * Renderiza a lista de todos os produtos com uma barra de pesquisa.
- */
 async function renderAdminProductsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
 
     adminContent.innerHTML = `
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Produtos e Custos</h1>
-            <p class="text-gray-500">Pesquise por um produto ou clique nele para editar suas informações.</p>
+        <header class="admin-header">
+            <h1>Gerenciamento de Produtos e Custos</h1>
+            <p>Pesquise por um produto ou clique nele para editar suas informações.</p>
         </header>
-
         <div class="mb-6 relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <i class="fas fa-search text-gray-400"></i>
-            </span>
-            <input 
-                type="search" 
-                id="admin-product-search-input" 
-                placeholder="Pesquisar por nome ou categoria..." 
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
-            >
+            <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="search" id="admin-product-search-input" placeholder="Pesquisar por nome ou categoria..." class="admin-form-input pl-10">
         </div>
-        
-        <div id="admin-products-list" class="space-y-3">
-            <p>Carregando todos os produtos...</p>
+        <div id="admin-products-list" class="space-y-2">
+            <p>Carregando produtos...</p>
         </div>
     `;
 
@@ -483,40 +372,26 @@ async function renderAdminProductsView() {
             return;
         }
 
-        productsToDisplay.sort((a, b) => {
-            const getNameForSort = (productData) => {
-                if (productData.nome) return productData.nome.toLowerCase();
-                if (productData.variations && productData.variations.length > 0 && productData.variations[0].fullName) {
-                    return productData.variations[0].fullName.toLowerCase();
-                }
-                return '';
-            };
-            const nameA = getNameForSort(a.data);
-            const nameB = getNameForSort(b.data);
-            if (nameA < nameB) return -1;
-            if (nameA > nameB) return 1;
-            return 0;
-        });
+        productsToDisplay.sort((a, b) => (a.data.nome || '').localeCompare(b.data.nome || ''));
         
         productsListEl.innerHTML = productsToDisplay.map(productData => {
             const product = productData.data;
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
-            
-            let displayName = product.nome;
-            if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
-                displayName = product.variations[0].fullName;
-            }
-            displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
+            const displayName = product.nome || `[Produto sem nome - ID: ${productData.id}]`;
+            const imageUrl = defaultVariation.image || product.image || 'https://via.placeholder.com/60';
 
             return `
-                <div class="admin-product-item bg-white p-4 rounded-lg shadow-md border flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" data-product-id="${productData.id}">
-                    <div>
-                        <p class="font-bold text-primary">${displayName}</p>
-                        <p class="text-sm text-gray-600">Categoria: ${product.category || 'Não definida'}</p>
+                <div class="admin-card product-list-item" data-product-id="${productData.id}">
+                    <div class="product-list-item-thumbnail">
+                        <img src="${imageUrl}" alt="${displayName}">
                     </div>
-                    <div class="text-right">
-                         <p class="text-sm text-gray-500">Preço base</p>
-                         <p class="font-semibold text-gray-800">${formatCurrency(defaultVariation.price)}</p>
+                    <div class="product-info">
+                        <div class="name">${displayName}</div>
+                        <div class="category">Categoria: ${product.category || 'Não definida'}</div>
+                    </div>
+                    <div class="price-info">
+                        <div class="label">Preço base</div>
+                        <div class="price">${formatCurrency(defaultVariation.price)}</div>
                     </div>
                 </div>
             `;
@@ -524,132 +399,106 @@ async function renderAdminProductsView() {
     };
 
     try {
-        const productsQuery = query(collection(db, 'produtos'));
-        const querySnapshot = await getDocs(productsQuery);
+        const querySnapshot = await getDocs(query(collection(db, 'produtos')));
         allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-
-        displayProducts(allProducts); 
+        displayProducts(allProducts);
 
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim().toLowerCase();
-            
-            if (!searchTerm) {
-                displayProducts(allProducts);
-                return;
-            }
-
-            const filteredProducts = allProducts.filter(p => {
-                const product = p.data;
-                const searchTermLower = searchTerm.toLowerCase();
-
-                let searchableName = '';
-                if (product.nome) {
-                    searchableName = product.nome.toLowerCase();
-                } else if (product.variations && product.variations.length > 0 && product.variations[0].fullName) {
-                    searchableName = product.variations[0].fullName.toLowerCase();
-                }
-
-                const categoryMatch = product.category && product.category.toLowerCase().includes(searchTermLower);
-
-                return searchableName.includes(searchTermLower) || categoryMatch;
-            });
-
+            const filteredProducts = allProducts.filter(p => 
+                (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
+                (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
+            );
             displayProducts(filteredProducts);
         });
-
     } catch (error) {
         console.error("Erro ao buscar produtos para o painel admin:", error);
         productsListEl.innerHTML = `<p class="text-red-500">Ocorreu um erro ao carregar os produtos.</p>`;
     }
 }
 
-/**
- * Renderiza um formulário de edição para um produto específico.
- * @param {string} productId O ID do documento do produto no Firestore.
- */
 async function renderAdminProductEditView(productId) {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
 
-    adminContent.innerHTML = `<p>Carregando dados do produto para edição...</p>`;
+    adminContent.innerHTML = `<p>Carregando dados do produto...</p>`;
 
     try {
-        const productRef = doc(db, 'produtos', productId);
-        const productSnap = await getDoc(productRef);
-
+        const productSnap = await getDoc(doc(db, 'produtos', productId));
         if (!productSnap.exists()) {
             adminContent.innerHTML = '<p class="text-red-500">Erro: Produto não encontrado.</p>';
             return;
         }
 
         const product = productSnap.data();
-
         const variationsHTML = product.variations.map((v, index) => `
-            <div class="variation-editor-group border p-4 rounded-md mt-4" data-index="${index}">
-                <h4 class="text-lg font-semibold text-gray-700 mb-2">Variação ${index + 1}</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="variation-editor-group" data-index="${index}">
+                <h4>Variação ${index + 1}: ${v.fullName || ''}</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Nome Completo (Ex: Ração Golden 15kg)</label>
-                        <input type="text" value="${v.fullName || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" data-field="fullName">
+                        <label class="admin-form-label">Nome Completo</label>
+                        <input type="text" value="${v.fullName || ''}" class="admin-form-input" data-field="fullName">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Peso (Ex: 15kg)</label>
-                        <input type="text" value="${v.weight || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" data-field="weight">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Preço Promocional (R$)</label>
-                        <input type="number" step="0.01" value="${v.price || 0}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" data-field="price">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Preço Original (R$)</label>
-                        <input type="number" step="0.01" value="${v.originalPrice || 0}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" data-field="originalPrice">
+                        <label class="admin-form-label">Peso</label>
+                        <input type="text" value="${v.weight || ''}" class="admin-form-input" data-field="weight">
                     </div>
                      <div>
-                        <label class="block text-sm font-medium text-gray-700">Estoque</label>
-                        <input type="number" value="${v.stock || 0}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" data-field="stock">
+                        <label class="admin-form-label">Estoque</label>
+                        <input type="number" value="${v.stock || 0}" class="admin-form-input" data-field="stock">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Preço Promocional (R$)</label>
+                        <input type="number" step="0.01" value="${v.price || 0}" class="admin-form-input" data-field="price">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Preço Original (R$)</label>
+                        <input type="number" step="0.01" value="${v.originalPrice || 0}" class="admin-form-input" data-field="originalPrice">
                     </div>
                 </div>
             </div>
         `).join('');
 
         adminContent.innerHTML = `
-            <header class="mb-6">
-                <button class="admin-nav-link text-primary hover:underline mb-4 inline-block" data-admin-page="produtos">
-                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista de produtos
-                </button>
-                <h1 class="text-3xl font-bold text-gray-800">Editando: ${product.nome}</h1>
+            <header class="admin-header">
+                <a href="#" class="admin-nav-link text-gray-500 hover:text-gray-800 -ml-4 mb-2 inline-block" data-admin-page="produtos">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista
+                </a>
+                <h1>Editando: ${product.nome}</h1>
+                <p>Altere os detalhes do produto e suas variações abaixo.</p>
             </header>
-            <form id="edit-product-form" class="bg-white p-6 rounded-lg shadow-md" data-product-id="${productId}">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nome Principal do Produto</label>
-                        <input type="text" id="product-nome" value="${product.nome}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Categoria</label>
-                        <input type="text" id="product-category" value="${product.category || ''}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Descrição</label>
-                        <textarea id="product-description" rows="5" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary">${product.description || ''}</textarea>
-                    </div>
-                </div>
+            <form id="edit-product-form" class="admin-card p-6" data-product-id="${productId}">
+                <div class="space-y-6">
+                    <fieldset>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                               <label class="admin-form-label">Nome Principal do Produto</label>
+                               <input type="text" id="product-nome" value="${product.nome}" class="admin-form-input">
+                            </div>
+                            <div>
+                               <label class="admin-form-label">Categoria</label>
+                               <input type="text" id="product-category" value="${product.category || ''}" class="admin-form-input">
+                            </div>
+                         </div>
+                         <div class="mt-4">
+                            <label class="admin-form-label">Descrição</label>
+                            <textarea id="product-description" rows="5" class="admin-form-textarea">${product.description || ''}</textarea>
+                         </div>
+                    </fieldset>
 
-                <div class="mt-6">
-                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Variações do Produto</h3>
-                    <div id="variations-container">
-                        ${variationsHTML}
-                    </div>
+                    <fieldset>
+                        <legend class="text-xl font-bold text-gray-800 border-b pb-2 mb-2">Variações do Produto</legend>
+                        <div id="variations-container" class="space-y-4">${variationsHTML}</div>
+                    </fieldset>
                 </div>
                 
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" class="bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-md transition">
+                    <button type="submit" class="admin-btn btn-primary">
                         <i class="fas fa-save mr-2"></i> Salvar Alterações
                     </button>
                 </div>
             </form>
         `;
-
     } catch (error) {
         console.error("Erro ao carregar produto para edição:", error);
         adminContent.innerHTML = `<p class="text-red-500">Não foi possível carregar os detalhes do produto.</p>`;
@@ -2141,3 +1990,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
