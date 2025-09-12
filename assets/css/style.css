@@ -2861,3 +2861,223 @@ input[type='number'] {
     display: inline-block; /* Faz a borda ter a largura apenas do texto */
 }
 
+/* ================================================================== */
+/* ========== INÍCIO: ESTILOS GERAIS DO PAINEL ADMIN ========== */
+/* ================================================================== */
+
+/* --- Cabeçalho Padrão das Páginas Admin --- */
+.admin-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0; /* slate-200 */
+    padding-bottom: 1rem;
+}
+
+.admin-header h1 {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 700;
+    color: #1e293b; /* slate-800 */
+}
+
+.admin-header p {
+    font-size: 1rem;
+    color: #64748b; /* slate-500 */
+    margin-top: 0.25rem;
+}
+
+/* --- Card Padrão para Listas (Pedidos, Clientes, Produtos) --- */
+.admin-card {
+    background-color: #ffffff;
+    border-radius: 0.75rem; /* 12px */
+    border: 1px solid #e2e8f0; /* slate-200 */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    margin-bottom: 1rem;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Estilos para Formulários no Admin --- */
+.admin-form-label {
+    display: block;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: #334155; /* slate-700 */
+    margin-bottom: 0.5rem;
+}
+
+.admin-form-input,
+.admin-form-select,
+.admin-form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1; /* slate-300 */
+    border-radius: 0.5rem; /* 8px */
+    background-color: #f8fafc; /* slate-50 */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-form-input:focus,
+.admin-form-select:focus,
+.admin-form-textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.2);
+}
+
+/* --- Estilos para Botões no Admin --- */
+.admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.admin-btn.btn-primary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.admin-btn.btn-primary:hover {
+    background-color: #007f7f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 168, 168, 0.3);
+}
+
+.admin-btn.btn-danger {
+    background-color: #ef4444; /* red-500 */
+    color: white;
+}
+.admin-btn.btn-danger:hover {
+    background-color: #dc2626; /* red-600 */
+}
+
+/* --- Estilos Específicos para a Lista de Pedidos --- */
+.order-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.order-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.order-card .card-body {
+    padding: 1.5rem;
+}
+
+.order-card .card-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* --- Badges de Status --- */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.status-processando { background-color: #fffbeb; color: #b45309; }
+.status-processando::before { background-color: #f59e0b; }
+.status-enviado { background-color: #eff6ff; color: #1d4ed8; }
+.status-enviado::before { background-color: #3b82f6; }
+.status-entregue { background-color: #f0fdf4; color: #15803d; }
+.status-entregue::before { background-color: #22c55e; }
+.status-cancelado { background-color: #f1f5f9; color: #475569; }
+.status-cancelado::before { background-color: #64748b; }
+
+/* --- Estilos Específicos para a Lista de Clientes --- */
+.client-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+}
+.client-avatar {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.client-info { flex-grow: 1; }
+.client-info .name { font-weight: 600; color: #1e293b; }
+.client-info .email { font-size: 0.9rem; color: #64748b; }
+.client-card .join-date { color: #64748b; font-size: 0.9rem; white-space: nowrap; }
+
+/* --- Estilos Específicos para a Lista de Produtos --- */
+.product-list-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    gap: 1rem;
+    cursor: pointer;
+}
+.product-list-item-thumbnail {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 0.5rem;
+    background-color: #f1f5f9;
+    padding: 4px;
+    border: 1px solid #e2e8f0;
+}
+.product-list-item-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.product-info { flex-grow: 1; }
+.product-info .name { font-weight: 600; color: #1e293b; }
+.product-info .category { font-size: 0.9rem; color: #64748b; }
+.product-list-item .price-info { text-align: right; }
+.product-list-item .price-info .label { font-size: 0.8rem; color: #94a3b8; }
+.product-list-item .price-info .price { font-weight: 600; font-size: 1rem; color: #1e293b; }
+
+/* --- Estilos Específicos para Edição de Produto --- */
+.variation-editor-group {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+.variation-editor-group h4 {
+    color: var(--secondary-color);
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
