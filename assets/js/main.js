@@ -202,7 +202,7 @@ async function renderAdminOrdersView() {
 
             return `
             <div class="admin-card order-card" data-order-id="${orderId}">
-                <div class="card-header">
+               <div class="card-header order-details-trigger cursor-pointer">
                     <div>
                         <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
                         <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
@@ -244,39 +244,42 @@ async function renderAdminOrdersView() {
     }
 
     ordersListEl.addEventListener('click', async (e) => {
-        const button = e.target.closest('.update-order-btn');
-        const deleteButton = e.target.closest('.delete-order-btn');
+    const button = e.target.closest('.update-order-btn');
+    const deleteButton = e.target.closest('.delete-order-btn');
+    const detailsTrigger = e.target.closest('.order-details-trigger');
 
-        if (button) {
-            const orderId = button.dataset.orderId;
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-            button.innerHTML = 'Salvando...';
-            button.disabled = true;
-            try {
-                await updateDoc(doc(db, 'orders', orderId), { status: newStatus, estimatedDelivery: newDeliveryEstimate });
-                button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-save"></i> Salvar';
-                    button.disabled = false;
-                }, 2000);
-            } catch (error) {
-                alert('Erro ao salvar.');
+    if (button) {
+        const orderId = button.closest('.order-card').dataset.orderId;
+        const newStatus = document.getElementById(`status-${orderId}`).value;
+        const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+        button.innerHTML = 'Salvando...';
+        button.disabled = true;
+        try {
+            await updateDoc(doc(db, 'orders', orderId), { status: newStatus, estimatedDelivery: newDeliveryEstimate });
+            button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+            setTimeout(() => {
                 button.innerHTML = '<i class="fas fa-save"></i> Salvar';
                 button.disabled = false;
-            }
-        } else if (deleteButton) {
-            const orderId = deleteButton.dataset.orderId;
-            if (confirm('Tem certeza que deseja excluir este pedido?')) {
-                try {
-                    await deleteDoc(doc(db, 'orders', orderId));
-                } catch (error) {
-                    alert('Erro ao excluir o pedido.');
-                }
+            }, 2000);
+        } catch (error) {
+            alert('Erro ao salvar.');
+            button.innerHTML = '<i class="fas fa-save"></i> Salvar';
+            button.disabled = false;
+        }
+    } else if (deleteButton) {
+        const orderId = deleteButton.closest('.order-card').dataset.orderId;
+        if (confirm('Tem certeza que deseja excluir este pedido?')) {
+            try {
+                await deleteDoc(doc(db, 'orders', orderId));
+            } catch (error) {
+                alert('Erro ao excluir o pedido.');
             }
         }
-    });
-}
+    } else if (detailsTrigger) {
+        const orderId = detailsTrigger.closest('.order-card').dataset.orderId;
+        renderDetailedOrderView(orderId);
+    }
+});
 
 async function renderAdminClientsView() {
     const adminContent = document.getElementById('admin-content');
@@ -377,7 +380,11 @@ async function renderAdminProductsView() {
         productsListEl.innerHTML = productsToDisplay.map(productData => {
             const product = productData.data;
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
-            const displayName = product.nome || `[Produto sem nome - ID: ${productData.id}]`;
+           let displayName = product.nome;
+if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
+    displayName = product.variations[0].fullName;
+}
+displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
             const imageUrl = defaultVariation.image || product.image || 'https://via.placeholder.com/60';
 
             return `
@@ -1685,8 +1692,8 @@ async function startApplication() {
         const target = e.target;
 
         // NOVA FUNCIONALIDADE: Abre o editor de produto no painel de admin
-        const adminProductItem = target.closest('.admin-product-item');
-        if (adminProductItem && adminProductItem.dataset.productId) {
+       const adminProductItem = target.closest('.product-list-item');
+    if (adminProductItem && adminProductItem.dataset.productId) {
             e.preventDefault();
             renderAdminProductEditView(adminProductItem.dataset.productId);
         }
@@ -1990,4 +1997,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
