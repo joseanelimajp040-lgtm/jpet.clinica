@@ -279,8 +279,8 @@ async function renderAdminOrdersView() {
         const orderId = detailsTrigger.closest('.order-card').dataset.orderId;
         renderDetailedOrderView(orderId);
     }
-});
-
+  });
+} //
 async function renderAdminClientsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -1997,5 +1997,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
