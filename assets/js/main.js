@@ -490,22 +490,33 @@ async function renderAdminProductsView() {
     const searchInput = document.getElementById('admin-product-search-input');
     if (!productsListEl || !searchInput) return;
 
-    let allProducts = []; // Array para guardar a lista completa de produtos
+    let allProducts = [];
 
-    // 2. Nova função auxiliar para exibir os produtos na tela
     const displayProducts = (productsToDisplay) => {
         if (productsToDisplay.length === 0) {
-            productsListEl.innerHTML = '<p>Nenhum produto encontrado com os critérios da busca.</p>';
+            productsListEl.innerHTML = '<p>Nenhum produto encontrado.</p>';
             return;
         }
+
+        // Ordena os produtos localmente via JavaScript para garantir a ordem alfabética
+        productsToDisplay.sort((a, b) => {
+            const nameA = a.data.nome ? a.data.nome.toLowerCase() : '';
+            const nameB = b.data.nome ? b.data.nome.toLowerCase() : '';
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
         
         productsListEl.innerHTML = productsToDisplay.map(productData => {
-            const product = productData.data; // Os dados do produto estão aqui
+            const product = productData.data;
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
+            // Adicionamos uma verificação: se o produto não tiver nome, exibimos uma mensagem
+            const productName = product.nome || `[Produto sem nome - ID: ${productData.id}]`;
+
             return `
                 <div class="admin-product-item bg-white p-4 rounded-lg shadow-md border flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" data-product-id="${productData.id}">
                     <div>
-                        <p class="font-bold text-primary">${product.nome}</p>
+                        <p class="font-bold text-primary">${productName}</p>
                         <p class="text-sm text-gray-600">Categoria: ${product.category || 'Não definida'}</p>
                     </div>
                     <div class="text-right">
@@ -518,40 +529,40 @@ async function renderAdminProductsView() {
     };
 
     try {
-        // 3. Busca todos os produtos, ordenados por nome (sem filtros)
-        const productsQuery = query(collection(db, 'produtos'), orderBy('nome'));
+        // --- MUDANÇA PRINCIPAL AQUI ---
+        // Removemos o `orderBy('nome')` para garantir que o Firestore retorne TODOS os documentos,
+        // mesmo que alguns não tenham o campo 'nome'. A ordenação será feita depois no JavaScript.
+        const productsQuery = query(collection(db, 'produtos'));
         const querySnapshot = await getDocs(productsQuery);
 
-        // Armazena todos os produtos no array local
+        // LOG DE DIAGNÓSTICO: Verifique o console do navegador (F12) para ver quantos produtos foram realmente carregados.
+        console.log(`[Admin Panel] Total de produtos carregados do Firestore: ${querySnapshot.size}`);
+
         allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
 
-        // Exibe a lista completa inicialmente
         displayProducts(allProducts); 
 
-        // 4. Adiciona o evento de 'input' para a barra de pesquisa
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim().toLowerCase();
             
             if (!searchTerm) {
-                displayProducts(allProducts); // Se a busca estiver vazia, mostra todos
+                displayProducts(allProducts);
                 return;
             }
 
-            // Filtra os produtos com base no nome ou categoria
             const filteredProducts = allProducts.filter(p =>
                 (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
                 (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
             );
 
-            displayProducts(filteredProducts); // Exibe os resultados filtrados
+            displayProducts(filteredProducts);
         });
 
     } catch (error) {
         console.error("Erro ao buscar produtos para o painel admin:", error);
-        productsListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os produtos.</p>';
+        productsListEl.innerHTML = `<p class="text-red-500">Ocorreu um erro ao carregar os produtos. Verifique o console para mais detalhes.</p>`;
     }
 }
-
 
 /**
  * Renderiza um formulário de edição para um produto específico.
@@ -2141,3 +2152,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
