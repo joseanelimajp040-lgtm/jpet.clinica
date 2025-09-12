@@ -462,7 +462,6 @@ async function renderAdminProductsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
 
-    // 1. Define a estrutura HTML com a nova barra de pesquisa
     adminContent.innerHTML = `
         <header class="mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Produtos e Custos</h1>
@@ -498,10 +497,17 @@ async function renderAdminProductsView() {
             return;
         }
 
-        // Ordena os produtos localmente via JavaScript para garantir a ordem alfabética
+        // MUDANÇA 1: Lógica de ordenação atualizada para usar o nome da variação como fallback.
         productsToDisplay.sort((a, b) => {
-            const nameA = a.data.nome ? a.data.nome.toLowerCase() : '';
-            const nameB = b.data.nome ? b.data.nome.toLowerCase() : '';
+            const getNameForSort = (productData) => {
+                if (productData.nome) return productData.nome.toLowerCase();
+                if (productData.variations && productData.variations.length > 0 && productData.variations[0].fullName) {
+                    return productData.variations[0].fullName.toLowerCase();
+                }
+                return ''; // Fallback para produtos sem nome algum
+            };
+            const nameA = getNameForSort(a.data);
+            const nameB = getNameForSort(b.data);
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
             return 0;
@@ -510,13 +516,18 @@ async function renderAdminProductsView() {
         productsListEl.innerHTML = productsToDisplay.map(productData => {
             const product = productData.data;
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
-            // Adicionamos uma verificação: se o produto não tiver nome, exibimos uma mensagem
-            const productName = product.nome || `[Produto sem nome - ID: ${productData.id}]`;
+            
+            // MUDANÇA 2: Lógica para obter o nome de exibição atualizada.
+            let displayName = product.nome;
+            if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
+                displayName = product.variations[0].fullName;
+            }
+            displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
 
             return `
                 <div class="admin-product-item bg-white p-4 rounded-lg shadow-md border flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" data-product-id="${productData.id}">
                     <div>
-                        <p class="font-bold text-primary">${productName}</p>
+                        <p class="font-bold text-primary">${displayName}</p>
                         <p class="text-sm text-gray-600">Categoria: ${product.category || 'Não definida'}</p>
                     </div>
                     <div class="text-right">
@@ -529,13 +540,9 @@ async function renderAdminProductsView() {
     };
 
     try {
-        // --- MUDANÇA PRINCIPAL AQUI ---
-        // Removemos o `orderBy('nome')` para garantir que o Firestore retorne TODOS os documentos,
-        // mesmo que alguns não tenham o campo 'nome'. A ordenação será feita depois no JavaScript.
         const productsQuery = query(collection(db, 'produtos'));
         const querySnapshot = await getDocs(productsQuery);
 
-        // LOG DE DIAGNÓSTICO: Verifique o console do navegador (F12) para ver quantos produtos foram realmente carregados.
         console.log(`[Admin Panel] Total de produtos carregados do Firestore: ${querySnapshot.size}`);
 
         allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
@@ -550,10 +557,22 @@ async function renderAdminProductsView() {
                 return;
             }
 
-            const filteredProducts = allProducts.filter(p =>
-                (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
-                (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
-            );
+            // MUDANÇA 3: Lógica de busca atualizada para pesquisar no nome da variação também.
+            const filteredProducts = allProducts.filter(p => {
+                const product = p.data;
+                const searchTermLower = searchTerm.toLowerCase();
+
+                let searchableName = '';
+                if (product.nome) {
+                    searchableName = product.nome.toLowerCase();
+                } else if (product.variations && product.variations.length > 0 && product.variations[0].fullName) {
+                    searchableName = product.variations[0].fullName.toLowerCase();
+                }
+
+                const categoryMatch = product.category && product.category.toLowerCase().includes(searchTermLower);
+
+                return searchableName.includes(searchTermLower) || categoryMatch;
+            });
 
             displayProducts(filteredProducts);
         });
@@ -2152,4 +2171,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
