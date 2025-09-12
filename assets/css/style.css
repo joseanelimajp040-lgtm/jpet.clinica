@@ -2860,3 +2860,108 @@ input[type='number'] {
     border-bottom: 3px solid #FF6B00; /* Borda de destaque com sua cor primária */
     display: inline-block; /* Faz a borda ter a largura apenas do texto */
 }
+
+/* ================================================================== */
+/* NOVOS ESTILOS PARA AS PÁGINAS DO PAINEL ADMIN             */
+/* ================================================================== */
+
+/* --- Estilo Base dos Cabeçalhos das Seções Admin --- */
+#admin-content header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0; /* slate-200 */
+    margin-bottom: 2rem !important; /* Aumenta o espaçamento abaixo do header */
+}
+
+#admin-content header h1 {
+    color: #1e293b; /* slate-800 */
+}
+
+#admin-content header p {
+    color: #64748b; /* slate-500 */
+    font-size: 1rem;
+}
+
+
+/* --- Barra de Pesquisa Padronizada --- */
+.admin-search-input {
+    border-radius: 9999px !important; /* Deixa a barra totalmente arredondada */
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1; /* slate-300 */
+    transition: all 0.2s ease-in-out;
+}
+
+.admin-search-input:focus {
+    border-color: var(--secondary-color); /* #00A8A8 */
+    box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.2);
+}
+
+
+/* --- Estilo para os Itens da Lista (Produtos, Pedidos, Clientes) --- */
+.admin-list-item {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    border-radius: 0.75rem; /* 12px */
+    padding: 1rem 1.5rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    border-left: 5px solid transparent; /* Borda inicial invisível */
+}
+
+.admin-list-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+    border-left-color: var(--secondary-color); /* #00A8A8 */
+}
+
+
+/* --- Estilo Específico para Itens de Pedidos --- */
+.order-item-card {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0; /* slate-200 */
+}
+.order-item-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+
+/* --- Estilo para Formulários de Edição (Produtos, Pedidos) --- */
+.admin-edit-form {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.admin-edit-form label {
+    font-weight: 600;
+    color: #475569; /* slate-600 */
+}
+
+.admin-edit-form input,
+.admin-edit-form textarea,
+.admin-edit-form select {
+    border: 1px solid #cbd5e1; /* slate-300 */
+    transition: all 0.2s ease-in-out;
+}
+
+.admin-edit-form input:focus,
+.admin-edit-form textarea:focus,
+.admin-edit-form select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.2);
+    outline: none;
+}
+
+/* --- Estilo para os grupos de variação no editor de produto --- */
+.variation-editor-group {
+    background-color: #f8fafc; /* slate-50 */
+    border-color: #e2e8f0; /* slate-200 */
+}
+.variation-editor-group h4 {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
