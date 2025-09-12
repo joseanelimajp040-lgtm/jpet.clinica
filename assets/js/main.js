@@ -243,13 +243,20 @@ async function renderAdminOrdersView() {
         ordersListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os pedidos.</p>';
     }
 
-    ordersListEl.addEventListener('click', async (e) => {
-    const button = e.target.closest('.update-order-btn');
-    const deleteButton = e.target.closest('.delete-order-btn');
-    const detailsTrigger = e.target.closest('.order-details-trigger');
+   ordersListEl.addEventListener('click', async (e) => {
+    // Primeiro, vamos ver se o clique foi dentro de um card de pedido
+    const clickedCard = e.target.closest('.order-card');
+    if (!clickedCard) {
+        return; // Se não foi, não fazemos nada
+    }
 
-    if (button) {
-        const orderId = button.closest('.order-card').dataset.orderId;
+    const orderId = clickedCard.dataset.orderId;
+
+    // Agora, verificamos qual parte do card foi clicada
+
+    // 1. Foi o botão de ATUALIZAR?
+    if (e.target.closest('.update-order-btn')) {
+        const button = e.target.closest('.update-order-btn');
         const newStatus = document.getElementById(`status-${orderId}`).value;
         const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
         button.innerHTML = 'Salvando...';
@@ -266,8 +273,11 @@ async function renderAdminOrdersView() {
             button.innerHTML = '<i class="fas fa-save"></i> Salvar';
             button.disabled = false;
         }
-    } else if (deleteButton) {
-        const orderId = deleteButton.closest('.order-card').dataset.orderId;
+        return; // Termina a execução aqui
+    }
+
+    // 2. Foi o botão de DELETAR?
+    if (e.target.closest('.delete-order-btn')) {
         if (confirm('Tem certeza que deseja excluir este pedido?')) {
             try {
                 await deleteDoc(doc(db, 'orders', orderId));
@@ -275,12 +285,14 @@ async function renderAdminOrdersView() {
                 alert('Erro ao excluir o pedido.');
             }
         }
-    } else if (detailsTrigger) {
-        const orderId = detailsTrigger.closest('.order-card').dataset.orderId;
+        return; // Termina a execução aqui
+    }
+
+    // 3. Se não foi nenhum dos botões, foi na ÁREA DE DETALHES?
+    if (e.target.closest('.order-details-trigger')) {
         renderDetailedOrderView(orderId);
     }
-  });
-} //
+});
 async function renderAdminClientsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -1997,6 +2009,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
