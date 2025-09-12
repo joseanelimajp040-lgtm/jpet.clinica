@@ -452,46 +452,58 @@ async function renderAdminClientsView() {
     }
 }
 
-// --- INÍCIO: NOVAS FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
+// --- INÍCIO: FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
 
 /**
- * Renderiza a lista de todos os produtos cadastrados no Firestore.
- * Cada item da lista é clicável e leva para a página de edição.
+ * Renderiza a lista de todos os produtos com uma barra de pesquisa.
+ * Todos os produtos são carregados uma vez e a pesquisa filtra a lista localmente.
  */
 async function renderAdminProductsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
 
-    // 1. Define a estrutura HTML da página de listagem de produtos
+    // 1. Define a estrutura HTML com a nova barra de pesquisa
     adminContent.innerHTML = `
         <header class="mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Gerenciamento de Produtos e Custos</h1>
-            <p class="text-gray-500">Clique em um produto para editar suas informações.</p>
+            <p class="text-gray-500">Pesquise por um produto ou clique nele para editar suas informações.</p>
         </header>
+
+        <div class="mb-6 relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <i class="fas fa-search text-gray-400"></i>
+            </span>
+            <input 
+                type="search" 
+                id="admin-product-search-input" 
+                placeholder="Pesquisar por nome ou categoria..." 
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
+            >
+        </div>
+        
         <div id="admin-products-list" class="space-y-3">
-            <p>Carregando produtos...</p>
+            <p>Carregando todos os produtos...</p>
         </div>
     `;
 
     const productsListEl = document.getElementById('admin-products-list');
-    if (!productsListEl) return;
+    const searchInput = document.getElementById('admin-product-search-input');
+    if (!productsListEl || !searchInput) return;
 
-    try {
-        // 2. Busca todos os produtos, ordenados por nome
-        const productsQuery = query(collection(db, 'produtos'), orderBy('nome'));
-        const querySnapshot = await getDocs(productsQuery);
+    let allProducts = []; // Array para guardar a lista completa de produtos
 
-        if (querySnapshot.empty) {
-            productsListEl.innerHTML = '<p>Nenhum produto cadastrado ainda.</p>';
+    // 2. Nova função auxiliar para exibir os produtos na tela
+    const displayProducts = (productsToDisplay) => {
+        if (productsToDisplay.length === 0) {
+            productsListEl.innerHTML = '<p>Nenhum produto encontrado com os critérios da busca.</p>';
             return;
         }
-
-        // 3. Gera o HTML para cada produto na lista
-        productsListEl.innerHTML = querySnapshot.docs.map(doc => {
-            const product = doc.data();
+        
+        productsListEl.innerHTML = productsToDisplay.map(productData => {
+            const product = productData.data; // Os dados do produto estão aqui
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
             return `
-                <div class="admin-product-item bg-white p-4 rounded-lg shadow-md border flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" data-product-id="${doc.id}">
+                <div class="admin-product-item bg-white p-4 rounded-lg shadow-md border flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" data-product-id="${productData.id}">
                     <div>
                         <p class="font-bold text-primary">${product.nome}</p>
                         <p class="text-sm text-gray-600">Categoria: ${product.category || 'Não definida'}</p>
@@ -503,12 +515,43 @@ async function renderAdminProductsView() {
                 </div>
             `;
         }).join('');
+    };
+
+    try {
+        // 3. Busca todos os produtos, ordenados por nome (sem filtros)
+        const productsQuery = query(collection(db, 'produtos'), orderBy('nome'));
+        const querySnapshot = await getDocs(productsQuery);
+
+        // Armazena todos os produtos no array local
+        allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+
+        // Exibe a lista completa inicialmente
+        displayProducts(allProducts); 
+
+        // 4. Adiciona o evento de 'input' para a barra de pesquisa
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            
+            if (!searchTerm) {
+                displayProducts(allProducts); // Se a busca estiver vazia, mostra todos
+                return;
+            }
+
+            // Filtra os produtos com base no nome ou categoria
+            const filteredProducts = allProducts.filter(p =>
+                (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
+                (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
+            );
+
+            displayProducts(filteredProducts); // Exibe os resultados filtrados
+        });
 
     } catch (error) {
         console.error("Erro ao buscar produtos para o painel admin:", error);
         productsListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os produtos.</p>';
     }
 }
+
 
 /**
  * Renderiza um formulário de edição para um produto específico.
@@ -605,7 +648,7 @@ async function renderAdminProductEditView(productId) {
         adminContent.innerHTML = `<p class="text-red-500">Não foi possível carregar os detalhes do produto.</p>`;
     }
 }
-// --- FIM: NOVAS FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
+// --- FIM: FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
 
 function createProductCardHTML(productData, productId) {
     if (!productData.variations || productData.variations.length === 0) {
@@ -1629,7 +1672,7 @@ async function loadPage(pageName, params = {}) {
                             renderAdminOrdersView();
                         } else if (adminPage === 'clientes') {
                             renderAdminClientsView();
-                        } else if (adminPage === 'produtos') { // <-- MODIFICAÇÃO AQUI
+                        } else if (adminPage === 'produtos') {
                             renderAdminProductsView();
                         } else if (adminPage === 'dashboard') {
                             loadPage('admin'); 
@@ -1790,14 +1833,12 @@ async function startApplication() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // --- INÍCIO: MODIFICAÇÃO NO LISTENER DE CLIQUE ---
         // Abre o editor de produto no painel de admin
         const adminProductItem = target.closest('.admin-product-item');
         if (adminProductItem && adminProductItem.dataset.productId) {
             e.preventDefault();
             renderAdminProductEditView(adminProductItem.dataset.productId);
         }
-        // --- FIM: MODIFICAÇÃO NO LISTENER DE CLIQUE ---
 
         const navLink = target.closest('.nav-link');
         if (navLink && navLink.dataset.page) {
@@ -1953,7 +1994,6 @@ async function startApplication() {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
 
-        // --- INÍCIO: MODIFICAÇÃO NO LISTENER DE SUBMIT ---
         if (e.target.id === 'edit-product-form') {
             e.preventDefault();
             const form = e.target;
@@ -2001,7 +2041,6 @@ async function startApplication() {
                 button.disabled = false;
             }
         }
-        // --- FIM: MODIFICAÇÃO NO LISTENER DE SUBMIT ---
 
         if (e.target.id === 'search-form') {
             e.preventDefault();
