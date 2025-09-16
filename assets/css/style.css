@@ -3081,3 +3081,51 @@ input[type='number'] {
     padding-bottom: 0.75rem;
     margin-bottom: 1rem;
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: ESTILOS PARA PRODUTO INDISPONÍVEL ========== */
+/* ================================================================== */
+
+/* Estilo para o botão de variação indisponível */
+.variation-btn.unavailable {
+    background-color: #fee2e2; /* bg-red-100 */
+    border-color: #fca5a5;    /* border-red-300 */
+    color: #b91c1c;           /* text-red-700 */
+    cursor: not-allowed;
+    font-weight: 600;
+}
+
+/* Remove os efeitos de hover do botão indisponível */
+.variation-btn.unavailable:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* Estilo para o botão "Adicionar" quando desabilitado */
+.add-to-cart-btn:disabled {
+    background-color: #6b7280; /* bg-gray-500 */
+    cursor: not-allowed;
+    color: #d1d5db;           /* text-gray-300 */
+}
+
+.add-to-cart-btn:disabled:hover {
+    background-color: #6b7280; /* Mantém a cor no hover */
+}
+
+/* Efeito no card inteiro quando a variação selecionada está indisponível */
+.product-card.out-of-stock {
+    filter: grayscale(85%);
+    opacity: 0.8;
+    background-color: #f9fafb; /* bg-gray-50 */
+    pointer-events: none; /* Desabilita cliques na imagem/link */
+}
+
+/* Reabilita os eventos de clique APENAS nos botões de variação e favoritos */
+.product-card.out-of-stock .variations-container,
+.product-card.out-of-stock .favorite-btn {
+    pointer-events: auto;
+}
+
+/* ================================================================== */
+/* ========== FIM: ESTILOS PARA PRODUTO INDISPONÍVEL ========== */
+/* ================================================================== */
