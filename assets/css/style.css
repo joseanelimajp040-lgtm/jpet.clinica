@@ -3131,24 +3131,60 @@ input[type='number'] {
 /* ================================================================== */
 
 /* ================================================================== */
-/* ========== INÍCIO: ESTILO CORRIGIDO P/ BOTÃO INDISPONÍVEL ========== */
+/* ========== INÍCIO: ESTILOS CORRIGIDOS PARA PRODUTO INDISPONÍVEL ========== */
 /* ================================================================== */
 
-/* Estilo base para o botão de variação indisponível */
+/* Estilo para o botão de variação indisponível (com hover vermelho) */
 .variation-btn.unavailable {
-    background-color: #fee2e2; /* bg-red-100 */
-    border-color: #fca5a5;    /* border-red-300 */
-    color: #b91c1c;           /* text-red-700 */
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
     cursor: not-allowed;
     font-weight: 600;
-    /* Transição suave para TODAS as propriedades que vamos alterar no hover */
     transition: all 0.2s ease-in-out; 
 }
-
-/* Efeito CORRIGIDO ao passar o mouse por cima */
 .variation-btn.unavailable:hover {
-    transform: scale(1.1);              /* Aumenta o tamanho */
-    background-color: #dc2626;          /* ALTERAÇÃO: Fundo vermelho mais forte (red-600) */
-    border-color: #dc2626;              /* ALTERAÇÃO: Borda da mesma cor do fundo */
-    color: #ffffff;                     /* ALTERAÇÃO: Texto branco para melhor contraste */
+    transform: scale(1.1);
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
 }
+
+/* Estilo para o botão "Adicionar" quando desabilitado */
+.add-to-cart-btn:disabled {
+    background-color: #6b7280;
+    cursor: not-allowed;
+    color: #d1d5db;
+}
+.add-to-cart-btn:disabled:hover {
+    background-color: #6b7280;
+}
+
+/* --- MUDANÇAS PRINCIPAIS ABAIXO --- */
+
+/* 1. Efeito no card: Apenas muda o fundo, sem filtro ou desativar o hover */
+.product-card.out-of-stock {
+    background-color: #f8fafc; /* Um fundo cinza bem claro para diferenciar */
+}
+
+/* 2. Aplica o filtro cinza SOMENTE na imagem do produto */
+.product-card.out-of-stock .product-card-image {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+/* 3. Desabilita o clique SOMENTE no link da imagem, o que restaura a animação de hover do card */
+.product-card.out-of-stock .nav-link {
+    cursor: default;
+    pointer-events: none;
+}
+
+/* 4. Garante que os botões dentro do card permaneçam clicáveis (para trocar de variação) */
+.product-card.out-of-stock .variations-container,
+.product-card.out-of-stock .favorite-btn {
+    pointer-events: auto;
+}
+
+/* ================================================================== */
+/* ========== FIM: ESTILOS CORRIGIDOS PARA PRODUTO INDISPONÍVEL ========== */
+/* ================================================================== */
