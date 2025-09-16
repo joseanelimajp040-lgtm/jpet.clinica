@@ -3129,3 +3129,19 @@ input[type='number'] {
 /* ================================================================== */
 /* ========== FIM: ESTILOS PARA PRODUTO INDISPONÍVEL ========== */
 /* ================================================================== */
+
+/* ================================================================== */
+/* ========== INÍCIO: EFEITO HOVER PARA BOTÃO INDISPONÍVEL ========== */
+/* ================================================================== */
+
+/* Adicionamos uma transição suave ao estado base do botão */
+.variation-btn.unavailable {
+    /* ... (as outras propriedades que já estão lá) ... */
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Efeito ao passar o mouse por cima */
+.variation-btn.unavailable:hover {
+    transform: scale(1.1);       /* Aumenta o tamanho do botão em 10% */
+    color: #ef4444;              /* Altera a cor do texto para um vermelho mais vibrante */
+}
