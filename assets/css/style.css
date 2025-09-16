@@ -3083,78 +3083,65 @@ input[type='number'] {
 }
 
 /* ================================================================== */
-/* ====== INÍCIO: ESTILOS PARA PRODUTO INDISPONÍVEL ====== */
+/* ========== INÍCIO: ESTILOS PARA PRODUTO INDISPONÍVEL ========== */
 /* ================================================================== */
 
-/* ------------------------------------------------------------------ */
-/* PARTE 1: SELETOR DE VARIAÇÃO INDISPONÍVEL (EM VERMELHO) */
-/* ------------------------------------------------------------------ */
-/* Apenas este seletor terá o destaque em vermelho para indicar */
-/* que a VARIAÇÃO específica não está disponível. */
-
+/* Estilo para o botão de variação indisponível */
 .variation-btn.unavailable {
-    background-color: #fee2e2;    /* Fundo vermelho claro */
-    border-color: #fca5a5;          /* Borda vermelha clara */
-    color: #b91c1c;                 /* Texto vermelho escuro */
+    background-color: #fee2e2; /* bg-red-100 */
+    border-color: #fca5a5;    /* border-red-300 */
+    color: #b91c1c;           /* text-red-700 */
     cursor: not-allowed;
     font-weight: 600;
-    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-/* Efeito hover para o seletor de variação indisponível */
+/* Remove os efeitos de hover do botão indisponível */
 .variation-btn.unavailable:hover {
-    transform: scale(1.1);
-    background-color: #dc2626;      /* Fundo vermelho vibrante */
-    border-color: #dc2626;
-    color: #ffffff;
+    background-color: #fee2e2;
+    border-color: #fca5a5;
 }
 
-
-/* ------------------------------------------------------------------ */
-/* PARTE 2: BOTÃO PRINCIPAL DESABILITADO (EM CINZA) */
-/* ------------------------------------------------------------------ */
-/* Estilo para o botão "Adicionar" ou "Indisponível" principal. */
-/* Quando desabilitado, ele ficará sempre cinza. */
-
+/* Estilo para o botão "Adicionar" quando desabilitado */
 .add-to-cart-btn:disabled {
-    background-color: #6b7280;      /* Fundo cinza */
+    background-color: #6b7280; /* bg-gray-500 */
     cursor: not-allowed;
-    color: #d1d5db;                 /* Texto cinza claro */
+    color: #d1d5db;           /* text-gray-300 */
 }
 
-/* Garante que o botão principal não mude de cor no hover quando desabilitado */
 .add-to-cart-btn:disabled:hover {
-    background-color: #6b7280;
+    background-color: #6b7280; /* Mantém a cor no hover */
 }
 
-
-/* ------------------------------------------------------------------ */
-/* PARTE 3: ESTILOS GERAIS PARA O CARD DO PRODUTO (EFEITOS EM CINZA) */
-/* ------------------------------------------------------------------ */
-
-/* Fundo cinza claro para o card inteiro quando o produto está indisponível */
+/* Efeito no card inteiro quando a variação selecionada está indisponível */
 .product-card.out-of-stock {
-    background-color: #f8fafc;
+    filter: grayscale(85%);
+    opacity: 0.8;
+    background-color: #f9fafb; /* bg-gray-50 */
+    pointer-events: none; /* Desabilita cliques na imagem/link */
 }
 
-/* Aplica o filtro de escala de cinza e opacidade SOMENTE na imagem */
-.product-card.out-of-stock .product-card-image {
-    filter: grayscale(100%);
-    opacity: 0.6;
-}
-
-/* Desabilita o clique no link da imagem, mas mantém o hover do card */
-.product-card.out-of-stock .nav-link {
-    cursor: default;
-    pointer-events: none;
-}
-
-/* Permite o clique nos seletores de variação e favoritos mesmo no card indisponível */
+/* Reabilita os eventos de clique APENAS nos botões de variação e favoritos */
 .product-card.out-of-stock .variations-container,
 .product-card.out-of-stock .favorite-btn {
     pointer-events: auto;
 }
 
 /* ================================================================== */
-/* ============================ FIM ================================= */
+/* ========== FIM: ESTILOS PARA PRODUTO INDISPONÍVEL ========== */
 /* ================================================================== */
+
+/* ================================================================== */
+/* ========== INÍCIO: EFEITO HOVER PARA BOTÃO INDISPONÍVEL ========== */
+/* ================================================================== */
+
+/* Adicionamos uma transição suave ao estado base do botão */
+.variation-btn.unavailable {
+    /* ... (as outras propriedades que já estão lá) ... */
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Efeito ao passar o mouse por cima */
+.variation-btn.unavailable:hover {
+    transform: scale(1.1);       /* Aumenta o tamanho do botão em 10% */
+    color: #ef4444;              /* Altera a cor do texto para um vermelho mais vibrante */
+}
