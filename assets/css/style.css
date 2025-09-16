@@ -3131,17 +3131,24 @@ input[type='number'] {
 /* ================================================================== */
 
 /* ================================================================== */
-/* ========== INÍCIO: EFEITO HOVER PARA BOTÃO INDISPONÍVEL ========== */
+/* ========== INÍCIO: ESTILO CORRIGIDO P/ BOTÃO INDISPONÍVEL ========== */
 /* ================================================================== */
 
-/* Adicionamos uma transição suave ao estado base do botão */
+/* Estilo base para o botão de variação indisponível */
 .variation-btn.unavailable {
-    /* ... (as outras propriedades que já estão lá) ... */
-    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+    background-color: #fee2e2; /* bg-red-100 */
+    border-color: #fca5a5;    /* border-red-300 */
+    color: #b91c1c;           /* text-red-700 */
+    cursor: not-allowed;
+    font-weight: 600;
+    /* Transição suave para TODAS as propriedades que vamos alterar no hover */
+    transition: all 0.2s ease-in-out; 
 }
 
-/* Efeito ao passar o mouse por cima */
+/* Efeito CORRIGIDO ao passar o mouse por cima */
 .variation-btn.unavailable:hover {
-    transform: scale(1.1);       /* Aumenta o tamanho do botão em 10% */
-    color: #ef4444;              /* Altera a cor do texto para um vermelho mais vibrante */
+    transform: scale(1.1);              /* Aumenta o tamanho */
+    background-color: #dc2626;          /* ALTERAÇÃO: Fundo vermelho mais forte (red-600) */
+    border-color: #dc2626;              /* ALTERAÇÃO: Borda da mesma cor do fundo */
+    color: #ffffff;                     /* ALTERAÇÃO: Texto branco para melhor contraste */
 }
