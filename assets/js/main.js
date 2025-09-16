@@ -536,20 +536,36 @@ function createProductCardHTML(productData, productId) {
     const defaultVariation = productData.variations[defaultIndex];
     const isFav = state.favorites.some(fav => fav.id === productId);
     const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-300';
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Verifica se a variação padrão está fora de estoque
+    const isDefaultOutOfStock = defaultVariation.stock <= 0;
+    // --- FIM DA ALTERAÇÃO ---
 
-    const variationsHTML = productData.variations.map((v, index) => `
+    const variationsHTML = productData.variations.map((v, index) => {
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Verifica se esta variação específica está indisponível
+        const isUnavailable = v.stock <= 0;
+        const buttonText = isUnavailable ? 'Indisponível' : v.weight;
+        const extraClasses = isUnavailable ? 'unavailable' : '';
+        const disabledAttr = isUnavailable ? 'disabled' : '';
+        // --- FIM DA ALTERAÇÃO ---
+
+        return `
         <button
-            class="variation-btn ${index === defaultIndex ? 'selected' : ''}"
+            class="variation-btn ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
             data-index="${index}"
             data-price="${v.price}"
             data-original-price="${v.originalPrice || ''}"
             data-weight="${v.weight}"
             data-stock="${v.stock}"
             data-image="${v.image || productData.image}"
-            data-full-name="${v.fullName || productData.nome}">
-            ${v.weight}
+            data-full-name="${v.fullName || productData.nome}"
+            ${disabledAttr}>
+            ${buttonText} 
         </button>
-    `).join('');
+        `;
+    }).join('');
 
     let priceHTML = '';
     let discountBadgeHTML = '';
@@ -568,7 +584,7 @@ function createProductCardHTML(productData, productId) {
     }
 
     return `
-        <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" data-product-id="${productId}">
+        <div class="product-card bg-white rounded-lg shadow transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col ${isDefaultOutOfStock ? 'out-of-stock' : ''}" data-product-id="${productId}">
             <div class="relative">
                 ${discountBadgeHTML}
                 <button class="favorite-btn absolute top-2 right-2 text-2xl z-10" data-id="${productId}">
@@ -587,8 +603,9 @@ function createProductCardHTML(productData, productId) {
                     data-name="${defaultVariation.fullName || productData.nome}"
                     data-price="${defaultVariation.price}"
                     data-image="${defaultVariation.image || productData.image}"
-                    data-weight="${defaultVariation.weight}">
-                    <i class="fas fa-shopping-cart mr-2"></i> Adicionar
+                    data-weight="${defaultVariation.weight}"
+                    ${isDefaultOutOfStock ? 'disabled' : ''}>
+                    ${isDefaultOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar'}
                 </button>
             </div>
         </div>
@@ -1717,15 +1734,20 @@ async function startApplication() {
             loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
-        const variationBtn = target.closest('.variation-btn');
+         const variationBtn = target.closest('.variation-btn');
         if (variationBtn) {
             e.preventDefault();
             const data = variationBtn.dataset;
             variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
             variationBtn.classList.add('selected');
 
+            // --- INÍCIO DA ALTERAÇÃO ---
+            const stock = parseInt(data.stock, 10);
+            const isOutOfStock = stock <= 0;
+            // --- FIM DA ALTERAÇÃO ---
+            
             const card = variationBtn.closest('.product-card');
-            if (card) {
+            if (card) { // Lógica para o card na página de listagem
                 const priceContainer = card.querySelector('.product-price-container');
                 const addToCartBtn = card.querySelector('.add-to-cart-btn');
                 const cardImage = card.querySelector('.product-card-image');
@@ -1746,7 +1768,13 @@ async function startApplication() {
                 addToCartBtn.dataset.image = data.image;
                 addToCartBtn.dataset.name = data.fullName;
 
-            } else {
+                // --- INÍCIO DA ALTERAÇÃO ---
+                card.classList.toggle('out-of-stock', isOutOfStock);
+                addToCartBtn.disabled = isOutOfStock;
+                addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                // --- FIM DA ALTERAÇÃO ---
+
+            } else { // Lógica para a página de detalhes do produto
                 const el = (id) => document.getElementById(id);
                 renderStockStatus(parseInt(data.stock));
                 if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
@@ -1775,10 +1803,14 @@ async function startApplication() {
                     pageCartBtn.dataset.weight = data.weight;
                     pageCartBtn.dataset.image = data.image;
                     pageCartBtn.dataset.name = data.fullName;
+                    
+                    // --- INÍCIO DA ALTERAÇÃO ---
+                    pageCartBtn.disabled = isOutOfStock;
+                    pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Comprar Agora';
+                    // --- FIM DA ALTERAÇÃO ---
                 }
             }
         }
-
         if (target.closest('.logout-btn')) handleLogout();
         if (target.closest('#google-login-btn')) handleSocialLogin('google');
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
@@ -2010,6 +2042,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
