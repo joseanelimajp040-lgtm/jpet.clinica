@@ -3131,60 +3131,66 @@ input[type='number'] {
 /* ================================================================== */
 
 /* ================================================================== */
-/* ========== INÍCIO: ESTILOS CORRIGIDOS PARA PRODUTO INDISPONÍVEL ========== */
+/* ====== INÍCIO: ESTILOS UNIFICADOS PARA PRODUTO INDISPONÍVEL ====== */
 /* ================================================================== */
 
-/* Estilo para o botão de variação indisponível (com hover vermelho) */
+/* 1. Estilo para o botão de variação indisponível */
+/* Combina os estilos de fundo, borda e cor com a transição suave */
 .variation-btn.unavailable {
-    background-color: #fee2e2;
-    border-color: #fca5a5;
-    color: #b91c1c;
-    cursor: not-allowed;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out; 
-}
-.variation-btn.unavailable:hover {
-    transform: scale(1.1);
-    background-color: #dc2626;
-    border-color: #dc2626;
-    color: #ffffff;
+    background-color: #fee2e2;    /* Fundo vermelho claro */
+    border-color: #fca5a5;          /* Borda vermelha clara */
+    color: #b91c1c;                 /* Texto vermelho escuro */
+    cursor: not-allowed;            /* Cursor de bloqueio */
+    font-weight: 600;               /* Fonte em negrito */
+    /* Transição unificada para todas as propriedades animadas */
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-/* Estilo para o botão "Adicionar" quando desabilitado */
-.add-to-cart-btn:disabled {
-    background-color: #6b7280;
-    cursor: not-allowed;
-    color: #d1d5db;
+/* Efeito ao passar o mouse sobre o botão de variação indisponível */
+.variation-btn.unavailable:hover {
+    transform: scale(1.1);              /* Aumenta o tamanho em 10% */
+    background-color: #dc2626;      /* Fundo vermelho vibrante */
+    border-color: #dc2626;          /* Borda vermelha vibrante */
+    color: #ffffff;                 /* Texto branco */
 }
+
+/* 2. Estilo para o botão "Adicionar ao Carrinho" quando desabilitado */
+.add-to-cart-btn:disabled {
+    background-color: #6b7280;      /* Fundo cinza */
+    cursor: not-allowed;            /* Cursor de bloqueio */
+    color: #d1d5db;                 /* Texto cinza claro */
+}
+
+/* Mantém a cor de fundo no hover para evitar mudança de cor */
 .add-to-cart-btn:disabled:hover {
     background-color: #6b7280;
 }
 
-/* --- MUDANÇAS PRINCIPAIS ABAIXO --- */
+/* 3. Estilos para o Card do Produto indisponível */
 
-/* 1. Efeito no card: Apenas muda o fundo, sem filtro ou desativar o hover */
+/* Efeito no card: Apenas um fundo cinza claro para diferenciar */
 .product-card.out-of-stock {
-    background-color: #f8fafc; /* Um fundo cinza bem claro para diferenciar */
+    background-color: #f8fafc;
 }
 
-/* 2. Aplica o filtro cinza SOMENTE na imagem do produto */
+/* Aplica o filtro de escala de cinza SOMENTE na imagem do produto */
 .product-card.out-of-stock .product-card-image {
     filter: grayscale(100%);
     opacity: 0.6;
 }
 
-/* 3. Desabilita o clique SOMENTE no link da imagem, o que restaura a animação de hover do card */
+/* Desabilita o clique SOMENTE no link da imagem, restaurando o hover do card */
 .product-card.out-of-stock .nav-link {
     cursor: default;
     pointer-events: none;
 }
 
-/* 4. Garante que os botões dentro do card permaneçam clicáveis (para trocar de variação) */
+/* Garante que botões internos (variações, favoritos) permaneçam clicáveis */
 .product-card.out-of-stock .variations-container,
 .product-card.out-of-stock .favorite-btn {
     pointer-events: auto;
 }
 
 /* ================================================================== */
-/* ========== FIM: ESTILOS CORRIGIDOS PARA PRODUTO INDISPONÍVEL ========== */
+/* ======= FIM: ESTILOS UNIFICADOS PARA PRODUTO INDISPONÍVEL ======== */
 /* ================================================================== */
