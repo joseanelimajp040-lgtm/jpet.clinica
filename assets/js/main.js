@@ -463,7 +463,7 @@ async function renderAdminProductEditView(productId) {
                         <label class="admin-form-label">Peso</label>
                         <input type="text" value="${v.weight || ''}" class="admin-form-input" data-field="weight">
                     </div>
-                     <div>
+                    <div>
                         <label class="admin-form-label">Estoque</label>
                         <input type="number" value="${v.stock || 0}" class="admin-form-input" data-field="stock">
                     </div>
@@ -475,7 +475,12 @@ async function renderAdminProductEditView(productId) {
                         <label class="admin-form-label">Preço Original (R$)</label>
                         <input type="number" step="0.01" value="${v.originalPrice || 0}" class="admin-form-input" data-field="originalPrice">
                     </div>
-                </div>
+                    
+                    <div class="lg:col-span-1">
+                        <label class="admin-form-label">URL da Imagem</label>
+                        <input type="url" value="${v.image || ''}" class="admin-form-input" data-field="image" placeholder="https://...">
+                    </div>
+                    </div>
             </div>
         `).join('');
 
@@ -490,20 +495,20 @@ async function renderAdminProductEditView(productId) {
             <form id="edit-product-form" class="admin-card p-6" data-product-id="${productId}">
                 <div class="space-y-6">
                     <fieldset>
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                               <label class="admin-form-label">Nome Principal do Produto</label>
-                               <input type="text" id="product-nome" value="${product.nome}" class="admin-form-input">
+                                <label class="admin-form-label">Nome Principal do Produto</label>
+                                <input type="text" id="product-nome" value="${product.nome}" class="admin-form-input">
                             </div>
                             <div>
-                               <label class="admin-form-label">Categoria</label>
-                               <input type="text" id="product-category" value="${product.category || ''}" class="admin-form-input">
+                                <label class="admin-form-label">Categoria</label>
+                                <input type="text" id="product-category" value="${product.category || ''}" class="admin-form-input">
                             </div>
-                         </div>
-                         <div class="mt-4">
+                        </div>
+                        <div class="mt-4">
                             <label class="admin-form-label">Descrição</label>
                             <textarea id="product-description" rows="5" class="admin-form-textarea">${product.description || ''}</textarea>
-                         </div>
+                        </div>
                     </fieldset>
 
                     <fieldset>
@@ -2354,6 +2359,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
