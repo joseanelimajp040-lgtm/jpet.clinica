@@ -3145,3 +3145,59 @@ input[type='number'] {
     transform: scale(1.1);       /* Aumenta o tamanho do botão em 10% */
     color: #ef4444;              /* Altera a cor do texto para um vermelho mais vibrante */
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: ESTILOS PARA IMPORTAÇÃO DE XML ========== */
+/* ================================================================== */
+
+.xml-product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border-left: 5px solid transparent; /* Borda para indicar seleção */
+}
+
+.xml-product-item .product-info .name {
+    font-weight: 600;
+    color: #1e293b; /* slate-800 */
+}
+
+.xml-product-item .product-info .details {
+    font-size: 0.875rem; /* 14px */
+    color: #64748b; /* slate-500 */
+}
+
+.xml-product-item .product-status {
+    font-weight: 600;
+    color: var(--secondary-color); /* #00A8A8 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Efeito ao passar o mouse */
+.xml-product-item:not(.selected):not(.registered):hover {
+    background-color: #f8fafc; /* slate-50 */
+    border-left-color: #cbd5e1; /* slate-300 */
+}
+
+/* Estilo do item selecionado */
+.xml-product-item.selected {
+    border-left-color: var(--primary-color); /* #FF6B00 */
+    background-color: #fff7ed; /* orange-50 */
+}
+
+/* Estilo do item já cadastrado */
+.xml-product-item.registered {
+    border-left-color: #22c55e; /* green-500 */
+    background-color: #f0fdf4; /* green-50 */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.xml-product-item.registered:hover {
+    /* Sem efeito de hover para itens já cadastrados */
+    background-color: #f0fdf4;
+}
