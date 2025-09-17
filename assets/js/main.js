@@ -1562,6 +1562,8 @@ async function loadPage(pageName, params = {}) {
                             renderAdminClientsView();
                         } else if (adminPage === 'produtos') { // NOVA FUNCIONALIDADE
                             renderAdminProductsView();
+                        } else if (adminPage === 'importar-xml') { // <<< ADICIONE ESTE ELSE IF
+                            renderAdminImportXMLView();
                         } else if (adminPage === 'dashboard') {
                             loadPage('admin'); 
                         } else {
@@ -2010,7 +2012,260 @@ async function startApplication() {
     updateCounters();
     await loadPage('home');
 }
+// ======================================================================
+// --- INÍCIO: NOVAS FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
+// ======================================================================
 
+/**
+ * Renderiza a view principal para importação de XML da NFe.
+ */
+async function renderAdminImportXMLView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Importar Produtos via NFe</h1>
+            <p>Selecione um arquivo XML de uma Nota Fiscal Eletrônica para cadastrar produtos em massa.</p>
+        </header>
+
+        <div class="admin-card p-6 mb-6">
+             <label for="xml-file-input" class="admin-form-label">Selecione o arquivo XML:</label>
+             <input type="file" id="xml-file-input" accept=".xml" class="admin-form-input">
+        </div>
+
+        <div id="xml-products-list" class="space-y-4"></div>
+        
+        <div id="product-registration-form-container" class="mt-8"></div>
+    `;
+
+    // Adiciona o listener para o input de arquivo
+    document.getElementById('xml-file-input').addEventListener('change', handleFileSelect);
+}
+
+/**
+ * Lida com a seleção do arquivo XML, lê e inicia o parse.
+ * @param {Event} event - O evento de 'change' do input de arquivo.
+ */
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Nenhum arquivo selecionado.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const xmlText = e.target.result;
+        parseNFeXML(xmlText);
+    };
+    reader.readAsText(file);
+}
+
+/**
+ * Faz o parse do conteúdo do XML e extrai os dados dos produtos.
+ * @param {string} xmlText - O conteúdo do arquivo XML como texto.
+ */
+function parseNFeXML(xmlText) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+
+    // Verifica se houve erro no parse
+    const parserError = xmlDoc.querySelector('parsererror');
+    if (parserError) {
+        console.error('Erro ao fazer o parse do XML:', parserError);
+        alert('O arquivo XML fornecido parece ser inválido ou está corrompido.');
+        return;
+    }
+
+    const productsList = [];
+    const productElements = xmlDoc.querySelectorAll('det'); // Cada produto está dentro de uma tag <det>
+
+    productElements.forEach(det => {
+        const prod = det.querySelector('prod');
+        if (prod) {
+            const getTagValue = (tagName, parent = prod) => {
+                const el = parent.querySelector(tagName);
+                return el ? el.textContent : '';
+            };
+
+            productsList.push({
+                code: getTagValue('cProd'),
+                name: getTagValue('xProd'),
+                quantity: parseFloat(getTagValue('qCom') || 0),
+                unitPrice: parseFloat(getTagValue('vUnCom') || 0),
+                totalPrice: parseFloat(getTagValue('vProd') || 0),
+                ean: getTagValue('cEAN'), // Código de barras
+            });
+        }
+    });
+
+    if (productsList.length > 0) {
+        displayXMLProducts(productsList);
+    } else {
+        alert('Nenhum produto encontrado no arquivo XML. Verifique se o formato está correto.');
+    }
+}
+
+/**
+ * Exibe os produtos extraídos do XML em uma lista na tela.
+ * @param {Array<Object>} products - Array com os objetos de produto.
+ */
+function displayXMLProducts(products) {
+    const listContainer = document.getElementById('xml-products-list');
+    listContainer.innerHTML = `
+        <h2 class="text-xl font-bold text-gray-800">Produtos Encontrados na NFe</h2>
+        <p class="text-gray-600 mb-4">Clique em um produto para preencher os detalhes e cadastrá-lo.</p>
+    `;
+
+    const productsHTML = products.map(product => `
+        <div class="xml-product-item admin-card" data-product-xml='${JSON.stringify(product)}'>
+            <div class="product-info">
+                <div class="name">${product.name}</div>
+                <div class="details">
+                    <span>Código: ${product.code}</span> | 
+                    <span>Preço Unit.: ${formatCurrency(product.unitPrice)}</span> | 
+                    <span>Qtd.: ${product.quantity}</span>
+                </div>
+            </div>
+            <div class="product-status">
+                <i class="fas fa-plus-circle"></i> Cadastrar
+            </div>
+        </div>
+    `).join('');
+
+    listContainer.innerHTML += productsHTML;
+
+    // Adiciona event listener para os cliques nos itens da lista
+    listContainer.querySelectorAll('.xml-product-item').forEach(item => {
+        item.addEventListener('click', () => {
+             // Desmarca outros itens selecionados
+            listContainer.querySelectorAll('.xml-product-item').forEach(el => el.classList.remove('selected'));
+            // Marca o item clicado
+            item.classList.add('selected');
+
+            const productData = JSON.parse(item.dataset.productXml);
+            showProductRegistrationForm(productData, item);
+        });
+    });
+}
+
+/**
+ * Mostra o formulário de cadastro para um produto selecionado.
+ * @param {Object} xmlProductData - Os dados do produto extraídos do XML.
+ * @param {HTMLElement} listItemElement - O elemento da lista que foi clicado.
+ */
+function showProductRegistrationForm(xmlProductData, listItemElement) {
+    const formContainer = document.getElementById('product-registration-form-container');
+    
+    // O formulário será inserido aqui. Pré-preenchemos com dados do XML.
+    formContainer.innerHTML = `
+        <div class="admin-card p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Cadastrar Novo Produto</h3>
+            <form id="new-product-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="product-nome" class="admin-form-label">Nome Principal do Produto</label>
+                        <input type="text" id="product-nome" class="admin-form-input" value="${xmlProductData.name}" required>
+                    </div>
+                    <div>
+                        <label for="product-category" class="admin-form-label">Categoria</label>
+                        <input type="text" id="product-category" class="admin-form-input" placeholder="Ex: Ração, Brinquedo, Higiene" required>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label for="product-description" class="admin-form-label">Descrição</label>
+                    <textarea id="product-description" rows="4" class="admin-form-textarea" placeholder="Detalhes sobre o produto..."></textarea>
+                </div>
+                
+                <fieldset class="mt-6 border-t pt-4">
+                    <legend class="text-lg font-semibold text-gray-700 mb-2">Variação Inicial</legend>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                         <div>
+                            <label class="admin-form-label">Nome Completo</label>
+                            <input type="text" data-field="fullName" class="admin-form-input" value="${xmlProductData.name}" required>
+                        </div>
+                        <div>
+                            <label class="admin-form-label">Preço de Venda (R$)</label>
+                            <input type="number" step="0.01" data-field="price" class="admin-form-input" value="${xmlProductData.unitPrice.toFixed(2)}" required>
+                        </div>
+                         <div>
+                            <label class="admin-form-label">Estoque</label>
+                            <input type="number" data-field="stock" class="admin-form-input" value="${Math.round(xmlProductData.quantity)}" required>
+                        </div>
+                        <div>
+                            <label class="admin-form-label">Peso/Variação</label>
+                            <input type="text" data-field="weight" class="admin-form-input" placeholder="Ex: 15kg, P, 1 Unidade" required>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="submit" class="admin-btn btn-primary">
+                        <i class="fas fa-save mr-2"></i> Salvar Produto no Firebase
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    // Adiciona o listener para o submit do formulário recém-criado
+    document.getElementById('new-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
+        button.disabled = true;
+
+        // Monta o objeto do produto no formato que seu Firestore espera
+        const newProduct = {
+            nome: document.getElementById('product-nome').value,
+            category: document.getElementById('product-category').value,
+            description: document.getElementById('product-description').value,
+            brand: '', // Adicione campos extras se necessário
+            featured: false,
+            variations: [{
+                fullName: e.target.querySelector('[data-field="fullName"]').value,
+                price: parseFloat(e.target.querySelector('[data-field="price"]').value),
+                stock: parseInt(e.target.querySelector('[data-field="stock"]').value),
+                weight: e.target.querySelector('[data-field="weight"]').value,
+                originalPrice: 0, // Pode adicionar um campo para isso se quiser
+                image: 'https://via.placeholder.com/200' // Imagem padrão
+            }]
+        };
+
+        try {
+            // Salva no Firebase
+            const docRef = await addDoc(collection(db, 'produtos'), newProduct);
+            console.log("Produto cadastrado com ID: ", docRef.id);
+            
+            // Feedback visual de sucesso
+            button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo com Sucesso!';
+            button.classList.remove('btn-primary');
+            button.classList.add('bg-green-500');
+
+            // Marca o item na lista como cadastrado
+            listItemElement.classList.add('registered');
+            listItemElement.querySelector('.product-status').innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Cadastrado';
+            listItemElement.classList.remove('selected');
+
+
+            // Limpa o formulário após um tempo
+            setTimeout(() => {
+                formContainer.innerHTML = '';
+            }, 2500);
+
+        } catch (error) {
+            console.error("Erro ao salvar produto no Firebase: ", error);
+            alert('Erro ao salvar o produto. Verifique o console.');
+            button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Produto no Firebase';
+            button.disabled = false;
+        }
+    });
+}
+
+// ======================================================================
+// --- FIM: NOVAS FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
+// ======================================================================
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     state = {
@@ -2042,6 +2297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
