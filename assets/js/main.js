@@ -2151,108 +2151,165 @@ function displayXMLProducts(products) {
 }
 
 /**
- * Mostra o formulário de cadastro para um produto selecionado.
+ * Mostra um MODAL com o formulário de cadastro para um produto selecionado.
  * @param {Object} xmlProductData - Os dados do produto extraídos do XML.
  * @param {HTMLElement} listItemElement - O elemento da lista que foi clicado.
  */
 function showProductRegistrationForm(xmlProductData, listItemElement) {
-    const formContainer = document.getElementById('product-registration-form-container');
-    
-    // O formulário será inserido aqui. Pré-preenchemos com dados do XML.
-    formContainer.innerHTML = `
-        <div class="admin-card p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Cadastrar Novo Produto</h3>
-            <form id="new-product-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="product-nome" class="admin-form-label">Nome Principal do Produto</label>
-                        <input type="text" id="product-nome" class="admin-form-input" value="${xmlProductData.name}" required>
-                    </div>
-                    <div>
-                        <label for="product-category" class="admin-form-label">Categoria</label>
-                        <input type="text" id="product-category" class="admin-form-input" placeholder="Ex: Ração, Brinquedo, Higiene" required>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <label for="product-description" class="admin-form-label">Descrição</label>
-                    <textarea id="product-description" rows="4" class="admin-form-textarea" placeholder="Detalhes sobre o produto..."></textarea>
-                </div>
-                
-                <fieldset class="mt-6 border-t pt-4">
-                    <legend class="text-lg font-semibold text-gray-700 mb-2">Variação Inicial</legend>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div>
-                            <label class="admin-form-label">Nome Completo</label>
-                            <input type="text" data-field="fullName" class="admin-form-input" value="${xmlProductData.name}" required>
-                        </div>
-                        <div>
-                            <label class="admin-form-label">Preço de Venda (R$)</label>
-                            <input type="number" step="0.01" data-field="price" class="admin-form-input" value="${xmlProductData.unitPrice.toFixed(2)}" required>
-                        </div>
-                         <div>
-                            <label class="admin-form-label">Estoque</label>
-                            <input type="number" data-field="stock" class="admin-form-input" value="${Math.round(xmlProductData.quantity)}" required>
-                        </div>
-                        <div>
-                            <label class="admin-form-label">Peso/Variação</label>
-                            <input type="text" data-field="weight" class="admin-form-input" placeholder="Ex: 15kg, P, 1 Unidade" required>
-                        </div>
-                    </div>
-                </fieldset>
+    // Se um modal já estiver aberto, remove-o para evitar duplicatas
+    const existingModal = document.getElementById('product-modal');
+    if (existingModal) existingModal.remove();
 
-                <div class="mt-8 flex justify-end">
-                    <button type="submit" class="admin-btn btn-primary">
-                        <i class="fas fa-save mr-2"></i> Salvar Produto no Firebase
-                    </button>
-                </div>
-            </form>
+    // Cria o HTML do modal e do formulário
+    const modalHTML = `
+        <div id="product-modal" class="admin-modal-overlay">
+            <div class="admin-modal-content">
+                <button id="modal-close-btn" class="modal-close-button">&times;</button>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Cadastrar Novo Produto</h3>
+                <form id="new-product-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="product-nome" class="admin-form-label">Nome Principal do Produto</label>
+                            <input type="text" id="product-nome" class="admin-form-input" value="${xmlProductData.name}" required>
+                        </div>
+                        <div>
+                            <label for="product-category" class="admin-form-label">Categoria</label>
+                            <input type="text" id="product-category" class="admin-form-input" placeholder="Ex: Ração, Brinquedo" required>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="product-description" class="admin-form-label">Descrição</label>
+                        <textarea id="product-description" rows="3" class="admin-form-textarea" placeholder="Detalhes sobre o produto..."></textarea>
+                    </div>
+                    
+                    <fieldset class="mt-6 border-t pt-4">
+                        <legend class="text-lg font-semibold text-gray-700 mb-2">Variações do Produto</legend>
+                        
+                        <div id="variations-container" class="space-y-4">
+                            <div class="variation-form-group">
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                    <div>
+                                        <label class="admin-form-label">Nome Completo</label>
+                                        <input type="text" data-field="fullName" class="admin-form-input" value="${xmlProductData.name}" required>
+                                    </div>
+                                    <div>
+                                        <label class="admin-form-label">Preço (R$)</label>
+                                        <input type="number" step="0.01" data-field="price" class="admin-form-input" value="${xmlProductData.unitPrice.toFixed(2)}" required>
+                                    </div>
+                                    <div>
+                                        <label class="admin-form-label">Estoque</label>
+                                        <input type="number" data-field="stock" class="admin-form-input" value="${Math.round(xmlProductData.quantity)}" required>
+                                    </div>
+                                    <div>
+                                        <label class="admin-form-label">Peso/Variação</label>
+                                        <input type="text" data-field="weight" class="admin-form-input" placeholder="Ex: 15kg, P" required>
+                                    </div>
+                                    <div class="col-span-2 md:col-span-3 lg:col-span-1">
+                                        <label class="admin-form-label">URL da Imagem</label>
+                                        <input type="url" data-field="image" class="admin-form-input" placeholder="https://...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-variation-btn" class="admin-btn mt-4">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Variação
+                        </button>
+                    </fieldset>
+
+                    <div class="mt-8 flex justify-end">
+                        <button type="submit" class="admin-btn btn-primary">
+                            <i class="fas fa-save mr-2"></i> Salvar Produto no Firebase
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     `;
 
-    // Adiciona o listener para o submit do formulário recém-criado
+    // Adiciona o modal ao corpo do documento
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modal = document.getElementById('product-modal');
+
+    // --- Lógica para fechar o modal ---
+    const closeModal = () => modal.remove();
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) { // Fecha apenas se clicar no fundo
+            closeModal();
+        }
+    });
+
+    // --- Lógica para adicionar uma nova variação ---
+    const variationsContainer = document.getElementById('variations-container');
+    document.getElementById('add-variation-btn').addEventListener('click', () => {
+        const variationCount = variationsContainer.children.length;
+        const newVariationHTML = `
+            <div class="variation-form-group">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-md font-semibold text-gray-600">Variação Adicional ${variationCount}</h4>
+                    <button type="button" class="remove-variation-btn text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash-alt"></i> Remover
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div><label class="admin-form-label">Nome Completo</label><input type="text" data-field="fullName" class="admin-form-input" required></div>
+                    <div><label class="admin-form-label">Preço (R$)</label><input type="number" step="0.01" data-field="price" class="admin-form-input" required></div>
+                    <div><label class="admin-form-label">Estoque</label><input type="number" data-field="stock" class="admin-form-input" required></div>
+                    <div><label class="admin-form-label">Peso/Variação</label><input type="text" data-field="weight" class="admin-form-input" required></div>
+                    <div class="col-span-2 md:col-span-3 lg:col-span-1"><label class="admin-form-label">URL da Imagem</label><input type="url" data-field="image" class="admin-form-input" placeholder="https://..."></div>
+                </div>
+            </div>
+        `;
+        variationsContainer.insertAdjacentHTML('beforeend', newVariationHTML);
+    });
+    
+    // --- Lógica para remover uma variação (com delegação de evento) ---
+    variationsContainer.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.remove-variation-btn');
+        if (removeBtn) {
+            removeBtn.closest('.variation-form-group').remove();
+        }
+    });
+
+    // --- Lógica para o SUBMIT do formulário ---
     document.getElementById('new-product-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const button = e.target.querySelector('button[type="submit"]');
         button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Salvando...';
         button.disabled = true;
 
-        // Monta o objeto do produto no formato que seu Firestore espera
+        const variations = [];
+        document.querySelectorAll('.variation-form-group').forEach(group => {
+            const variation = {
+                fullName: group.querySelector('[data-field="fullName"]').value,
+                price: parseFloat(group.querySelector('[data-field="price"]').value),
+                stock: parseInt(group.querySelector('[data-field="stock"]').value),
+                weight: group.querySelector('[data-field="weight"]').value,
+                image: group.querySelector('[data-field="image"]').value || 'https://via.placeholder.com/200', // Imagem padrão
+                originalPrice: 0
+            };
+            variations.push(variation);
+        });
+
         const newProduct = {
             nome: document.getElementById('product-nome').value,
             category: document.getElementById('product-category').value,
             description: document.getElementById('product-description').value,
-            brand: '', // Adicione campos extras se necessário
+            brand: '',
             featured: false,
-            variations: [{
-                fullName: e.target.querySelector('[data-field="fullName"]').value,
-                price: parseFloat(e.target.querySelector('[data-field="price"]').value),
-                stock: parseInt(e.target.querySelector('[data-field="stock"]').value),
-                weight: e.target.querySelector('[data-field="weight"]').value,
-                originalPrice: 0, // Pode adicionar um campo para isso se quiser
-                image: 'https://via.placeholder.com/200' // Imagem padrão
-            }]
+            variations: variations
         };
 
         try {
-            // Salva no Firebase
             const docRef = await addDoc(collection(db, 'produtos'), newProduct);
             console.log("Produto cadastrado com ID: ", docRef.id);
             
-            // Feedback visual de sucesso
-            button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo com Sucesso!';
-            button.classList.remove('btn-primary');
-            button.classList.add('bg-green-500');
-
-            // Marca o item na lista como cadastrado
             listItemElement.classList.add('registered');
             listItemElement.querySelector('.product-status').innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Cadastrado';
             listItemElement.classList.remove('selected');
-
-
-            // Limpa o formulário após um tempo
-            setTimeout(() => {
-                formContainer.innerHTML = '';
-            }, 2500);
+            
+            showAnimation('success-animation-overlay', 1500, closeModal);
 
         } catch (error) {
             console.error("Erro ao salvar produto no Firebase: ", error);
@@ -2297,6 +2354,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
