@@ -605,7 +605,6 @@ function createProductCardHTML(productData, productId) {
                         data-weight="${defaultVariation.weight}"
                         ${isDefaultOutOfStock ? 'disabled' : ''}>
                         
-                        {/* Ícones que vamos alternar com CSS */}
                         <i class="fas fa-check check-icon"></i>
                         <i class="fas fa-shopping-cart cart-icon text-lg"></i>
                         
@@ -2354,6 +2353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
