@@ -3515,3 +3515,52 @@ input[type='number'] {
     max-width: 100px; /* Um valor grande o suficiente para o texto "Adicionar" */
     opacity: 1;
 }
+
+
+/* --- Animação do Botão Adicionar ao Carrinho --- */
+
+.add-to-cart-btn-v2 {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    overflow: hidden;
+    gap: 0.5rem;
+}
+
+.add-to-cart-btn-v2 .add-to-cart-reveal {
+    max-width: 0;
+    opacity: 0;
+    transition: max-width 0.4s ease-in-out, opacity 0.2s ease-in-out;
+    white-space: nowrap;
+}
+
+.add-to-cart-btn-v2:hover .add-to-cart-reveal {
+    max-width: 100px;
+    opacity: 1;
+}
+
+/* Ícone de check começa escondido */
+.add-to-cart-btn-v2 .check-icon {
+    display: none;
+}
+
+/* ESTADO 1: Adicionando (Fica laranja, mostra o check e o texto "Adicionado!") */
+.add-to-cart-btn-v2.is-adding {
+    background-color: #f97316; /* Cor Laranja (Tailwind orange-500) */
+}
+
+.add-to-cart-btn-v2.is-adding .cart-icon {
+    display: none; /* Esconde o carrinho */
+}
+
+.add-to-cart-btn-v2.is-adding .check-icon {
+    display: inline-block; /* Mostra o check */
+}
+
+.add-to-cart-btn-v2.is-adding .add-to-cart-reveal {
+    max-width: 100px; /* Força o texto "Adicionado!" a aparecer */
+    opacity: 1;
+}
+
+/* ESTADO 2: Revertendo (Ainda laranja, mas volta a ser ícone com hover) */
+.add-to-cart-btn-v2.is-reverting {
+    background-color: #f97316; /* Mantém a cor laranja */
+}
