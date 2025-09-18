@@ -144,21 +144,6 @@ function updateTotals() {
     updateElementText('checkout-total', formatCurrency(total));
 }
 
-function updateAllHeartIcons() {
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        const icon = btn.querySelector('i');
-        if (!icon) return;
-        const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
-        if (isFav) {
-            icon.classList.remove('far', 'text-gray-300');
-            icon.classList.add('fas', 'text-red-500');
-        } else {
-            icon.classList.remove('fas', 'text-red-500');
-            icon.classList.add('far', 'text-gray-300');
-        }
-    });
-}
-
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderAdminOrdersView() {
     const adminContent = document.getElementById('admin-content');
@@ -2380,6 +2365,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
