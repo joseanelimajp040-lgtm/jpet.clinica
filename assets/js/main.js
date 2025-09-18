@@ -592,8 +592,7 @@ function createProductCardHTML(productData, productId) {
             </div>
 
             <div class="product-details p-4 flex flex-col flex-grow">
-                <h3 class="product-name-display font-semibold text-gray-800 mb-2 h-14 overflow-hidden">${defaultVariation.fullName || productData.nome}</h3>
-                
+                <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem]">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="price-container mb-3">${priceHTML}</div>
 
                 <div class="variations-container-v2 mb-4 flex flex-wrap gap-2">${variationsHTML}</div>
@@ -2357,6 +2356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
