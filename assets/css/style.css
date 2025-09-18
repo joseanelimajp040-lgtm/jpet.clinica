@@ -3295,3 +3295,138 @@ input[type='number'] {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* ================================================================== */
+/* ========== NOVOS ESTILOS PARA CARDS DE PRODUTO V2 ========== */
+/* ================================================================== */
+
+/* --- 1. A Estrutura Principal do Card --- */
+.product-card-v2 {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; /* Essencial para o efeito de zoom da imagem */
+}
+
+/* Efeito "lift" ao passar o mouse */
+.product-card-v2:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 2. Container da Imagem --- */
+.product-image-container {
+    overflow: hidden; /* Garante que a imagem ampliada não saia do container */
+}
+.product-card-image {
+    transition: transform 0.4s ease-in-out;
+}
+.product-card-v2:hover .product-card-image {
+    transform: scale(1.1); /* Efeito de zoom suave na imagem */
+}
+
+/* --- 3. Detalhes do Produto (Texto) --- */
+.product-details {
+    /* O flexbox já está sendo aplicado via Tailwind, este seletor é para organização */
+}
+.product-name-display {
+    /* A altura fixa (h-14) garante alinhamento entre cards com títulos de 1 ou 2 linhas */
+    line-height: 1.4;
+}
+
+/* --- 4. Estilos de Preço --- */
+.price-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+.original-price {
+    font-size: 0.9rem;
+    color: #94a3b8; /* slate-400 */
+    text-decoration: line-through;
+}
+.current-price {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    color: var(--primary-color); /* #FF6B00 */
+}
+
+/* --- 5. Novos Botões de Variação (Formato "Pill") --- */
+.variations-container-v2 {}
+.variation-btn-v2 {
+    padding: 6px 14px;
+    border: 2px solid #e2e8f0; /* slate-200 */
+    background-color: #f8fafc; /* slate-50 */
+    border-radius: 9999px; /* rounded-full */
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #475569; /* slate-600 */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.variation-btn-v2:hover {
+    border-color: #cbd5e1; /* slate-300 */
+    background-color: #f1f5f9; /* slate-100 */
+}
+.variation-btn-v2.selected {
+    border-color: var(--secondary-color); /* #00A8A8 */
+    background-color: #f0fdfa; /* teal-50 */
+    color: #0f766e; /* teal-700 */
+    font-weight: 600;
+}
+.variation-btn-v2.unavailable {
+    background-color: #fee2e2; border-color: #fca5a5; color: #b91c1c; cursor: not-allowed; text-decoration: line-through;
+}
+.variation-btn-v2.unavailable:hover {
+    background-color: #fee2e2; border-color: #fca5a5;
+}
+
+
+/* --- 6. Botão de Adicionar Interativo (A MÁGICA ACONTECE AQUI) --- */
+.add-to-cart-btn-v2 {
+    height: 44px;
+    border-radius: 9999px; /* Formato de pílula */
+    padding: 0 1rem;
+    overflow: hidden; /* Esconde o texto que transborda */
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.add-to-cart-reveal {
+    opacity: 0;
+    max-width: 0;
+    white-space: nowrap; /* Impede que o texto quebre a linha durante a animação */
+    transition: max-width 0.4s ease-in-out, opacity 0.3s ease-in-out 0.1s;
+    margin-left: 0;
+}
+
+/* No estado inicial (sem hover), o botão é um círculo com ícone */
+.product-card-v2 .add-to-cart-btn-v2 {
+    width: 44px; /* Largura igual à altura para formar um círculo */
+}
+
+/* Ao passar o mouse no CARD INTEIRO, o botão se expande */
+.product-card-v2:hover .add-to-cart-btn-v2 {
+    width: 100%;
+    background-color: #007f7f; /* Tom mais escuro da cor secundária */
+}
+.product-card-v2:hover .add-to-cart-btn-v2:disabled {
+    background-color: #6b7280; /* Mantém a cor de desabilitado */
+}
+
+
+/* E o texto aparece */
+.product-card-v2:hover .add-to-cart-reveal {
+    opacity: 1;
+    max-width: 100px; /* Valor suficiente para o texto "Adicionar" */
+    margin-left: 0.5rem; /* Espaço entre o ícone e o texto */
+}
+
+.add-to-cart-btn-v2:disabled {
+    background-color: #6b7280; /* bg-gray-500 */
+    cursor: not-allowed;
+}
+.add-to-cart-btn-v2:disabled .add-to-cart-reveal {
+    transition: none; /* Evita animação estranha no estado desabilitado */
+}
