@@ -604,10 +604,7 @@ function createProductCardHTML(productData, productId) {
                         data-image="${defaultVariation.image || productData.image}"
                         data-weight="${defaultVariation.weight}"
                         ${isDefaultOutOfStock ? 'disabled' : ''}>
-                        
-                        <i class="fas fa-check check-icon"></i>
-                        <i class="fas fa-shopping-cart cart-icon text-lg"></i>
-                        
+                        <i class="fas fa-shopping-cart text-lg"></i>
                         <span class="add-to-cart-reveal">${isDefaultOutOfStock ? 'Indisponível' : 'Adicionar'}</span>
                     </button>
                 </div>
@@ -1158,50 +1155,41 @@ function displayProducts(products) {
 
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
+    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão.
     const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2');
-    // Trava para evitar cliques múltiplos durante a animação
-    if (!button || button.classList.contains('is-adding') || button.classList.contains('is-reverting')) {
-        return;
-    }
-
-    // --- Lógica do Carrinho (inalterada) ---
+    if (!button || button.classList.contains('added')) return;
+    
+    const quantityInput = document.getElementById('product-quantity');
+    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
     const productData = button.dataset;
     if (!productData.id) return;
+
     const existingProduct = state.cart.find(item => item.id === productData.id && item.name === productData.name);
     if (existingProduct) {
-        existingProduct.quantity++;
+        existingProduct.quantity += quantity;
     } else {
         state.cart.push({
             id: productData.id,
             name: productData.name,
             price: parseFloat(productData.price),
             image: productData.image,
-            quantity: 1,
+            quantity: quantity,
             weight: productData.weight
         });
     }
     save.cart();
     updateCounters();
-
-    // --- Nova Animação por Etapas ---
-    const textSpan = button.querySelector('.add-to-cart-reveal');
-
-    // 1. Inicia a animação: fica laranja e mostra "Adicionado!"
-    if (textSpan) textSpan.textContent = 'Adicionado!';
-    button.classList.add('is-adding');
-
-    // 2. Após 1.5s: muda para o estado "revertendo" (ainda laranja, mas com comportamento de hover)
+    
+    const originalContent = button.innerHTML;
+    button.classList.add('added', 'bg-orange-500', 'hover:bg-orange-600');
+    button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
     setTimeout(() => {
-        button.classList.remove('is-adding');
-        button.classList.add('is-reverting');
-        if (textSpan) textSpan.textContent = 'Adicionar';
-    }, 1500);
-
-    // 3. Após mais 1.5s (total 3s): remove tudo e volta ao estado original
-    setTimeout(() => {
-        button.classList.remove('is-reverting');
-    }, 3000);
+        button.classList.remove('added', 'bg-orange-500', 'hover:bg-orange-600');
+        button.innerHTML = originalContent;
+        if (quantityInput) quantityInput.value = '1';
+    }, 2000);
 }
+
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
@@ -2353,7 +2341,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
-
-
