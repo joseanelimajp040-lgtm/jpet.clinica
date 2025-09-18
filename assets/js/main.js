@@ -143,6 +143,22 @@ function updateTotals() {
     updateElementText('checkout-shipping', formatCurrency(shippingFee));
     updateElementText('checkout-total', formatCurrency(total));
 }
+
+function updateAllHeartIcons() {
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        const icon = btn.querySelector('i');
+        if (!icon) return;
+        const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
+        if (isFav) {
+            icon.classList.remove('far', 'text-gray-300');
+            icon.classList.add('fas', 'text-red-500');
+        } else {
+            icon.classList.remove('fas', 'text-red-500');
+            icon.classList.add('far', 'text-gray-300');
+        }
+    });
+}
+
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderAdminOrdersView() {
     const adminContent = document.getElementById('admin-content');
@@ -524,8 +540,7 @@ function createProductCardHTML(productData, productId) {
     const defaultIndex = productData.defaultVariationIndex || 0;
     const defaultVariation = productData.variations[defaultIndex];
     const isFav = state.favorites.some(fav => fav.id === productId);
-    // Adiciona a classe 'is-favorite' se o item já estiver favoritado
-    const favStateClass = isFav ? 'is-favorite' : '';
+    const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-400';
     const isDefaultOutOfStock = defaultVariation.stock <= 0;
 
     const variationsHTML = productData.variations.map((v, index) => {
@@ -559,7 +574,7 @@ function createProductCardHTML(productData, productId) {
             <span class="current-price">${formatCurrency(defaultVariation.price)}</span>
         `;
         const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
-        discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">-${discount}%</div>`;
+        discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-${discount}%</div>`;
     } else {
         priceHTML = `<span class="current-price">${formatCurrency(defaultVariation.price)}</span>`;
     }
@@ -568,12 +583,9 @@ function createProductCardHTML(productData, productId) {
         <div class="product-card-v2 flex flex-col" data-product-id="${productId}">
             <div class="product-image-container relative">
                 ${discountBadgeHTML}
-                
-                <button class="favorite-btn ${favStateClass} absolute top-3 right-3 text-2xl z-20" data-id="${productId}">
-                    <i class="far fa-heart heart-outline"></i>
-                    <i class="fas fa-heart heart-solid"></i>
+                <button class="favorite-btn absolute top-3 right-3 text-2xl z-10" data-id="${productId}">
+                    <i class="${favIconClass} fa-heart"></i>
                 </button>
-
                 <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
                     <img src="${defaultVariation.image || productData.image}" alt="${productData.nome}" class="product-card-image w-full h-48 object-contain p-4">
                 </a>
@@ -581,13 +593,12 @@ function createProductCardHTML(productData, productId) {
 
             <div class="product-details p-4 flex flex-col flex-grow">
                 <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem]">${defaultVariation.fullName || productData.nome}</h3>
-                
                 <div class="price-container mb-3">${priceHTML}</div>
 
                 <div class="variations-container-v2 mb-4 flex flex-wrap gap-2">${variationsHTML}</div>
 
                 <div class="product-actions mt-auto pt-3">
-                     <button class="add-to-cart-btn-v2 w-full bg-secondary text-white font-medium flex items-center justify-center add-to-cart-btn"
+                     <button class="add-to-cart-btn-v2 w-full bg-secondary text-white font-medium flex items-center justify-center"
                         data-id="${productId}"
                         data-name="${defaultVariation.fullName || productData.nome}"
                         data-price="${defaultVariation.price}"
@@ -601,24 +612,6 @@ function createProductCardHTML(productData, productId) {
             </div>
         </div>
     `;
-}
-
-function updateAllHeartIcons() {
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        const productId = btn.dataset.id;
-        if (!productId) return;
-
-        const isFav = state.favorites.some(fav => fav.id === productId);
-        
-        // Agora, em vez de trocar as classes dos ícones,
-        // apenas adicionamos ou removemos a classe 'is-favorite' no botão pai.
-        // O CSS cuidará da animação e de qual ícone mostrar.
-        if (isFav) {
-            btn.classList.add('is-favorite');
-        } else {
-            btn.classList.remove('is-favorite');
-        }
-    });
 }
 
 function renderCart() {
@@ -1745,12 +1738,11 @@ async function startApplication() {
             loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
 
-        const variationBtn = target.closest('.variation-btn-v2'); // <<< MUDANÇA AQUI
-if (variationBtn) {
-    e.preventDefault();
-    const data = variationBtn.dataset;
-    // Também atualizamos aqui para procurar pela classe nova
-    variationBtn.parentElement.querySelectorAll('.variation-btn-v2').forEach(btn => btn.classList.remove('selected')); // <<< MUDANÇA AQUI
+         const variationBtn = target.closest('.variation-btn');
+        if (variationBtn) {
+            e.preventDefault();
+            const data = variationBtn.dataset;
+            variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
             variationBtn.classList.add('selected');
 
             // --- INÍCIO DA ALTERAÇÃO ---
@@ -2364,8 +2356,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
 
 
 
