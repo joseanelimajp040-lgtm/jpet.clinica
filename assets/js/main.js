@@ -1160,65 +1160,47 @@ function displayProducts(products) {
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
     const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2');
-    if (!button || button.classList.contains('added')) return;
+    // Trava para evitar cliques múltiplos durante a animação
+    if (!button || button.classList.contains('is-adding') || button.classList.contains('is-reverting')) {
+        return;
+    }
 
-    const quantityInput = document.getElementById('product-quantity');
-    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+    // --- Lógica do Carrinho (inalterada) ---
     const productData = button.dataset;
     if (!productData.id) return;
-
     const existingProduct = state.cart.find(item => item.id === productData.id && item.name === productData.name);
     if (existingProduct) {
-        existingProduct.quantity += quantity;
+        existingProduct.quantity++;
     } else {
         state.cart.push({
             id: productData.id,
             name: productData.name,
             price: parseFloat(productData.price),
             image: productData.image,
-            quantity: quantity,
+            quantity: 1,
             weight: productData.weight
         });
     }
     save.cart();
     updateCounters();
 
-    const icon = button.querySelector('i');
+    // --- Nova Animação por Etapas ---
     const textSpan = button.querySelector('.add-to-cart-reveal');
 
-    // --- Início da nova lógica de animação ---
+    // 1. Inicia a animação: fica laranja e mostra "Adicionado!"
+    if (textSpan) textSpan.textContent = 'Adicionado!';
+    button.classList.add('is-adding');
 
-    // Etapa 1: Ação Imediata (Fica laranja e mostra "Adicionado!")
-    button.classList.remove('bg-secondary');
-    button.classList.add('bg-orange-500', 'added'); // 'added' previne múltiplos cliques
-
-    if (textSpan) {
-        textSpan.textContent = 'Adicionado!';
-        // Força o texto a aparecer, mesmo sem hover, expandindo o botão
-        textSpan.style.maxWidth = '100px';
-        textSpan.style.opacity = '1';
-    } else {
-        button.innerHTML = `<i class="fas fa-check"></i> Adicionado!`;
-    }
-    if(icon) icon.style.display = 'none'; // Esconde o ícone do carrinho
-
-    // Etapa 2: Após 1.5s (Volta a ser ícone, mas AINDA LARANJA)
+    // 2. Após 1.5s: muda para o estado "revertendo" (ainda laranja, mas com comportamento de hover)
     setTimeout(() => {
-        if (icon) {
-            icon.style.display = ''; // Mostra o ícone novamente
-        }
-        if (textSpan) {
-            textSpan.textContent = 'Adicionar';
-            // Remove o estilo inline para que o CSS de hover (:hover) volte a controlar
-            textSpan.style.maxWidth = '';
-            textSpan.style.opacity = '';
-        }
+        button.classList.remove('is-adding');
+        button.classList.add('is-reverting');
+        if (textSpan) textSpan.textContent = 'Adicionar';
     }, 1500);
 
-    // Etapa 3: Após 3s no total (Volta à cor original e libera para novo clique)
+    // 3. Após mais 1.5s (total 3s): remove tudo e volta ao estado original
     setTimeout(() => {
-        button.classList.remove('bg-orange-500', 'added');
-        button.classList.add('bg-secondary');
+        button.classList.remove('is-reverting');
     }, 3000);
 }
 function handleFavoriteToggle(event) {
@@ -2372,5 +2354,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
