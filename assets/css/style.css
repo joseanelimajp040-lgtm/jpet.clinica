@@ -3430,3 +3430,67 @@ input[type='number'] {
 .add-to-cart-btn-v2:disabled .add-to-cart-reveal {
     transition: none; /* Evita animação estranha no estado desabilitado */
 }
+
+/* ================================================================== */
+/* ========== NOVA ANIMAÇÃO PARA O BOTÃO DE FAVORITAR ========== */
+/* ================================================================== */
+
+.favorite-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Posiciona os dois ícones (vazio e cheio) um sobre o outro */
+.favorite-btn .far,
+.favorite-btn .fas {
+    position: absolute;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+    -webkit-text-stroke: 1px white; /* Adiciona uma borda branca fina para melhor visibilidade sobre a imagem */
+}
+
+/* --- Estado Inicial (Não Favoritado) --- */
+.favorite-btn .heart-outline {
+    transform: scale(1);
+    opacity: 1;
+    color: #9ca3af; /* gray-400 */
+}
+.favorite-btn .heart-solid {
+    transform: scale(0);
+    opacity: 0;
+    color: #ef4444; /* red-500 */
+}
+
+/* --- Efeito HOVER (Quando NÃO é favorito) --- */
+.favorite-btn:not(.is-favorite):hover .heart-outline {
+    transform: scale(1.1);
+    color: #f87171; /* red-400 */
+}
+.favorite-btn:not(.is-favorite):hover .heart-solid {
+    transform: scale(1.1); /* O coração sólido "cresce" por dentro */
+    opacity: 1;
+}
+
+/* --- Estado ATIVO (Quando é favorito) --- */
+.favorite-btn.is-favorite .heart-outline {
+    transform: scale(0);
+    opacity: 0;
+}
+.favorite-btn.is-favorite .heart-solid {
+    transform: scale(1);
+    opacity: 1;
+    color: #ef4444; /* red-500 */
+}
+
+/* Animação de pulo quando clica para favoritar */
+.favorite-btn.is-favorite {
+    animation: heart-pulse 0.4s ease-in-out;
+}
+@keyframes heart-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
