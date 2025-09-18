@@ -604,7 +604,11 @@ function createProductCardHTML(productData, productId) {
                         data-image="${defaultVariation.image || productData.image}"
                         data-weight="${defaultVariation.weight}"
                         ${isDefaultOutOfStock ? 'disabled' : ''}>
-                        <i class="fas fa-shopping-cart text-lg"></i>
+                        
+                        {/* Ícones que vamos alternar com CSS */}
+                        <i class="fas fa-check check-icon"></i>
+                        <i class="fas fa-shopping-cart cart-icon text-lg"></i>
+                        
                         <span class="add-to-cart-reveal">${isDefaultOutOfStock ? 'Indisponível' : 'Adicionar'}</span>
                     </button>
                 </div>
@@ -2368,4 +2372,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
