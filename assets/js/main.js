@@ -150,11 +150,11 @@ function updateAllHeartIcons() {
         if (!icon) return;
         const isFav = state.favorites.some(fav => fav.id === btn.dataset.id);
         if (isFav) {
-            icon.classList.remove('far', 'text-gray-300');
+            icon.classList.remove('far', 'text-gray-400');
             icon.classList.add('fas', 'text-red-500');
         } else {
             icon.classList.remove('fas', 'text-red-500');
-            icon.classList.add('far', 'text-gray-300');
+            icon.classList.add('far', 'text-gray-400');
         }
     });
 }
@@ -211,8 +211,8 @@ async function renderAdminOrdersView() {
                         <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
                         <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
                     </div>
-                </div>
-                <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+               </div>
+               <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
                         <select id="status-${orderId}" class="admin-form-select">
@@ -223,11 +223,11 @@ async function renderAdminOrdersView() {
                         <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status</label>
                         <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
                     </div>
-                </div>
-                <div class="card-footer">
-                     <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
+               </div>
+               <div class="card-footer">
+                   <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
                     <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
-                </div>
+               </div>
             </div>
             `;
         }).join('');
@@ -292,8 +292,8 @@ async function renderAdminOrdersView() {
     if (e.target.closest('.order-details-trigger')) {
         renderDetailedOrderView(orderId);
     }
- });
-} //
+  });
+} 
 async function renderAdminClientsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -394,10 +394,10 @@ async function renderAdminProductsView() {
             const product = productData.data;
             const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
            let displayName = product.nome;
-if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
-    displayName = product.variations[0].fullName;
-}
-displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
+			if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
+			    displayName = product.variations[0].fullName;
+			}
+			displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
             const imageUrl = defaultVariation.image || product.image || 'https://via.placeholder.com/60';
 
             return `
@@ -529,7 +529,6 @@ async function renderAdminProductEditView(productId) {
         adminContent.innerHTML = `<p class="text-red-500">Não foi possível carregar os detalhes do produto.</p>`;
     }
 }
-// --- FIM: NOVAS FUNÇÕES DE GERENCIAMENTO DE PRODUTOS ---
 
 function createProductCardHTML(productData, productId) {
     if (!productData.variations || productData.variations.length === 0) {
@@ -1156,8 +1155,10 @@ function displayProducts(products) {
 
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
-    const button = event.target.closest('.add-to-cart-btn');
+    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão.
+    const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2');
     if (!button || button.classList.contains('added')) return;
+    
     const quantityInput = document.getElementById('product-quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
     const productData = button.dataset;
@@ -1178,11 +1179,12 @@ function handleAddToCart(event) {
     }
     save.cart();
     updateCounters();
+    
     const originalContent = button.innerHTML;
-    button.classList.add('added', 'bg-green-500');
+    button.classList.add('added', 'bg-orange-500', 'hover:bg-orange-600');
     button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
     setTimeout(() => {
-        button.classList.remove('added', 'bg-green-500');
+        button.classList.remove('added', 'bg-orange-500', 'hover:bg-orange-600');
         button.innerHTML = originalContent;
         if (quantityInput) quantityInput.value = '1';
     }, 2000);
@@ -1191,10 +1193,11 @@ function handleAddToCart(event) {
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
-    const card = button.closest('.product-card');
+    // CORREÇÃO: Usar um seletor mais genérico que funciona para ambos os cards.
+    const card = button.closest('[data-product-id]');
     if (!card) return;
+    
     const productId = card.dataset.productId;
-
     const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
 
     if (favoriteIndex > -1) {
@@ -1562,9 +1565,9 @@ async function loadPage(pageName, params = {}) {
                             renderAdminOrdersView();
                         } else if (adminPage === 'clientes') {
                             renderAdminClientsView();
-                        } else if (adminPage === 'produtos') { // NOVA FUNCIONALIDADE
+                        } else if (adminPage === 'produtos') { 
                             renderAdminProductsView();
-                        } else if (adminPage === 'importar-xml') { // <<< ADICIONE ESTE ELSE IF
+                        } else if (adminPage === 'importar-xml') { 
                             renderAdminImportXMLView();
                         } else if (adminPage === 'dashboard') {
                             loadPage('admin'); 
@@ -1725,9 +1728,8 @@ async function startApplication() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // NOVA FUNCIONALIDADE: Abre o editor de produto no painel de admin
-       const adminProductItem = target.closest('.product-list-item');
-    if (adminProductItem && adminProductItem.dataset.productId) {
+        const adminProductItem = target.closest('.product-list-item');
+        if (adminProductItem && adminProductItem.dataset.productId) {
             e.preventDefault();
             renderAdminProductEditView(adminProductItem.dataset.productId);
         }
@@ -1737,51 +1739,64 @@ async function startApplication() {
             e.preventDefault();
             loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
         }
-
-         const variationBtn = target.closest('.variation-btn');
+        
+        // CORREÇÃO: Lógica unificada para lidar com clique nas variações de produto
+        const variationBtn = target.closest('.variation-btn, .variation-btn-v2');
         if (variationBtn) {
             e.preventDefault();
             const data = variationBtn.dataset;
-            variationBtn.parentElement.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+            variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
             variationBtn.classList.add('selected');
 
-            // --- INÍCIO DA ALTERAÇÃO ---
             const stock = parseInt(data.stock, 10);
             const isOutOfStock = stock <= 0;
-            // --- FIM DA ALTERAÇÃO ---
             
-            const card = variationBtn.closest('.product-card');
+            // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
+            const card = variationBtn.closest('.product-card, .product-card-v2');
             if (card) { // Lógica para o card na página de listagem
-                const priceContainer = card.querySelector('.product-price-container');
-                const addToCartBtn = card.querySelector('.add-to-cart-btn');
+                const priceContainer = card.querySelector('.price-container');
+                const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
                 const cardImage = card.querySelector('.product-card-image');
                 const cardName = card.querySelector('.product-name-display');
 
-                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
-                    priceContainer.innerHTML = `<div><span class="text-sm text-gray-400 line-through">${formatCurrency(data.originalPrice)}</span><span class="text-primary font-bold text-lg block">${formatCurrency(data.price)}</span></div>`;
-                } else {
-                    priceContainer.innerHTML = `<div class="h-[48px] flex items-center"><span class="text-primary font-bold text-lg">${formatCurrency(data.price)}</span></div>`;
+                if (priceContainer) {
+                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                        priceContainer.innerHTML = `
+                            <span class="original-price">${formatCurrency(data.originalPrice)}</span>
+                            <span class="current-price">${formatCurrency(data.price)}</span>
+                        `;
+                    } else {
+                        priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
+                    }
                 }
+                
                 if (cardImage && data.image && cardImage.src !== data.image) {
                     cardImage.style.opacity = '0';
                     setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
                 }
+                
                 if (cardName && data.fullName) cardName.textContent = data.fullName;
-                addToCartBtn.dataset.price = data.price;
-                addToCartBtn.dataset.weight = data.weight;
-                addToCartBtn.dataset.image = data.image;
-                addToCartBtn.dataset.name = data.fullName;
+                
+                if (addToCartBtn) {
+                    addToCartBtn.dataset.price = data.price;
+                    addToCartBtn.dataset.weight = data.weight;
+                    addToCartBtn.dataset.image = data.image;
+                    addToCartBtn.dataset.name = data.fullName;
 
-                // --- INÍCIO DA ALTERAÇÃO ---
-                card.classList.toggle('out-of-stock', isOutOfStock);
-                addToCartBtn.disabled = isOutOfStock;
-                addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
-                // --- FIM DA ALTERAÇÃO ---
+                    addToCartBtn.disabled = isOutOfStock;
+                    const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
+                    if(textSpan) {
+                         textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
+                    } else { // Fallback para botões sem o span
+                        addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                    }
+                }
 
             } else { // Lógica para a página de detalhes do produto
                 const el = (id) => document.getElementById(id);
                 renderStockStatus(parseInt(data.stock));
                 if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+                
                 const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
                 if (originalPrice && discountBadge) {
                     if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
@@ -1795,30 +1810,33 @@ async function startApplication() {
                         discountBadge.classList.add('hidden');
                     }
                 }
+                
                 const pageImage = el('main-product-image');
                 if (pageImage && data.image && pageImage.src !== data.image) {
                     pageImage.style.opacity = '0';
                     setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
                 }
+                
                 if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
+                
                 const pageCartBtn = el('add-to-cart-product-page');
                 if (pageCartBtn) {
                     pageCartBtn.dataset.price = data.price;
                     pageCartBtn.dataset.weight = data.weight;
                     pageCartBtn.dataset.image = data.image;
                     pageCartBtn.dataset.name = data.fullName;
-                    
-                    // --- INÍCIO DA ALTERAÇÃO ---
                     pageCartBtn.disabled = isOutOfStock;
                     pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Comprar Agora';
-                    // --- FIM DA ALTERAÇÃO ---
                 }
             }
         }
+        
         if (target.closest('.logout-btn')) handleLogout();
         if (target.closest('#google-login-btn')) handleSocialLogin('google');
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
-        if (target.closest('.add-to-cart-btn')) handleAddToCart(e);
+        
+        // CORREÇÃO: Delegadores de evento unificados
+        if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2')) handleAddToCart(e);
         if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
         if (target.closest('.remove-from-cart')) {
@@ -1901,7 +1919,6 @@ async function startApplication() {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
 
-        // NOVA FUNCIONALIDADE: Salva as alterações do formulário de edição de produto
         if (e.target.id === 'edit-product-form') {
             e.preventDefault();
             const form = e.target;
@@ -2015,12 +2032,9 @@ async function startApplication() {
     await loadPage('home');
 }
 // ======================================================================
-// --- INÍCIO: NOVAS FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
+// --- INÍCIO: FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
 // ======================================================================
 
-/**
- * Renderiza a view principal para importação de XML da NFe.
- */
 async function renderAdminImportXMLView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -2041,14 +2055,9 @@ async function renderAdminImportXMLView() {
         <div id="product-registration-form-container" class="mt-8"></div>
     `;
 
-    // Adiciona o listener para o input de arquivo
     document.getElementById('xml-file-input').addEventListener('change', handleFileSelect);
 }
 
-/**
- * Lida com a seleção do arquivo XML, lê e inicia o parse.
- * @param {Event} event - O evento de 'change' do input de arquivo.
- */
 function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) {
@@ -2064,15 +2073,10 @@ function handleFileSelect(event) {
     reader.readAsText(file);
 }
 
-/**
- * Faz o parse do conteúdo do XML e extrai os dados dos produtos.
- * @param {string} xmlText - O conteúdo do arquivo XML como texto.
- */
 function parseNFeXML(xmlText) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, "application/xml");
 
-    // Verifica se houve erro no parse
     const parserError = xmlDoc.querySelector('parsererror');
     if (parserError) {
         console.error('Erro ao fazer o parse do XML:', parserError);
@@ -2081,7 +2085,7 @@ function parseNFeXML(xmlText) {
     }
 
     const productsList = [];
-    const productElements = xmlDoc.querySelectorAll('det'); // Cada produto está dentro de uma tag <det>
+    const productElements = xmlDoc.querySelectorAll('det');
 
     productElements.forEach(det => {
         const prod = det.querySelector('prod');
@@ -2097,7 +2101,7 @@ function parseNFeXML(xmlText) {
                 quantity: parseFloat(getTagValue('qCom') || 0),
                 unitPrice: parseFloat(getTagValue('vUnCom') || 0),
                 totalPrice: parseFloat(getTagValue('vProd') || 0),
-                ean: getTagValue('cEAN'), // Código de barras
+                ean: getTagValue('cEAN'),
             });
         }
     });
@@ -2109,10 +2113,6 @@ function parseNFeXML(xmlText) {
     }
 }
 
-/**
- * Exibe os produtos extraídos do XML em uma lista na tela.
- * @param {Array<Object>} products - Array com os objetos de produto.
- */
 function displayXMLProducts(products) {
     const listContainer = document.getElementById('xml-products-list');
     listContainer.innerHTML = `
@@ -2138,12 +2138,9 @@ function displayXMLProducts(products) {
 
     listContainer.innerHTML += productsHTML;
 
-    // Adiciona event listener para os cliques nos itens da lista
     listContainer.querySelectorAll('.xml-product-item').forEach(item => {
         item.addEventListener('click', () => {
-             // Desmarca outros itens selecionados
             listContainer.querySelectorAll('.xml-product-item').forEach(el => el.classList.remove('selected'));
-            // Marca o item clicado
             item.classList.add('selected');
 
             const productData = JSON.parse(item.dataset.productXml);
@@ -2152,17 +2149,10 @@ function displayXMLProducts(products) {
     });
 }
 
-/**
- * Mostra um MODAL com o formulário de cadastro para um produto selecionado.
- * @param {Object} xmlProductData - Os dados do produto extraídos do XML.
- * @param {HTMLElement} listItemElement - O elemento da lista que foi clicado.
- */
 function showProductRegistrationForm(xmlProductData, listItemElement) {
-    // Se um modal já estiver aberto, remove-o para evitar duplicatas
     const existingModal = document.getElementById('product-modal');
     if (existingModal) existingModal.remove();
 
-    // Cria o HTML do modal e do formulário
     const modalHTML = `
         <div id="product-modal" class="admin-modal-overlay">
             <div class="admin-modal-content">
@@ -2229,20 +2219,17 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
         </div>
     `;
 
-    // Adiciona o modal ao corpo do documento
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     const modal = document.getElementById('product-modal');
 
-    // --- Lógica para fechar o modal ---
     const closeModal = () => modal.remove();
     document.getElementById('modal-close-btn').addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Fecha apenas se clicar no fundo
+        if (e.target === modal) {
             closeModal();
         }
     });
 
-    // --- Lógica para adicionar uma nova variação ---
     const variationsContainer = document.getElementById('variations-container');
     document.getElementById('add-variation-btn').addEventListener('click', () => {
         const variationCount = variationsContainer.children.length;
@@ -2266,7 +2253,6 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
         variationsContainer.insertAdjacentHTML('beforeend', newVariationHTML);
     });
     
-    // --- Lógica para remover uma variação (com delegação de evento) ---
     variationsContainer.addEventListener('click', (e) => {
         const removeBtn = e.target.closest('.remove-variation-btn');
         if (removeBtn) {
@@ -2274,7 +2260,6 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
         }
     });
 
-    // --- Lógica para o SUBMIT do formulário ---
     document.getElementById('new-product-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const button = e.target.querySelector('button[type="submit"]');
@@ -2288,7 +2273,7 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
                 price: parseFloat(group.querySelector('[data-field="price"]').value),
                 stock: parseInt(group.querySelector('[data-field="stock"]').value),
                 weight: group.querySelector('[data-field="weight"]').value,
-                image: group.querySelector('[data-field="image"]').value || 'https://via.placeholder.com/200', // Imagem padrão
+                image: group.querySelector('[data-field="image"]').value || 'https://via.placeholder.com/200',
                 originalPrice: 0
             };
             variations.push(variation);
@@ -2323,7 +2308,7 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
 }
 
 // ======================================================================
-// --- FIM: NOVAS FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
+// --- FIM: FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
 // ======================================================================
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -2356,13 +2341,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
-
-
-
-
-
-
-
-
