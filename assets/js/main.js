@@ -1155,10 +1155,9 @@ function displayProducts(products) {
 
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
-    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão.
     const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2');
     if (!button || button.classList.contains('added')) return;
-    
+
     const quantityInput = document.getElementById('product-quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
     const productData = button.dataset;
@@ -1179,17 +1178,45 @@ function handleAddToCart(event) {
     }
     save.cart();
     updateCounters();
-    
-    const originalContent = button.innerHTML;
-    button.classList.add('added', 'bg-orange-500', 'hover:bg-orange-600');
-    button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
-    setTimeout(() => {
-        button.classList.remove('added', 'bg-orange-500', 'hover:bg-orange-600');
-        button.innerHTML = originalContent;
-        if (quantityInput) quantityInput.value = '1';
-    }, 2000);
-}
 
+    const icon = button.querySelector('i');
+    const textSpan = button.querySelector('.add-to-cart-reveal');
+
+    // --- Início da nova lógica de animação ---
+
+    // Etapa 1: Ação Imediata (Fica laranja e mostra "Adicionado!")
+    button.classList.remove('bg-secondary');
+    button.classList.add('bg-orange-500', 'added'); // 'added' previne múltiplos cliques
+
+    if (textSpan) {
+        textSpan.textContent = 'Adicionado!';
+        // Força o texto a aparecer, mesmo sem hover, expandindo o botão
+        textSpan.style.maxWidth = '100px';
+        textSpan.style.opacity = '1';
+    } else {
+        button.innerHTML = `<i class="fas fa-check"></i> Adicionado!`;
+    }
+    if(icon) icon.style.display = 'none'; // Esconde o ícone do carrinho
+
+    // Etapa 2: Após 1.5s (Volta a ser ícone, mas AINDA LARANJA)
+    setTimeout(() => {
+        if (icon) {
+            icon.style.display = ''; // Mostra o ícone novamente
+        }
+        if (textSpan) {
+            textSpan.textContent = 'Adicionar';
+            // Remove o estilo inline para que o CSS de hover (:hover) volte a controlar
+            textSpan.style.maxWidth = '';
+            textSpan.style.opacity = '';
+        }
+    }, 1500);
+
+    // Etapa 3: Após 3s no total (Volta à cor original e libera para novo clique)
+    setTimeout(() => {
+        button.classList.remove('bg-orange-500', 'added');
+        button.classList.add('bg-secondary');
+    }, 3000);
+}
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
@@ -2341,3 +2368,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
