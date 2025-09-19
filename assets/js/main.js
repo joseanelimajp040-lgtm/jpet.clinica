@@ -1547,6 +1547,9 @@ async function loadPage(pageName, params = {}) {
             case 'produtos':
                 await renderProdutosPage();
                 break;
+            case 'promocoes':
+                await renderPromocoesPage();
+                break;
             case 'produto':
                 if (params.id) {
                     await renderProductPage(params.id);
@@ -2379,4 +2382,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
