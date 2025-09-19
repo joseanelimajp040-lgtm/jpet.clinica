@@ -58,13 +58,12 @@
 <nav id="main-nav-bar" class="bg-primary text-white">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between py-2 md:py-0">
-            
             <div class="dropdown relative">
                 <button class="bg-secondary hover:bg-teal-700 px-6 py-3 font-medium flex items-center text-sm md:text-base rounded-full md:rounded-none">
                     <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
                 </button>
                 <div class="dropdown-menu absolute left-0 mt-1 w-64 bg-white shadow-lg rounded-md hidden z-50">
-                    <a href="#" class="nav-link text-gray-800 hover:bg-gray-100 border-b flex items-center px-4 py-3" data-page="promocoes"><i class="fas fa-tags fa-fw mr-2 text-primary"></i> Promoções</a>
+                    <a href="#" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-tags fa-fw mr-2 text-primary"></i> Promoções</a>
                     <a href="#" id="racao-btn-dropdown" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-bone fa-fw mr-2 text-primary"></i> Rações</a>
                     <a href="#" id="medicamentos-btn-dropdown" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-pills fa-fw mr-2 text-primary"></i> Medicamentos</a>
                     <a href="#" class="nav-link text-gray-800 hover:bg-gray-100 border-b flex items-center px-4 py-3" data-page="farmacia"><i class="fas fa-briefcase-medical fa-fw mr-2 text-primary"></i> Farmácia</a>
@@ -72,21 +71,21 @@
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center space-x-2">
-               <a href="#" class="nav-link nav-button-styled" data-page="promocoes">Promoções</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="racao">Rações</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="medicamentos">Medicamentos</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="farmacia">Farmácia</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="banho-e-tosa">Banho e tosa</a>
+            <div class="hidden md:flex items-center space-x-6">
+               <a href="#" class="nav-link text-gray-700 hover:text-primary font-medium" data-page="promocoes">Promoções</a>
+                <a href="#" id="racao-btn-nav" class="py-3 px-2 font-medium hover:bg-orange-700 nav-link" data-page="racao">Rações</a>
+                <a href="#" id="medicamentos-btn" class="py-3 px-2 font-medium hover:bg-orange-700 nav-link" data-page="medicamentos">Medicamentos</a>
+                <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="farmacia">Farmácia</a>
+                <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="banho-e-tosa">Banho e tosa</a>
+                <div id="login-placeholder-desktop">
+                </div>
             </div>
 
-            <div class="flex items-center">
-                <div id="login-placeholder-desktop" class="hidden md:block">
-                    </div>
-                <div id="login-placeholder-mobile" class="md:hidden ml-4">
-                    </div>
+            <div id="login-placeholder-mobile" class="md:hidden ml-4">
             </div>
-
         </div>
     </div>
 </nav>
+
+
+
