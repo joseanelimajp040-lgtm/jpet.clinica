@@ -3567,3 +3567,47 @@ input[type='number'] {
 }
 
 /* ========== FIM: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
+
+/* ================================================================== */
+/* ========== ESTILOS PARA A PÁGINA DE PROMOÇÕES ========== */
+/* ================================================================== */
+
+.promotions-header {
+    background-color: #fdfdfd;
+    padding: 3rem 1.5rem;
+    border-radius: 1.5rem; /* 24px */
+    margin-bottom: 3rem;
+    border: 1px solid #ffeadd;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+}
+
+.promotions-header .icon-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1.5rem;
+    width: 5rem; /* 80px */
+    height: 5rem; /* 80px */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #FF6B00 0%, #00A8A8 100%);
+    color: white;
+    font-size: 2.5rem; /* 40px */
+    box-shadow: 0 10px 20px rgba(0, 168, 168, 0.2);
+    animation: bounce-icon 2s ease-in-out infinite;
+}
+
+@keyframes bounce-icon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.promotions-header h1 {
+    color: #FF6B00; /* Cor primária */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.promotions-header p {
+    color: #334155; /* slate-700 */
+}
