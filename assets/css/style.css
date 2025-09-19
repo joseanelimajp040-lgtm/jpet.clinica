@@ -3569,6 +3569,27 @@ input[type='number'] {
 /* ========== FIM: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
 
 /* ================================================================== */
+/* ========== CORREÇÃO DEFINITIVA PARA O BOTÃO PROMOÇÕES ========== */
+/* ================================================================== */
+
+/* Esta regra busca por um link com data-page="promocoes"
+  dentro da barra de navegação principal.
+*/
+#main-nav-bar .nav-link[data-page="promocoes"] {
+    color: white !important; /* Força a cor branca, sobrepondo qualquer outra classe */
+    background-color: rgba(0, 0, 0, 0.15); /* Adiciona um fundo sutil para destacá-lo */
+    padding: 6px 12px;
+    border-radius: 8px; /* Bordas arredondadas */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Efeito ao passar o mouse por cima */
+#main-nav-bar .nav-link[data-page="promocoes"]:hover {
+    color: white !important;
+    background-color: rgba(0, 0, 0, 0.25); /* Fundo fica um pouco mais escuro */
+}
+
+/* ================================================================== */
 /* ========== REDESIGN DO BANNER DE PROMOÇÕES (PROFISSIONAL) ========== */
 /* ================================================================== */
 
@@ -3580,7 +3601,7 @@ input[type='number'] {
 .promotions-banner-v2 {
     position: relative; /* Contexto para o overlay */
     padding: 6rem 0; /* Espaçamento interno vertical generoso */
-    background-image: url('https://images.unsplash.com/photo-1548681528-6a5c45b66b42?q=80&w=2070&auto=format&fit=crop'); /* Imagem de fundo profissional */
+    background-image: url('https://images.unsplash.com/photo-1548681528-6a5c45b66b42?q=80&w=2070&auto=format&fit=crop'); /* Imagem de fundo profissional de um gato */
     background-size: cover;
     background-position: center 30%; /* Foca um pouco mais para cima na imagem */
     color: white;
@@ -3625,25 +3646,4 @@ input[type='number'] {
 
 .promotions-banner-v2 p {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-/* ================================================================== */
-/* ========== CORREÇÃO DEFINITIVA PARA O BOTÃO PROMOÇÕES ========== */
-/* ================================================================== */
-
-/* Esta regra busca por um link com data-page="promocoes"
-  dentro da barra de navegação principal.
-*/
-#main-nav-bar .nav-link[data-page="promocoes"] {
-    color: white !important; /* Força a cor branca, sobrepondo qualquer outra classe */
-    background-color: rgba(0, 0, 0, 0.15); /* Adiciona um fundo sutil para destacá-lo */
-    padding: 6px 12px;
-    border-radius: 8px; /* Bordas arredondadas */
-    transition: background-color 0.2s ease-in-out;
-}
-
-/* Efeito ao passar o mouse por cima */
-#main-nav-bar .nav-link[data-page="promocoes"]:hover {
-    color: white !important;
-    background-color: rgba(0, 0, 0, 0.25); /* Fundo fica um pouco mais escuro */
 }
