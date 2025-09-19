@@ -3592,7 +3592,7 @@ input[type='number'] {
 }
 
 /* ================================================================== */
-/* ========== REDESIGN DO BANNER DE PROMOÇÕES (PROFISSIONAL) ========== */
+/* ========== REDESIGN DO BANNER DE PROMOÇÕES (COM EFEITO FLUTUANTE) ========== */
 /* ================================================================== */
 
 /* Remove margens e paddings padrão do container da página */
@@ -3601,16 +3601,28 @@ input[type='number'] {
 }
 
 .promotions-banner-v2 {
-    position: relative; /* Contexto para o overlay */
-    padding: 6rem 0; /* Espaçamento interno vertical generoso */
-    background-image: url('https://images.unsplash.com/photo-1548681528-6a5c45b66b42?q=80&w=2070&auto=format&fit=crop'); /* Imagem de fundo profissional de um gato */
-    background-size: cover;
-    background-position: center 30%; /* Foca um pouco mais para cima na imagem */
+    position: relative;
+    padding: 6rem 0;
+    background-image: url('https://images.unsplash.com/photo-1548681528-6a5c45b66b42?q=80&w=2070&auto=format&fit=crop');
+    background-size: 100%; /* << MUDANÇA: Começa em 100% para o efeito de zoom */
+    background-position: center 30%;
     color: white;
-    text-align: left; /* Alinha o texto à esquerda */
+    text-align: left;
+    overflow: hidden; /* Garante que nada vaze para fora */
+    cursor: default; /* Pode manter o cursor padrão aqui */
+    
+    /* ADIÇÃO: Transição suave para todos os efeitos */
+    transition: all 0.4s ease-in-out;
 }
 
-/* Camada escura semi-transparente sobre a imagem para garantir a legibilidade do texto */
+/* ADIÇÃO: Efeito de flutuar e sombra ao passar o mouse */
+.promotions-banner-v2:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    background-size: 105%; /* ADIÇÃO: Efeito sutil de zoom na imagem de fundo */
+}
+
+/* O overlay e os textos permanecem exatamente como estavam */
 .promotions-banner-v2 .banner-overlay {
     position: absolute;
     top: 0;
@@ -3619,18 +3631,24 @@ input[type='number'] {
     height: 100%;
     background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 100%);
     z-index: 1;
+    /* ADIÇÃO (Opcional): Transição para o gradiente mudar suavemente */
+    transition: background 0.4s ease-in-out;
 }
 
-/* Conteúdo do banner (textos) */
+/* ADIÇÃO (Opcional): Leve ajuste no gradiente para mais dinamismo no hover */
+.promotions-banner-v2:hover .banner-overlay {
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+
 .promotions-banner-v2 .banner-content {
     position: relative;
     z-index: 2;
 }
 
-/* Tag de destaque "Ofertas do Mês" */
 .promotions-banner-v2 .highlight-tag {
     display: inline-block;
-    background-color: #FF6B00; /* Cor primária */
+    background-color: #FF6B00;
     color: white;
     padding: 0.5rem 1.25rem;
     border-radius: 9999px;
@@ -3643,10 +3661,9 @@ input[type='number'] {
 
 .promotions-banner-v2 h1 {
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
-    letter-spacing: -0.025em; /* Deixa as letras mais próximas e profissionais */
+    letter-spacing: -0.025em;
 }
 
 .promotions-banner-v2 p {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
-
