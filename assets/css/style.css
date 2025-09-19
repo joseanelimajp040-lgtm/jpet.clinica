@@ -3494,3 +3494,76 @@ input[type='number'] {
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
+
+/* ========== INÍCIO: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
+
+.mystery-vet-card {
+  position: relative; /* Essencial para o posicionamento do overlay */
+  background-color: #f8fafc; /* Um cinza bem claro (slate-50) */
+  border: 3px dashed #cbd5e1; /* Borda tracejada (slate-300) */
+  transition: all 0.4s ease-in-out;
+  min-height: 256px; /* Garante uma altura mínima consistente com os outros cards */
+  overflow: hidden; /* Garante que o overlay não vaze para fora */
+  cursor: pointer;
+}
+
+.mystery-vet-card:hover {
+  border-color: #00A8A8; /* Cor secundária no hover */
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 168, 168, 0.2);
+}
+
+.mystery-content {
+  transition: all 0.4s ease;
+}
+
+.mystery-vet-card:hover .mystery-content {
+  transform: scale(0.9);
+  opacity: 0.1;
+  filter: blur(2px);
+}
+
+.mystery-icon {
+  font-size: 4rem; /* 64px */
+  color: #94a3b8; /* slate-400 */
+  animation: float-icon 3s ease-in-out infinite;
+}
+
+/* Animação de flutuação para o ícone */
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.mystery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.95), rgba(0, 168, 168, 0.95)); /* Gradiente com as cores da marca */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  opacity: 0; /* Começa invisível */
+  visibility: hidden; /* Começa inacessível */
+  transform: scale(0.9);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.mystery-vet-card:hover .mystery-overlay {
+  opacity: 1; /* Fica visível no hover */
+  visibility: visible; /* Fica acessível no hover */
+  transform: scale(1);
+}
+
+.mystery-text {
+  color: white;
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ========== FIM: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
