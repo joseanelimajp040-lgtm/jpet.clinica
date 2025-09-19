@@ -18,14 +18,11 @@
     <div class="container mx-auto px-4">
         <div id="main-header-content" class="flex items-center justify-between">
             <div class="flex items-center">
-    <a href="#" class="nav-link text-3xl font-bold logo-link flex items-center" data-page="home">
-
-        <img src="https://i.postimg.cc/x8gx2zTH/IMG-4959.png" alt="Logo Parceiro" class="logo-parceiro">
-
-        <img src="https://i.postimg.cc/YqVmjCVw/IMG-4956.png" alt="Logo J.A" class="header-logo-img">
-
-    </a>
-</div>
+                <a href="#" class="nav-link text-3xl font-bold logo-link flex items-center" data-page="home">
+                    <img src="https://i.postimg.cc/x8gx2zTH/IMG-4959.png" alt="Logo Parceiro" class="logo-parceiro">
+                    <img src="https://i.postimg.cc/YqVmjCVw/IMG-4956.png" alt="Logo J.A" class="header-logo-img">
+                </a>
+            </div>
             
             <div class="flex-1 mx-8 relative hidden md:flex">
                 <form id="search-form" class="relative w-full">
@@ -41,7 +38,6 @@
                 <a href="#" id="mobile-search-icon" class="text-2xl text-primary md:hidden">
                     <i class="fas fa-search"></i>
                 </a>
-
                 <a href="#" class="nav-link relative" data-page="favorites">
                     <i class="fas fa-heart text-2xl text-gray-700"></i>
                     <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
@@ -58,12 +54,11 @@
 <nav id="main-nav-bar" class="bg-primary text-white">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between py-2 md:py-0">
-            
             <div class="dropdown relative">
-    <button class="bg-secondary hover:bg-teal-700 px-6 py-3 font-medium flex items-center text-sm md:text-base rounded-full">
-        <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
-    </button>
-    </div>
+                <!-- BOTÃO "CATEGORIAS" COM O NOVO ESTILO ARREDONDADO -->
+                <button class="bg-secondary hover:bg-teal-700 px-6 py-3 font-medium flex items-center text-sm md:text-base rounded-full">
+                    <i class="fas fa-bars mr-2"></i> Categorias <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                </button>
                 <div class="dropdown-menu absolute left-0 mt-1 w-64 bg-white shadow-lg rounded-md hidden z-50">
                     <a href="#" class="nav-link text-gray-800 hover:bg-gray-100 border-b flex items-center px-4 py-3" data-page="promocoes"><i class="fas fa-tags fa-fw mr-2 text-primary"></i> Promoções</a>
                     <a href="#" id="racao-btn-dropdown" class="block px-4 py-3 text-gray-800 hover:bg-gray-100 border-b flex items-center"><i class="fas fa-bone fa-fw mr-2 text-primary"></i> Rações</a>
@@ -73,22 +68,19 @@
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center space-x-2">
-               <a href="#" class="nav-link nav-button-styled" data-page="promocoes">Promoções</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="racao">Rações</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="medicamentos">Medicamentos</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="farmacia">Farmácia</a>
-               <a href="#" class="nav-link nav-button-styled" data-page="banho-e-tosa">Banho e tosa</a>
+            <!-- ESTRUTURA CORRETA DA BARRA DE NAVEGAÇÃO -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="py-3 px-2 font-medium hover:bg-orange-700 nav-link" data-page="promocoes">Promoções</a>
+                <a href="#" id="racao-btn-nav" class="py-3 px-2 font-medium hover:bg-orange-700 nav-link" data-page="racao">Rações</a>
+                <a href="#" id="medicamentos-btn" class="py-3 px-2 font-medium hover:bg-orange-700 nav-link" data-page="medicamentos">Medicamentos</a>
+                <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="farmacia">Farmácia</a>
+                <a href="#" class="nav-link py-3 px-2 font-medium hover:bg-orange-700" data-page="banho-e-tosa">Banho e tosa</a>
+                <div id="login-placeholder-desktop">
+                </div>
             </div>
 
-            <div class="flex items-center">
-                <div id="login-placeholder-desktop" class="hidden md:block">
-                    </div>
-                <div id="login-placeholder-mobile" class="md:hidden ml-4">
-                    </div>
+            <div id="login-placeholder-mobile" class="md:hidden ml-4">
             </div>
-
         </div>
     </div>
 </nav>
-
