@@ -3569,24 +3569,26 @@ input[type='number'] {
 /* ========== FIM: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
 
 /* ================================================================== */
-/* ========== CORREÇÃO DEFINITIVA PARA O BOTÃO PROMOÇÕES ========== */
+/* ========== ESTILO PADRÃO PARA BOTÕES DA BARRA DE NAVEGAÇÃO ========== */
 /* ================================================================== */
 
-/* Esta regra busca por um link com data-page="promocoes"
-  dentro da barra de navegação principal.
+/* Esta nova classe .nav-button-styled será usada em todos os botões 
+  da navegação para garantir um visual uniforme.
 */
-#main-nav-bar .nav-link[data-page="promocoes"] {
-    color: white !important; /* Força a cor branca, sobrepondo qualquer outra classe */
-    background-color: rgba(0, 0, 0, 0.15); /* Adiciona um fundo sutil para destacá-lo */
-    padding: 6px 12px;
+.nav-button-styled {
+    color: white !important; /* Força a cor branca */
+    background-color: rgba(0, 0, 0, 0.15); /* Fundo sutil para destaque */
+    padding: 6px 14px; /* Espaçamento interno */
     border-radius: 8px; /* Bordas arredondadas */
-    transition: background-color 0.2s ease-in-out;
+    font-weight: 500; /* Peso da fonte */
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 /* Efeito ao passar o mouse por cima */
-#main-nav-bar .nav-link[data-page="promocoes"]:hover {
+.nav-button-styled:hover {
     color: white !important;
     background-color: rgba(0, 0, 0, 0.25); /* Fundo fica um pouco mais escuro */
+    transform: scale(1.05); /* Leve aumento para dar feedback */
 }
 
 /* ================================================================== */
@@ -3647,3 +3649,4 @@ input[type='number'] {
 .promotions-banner-v2 p {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
+
