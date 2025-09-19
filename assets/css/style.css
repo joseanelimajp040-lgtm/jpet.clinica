@@ -3569,45 +3569,96 @@ input[type='number'] {
 /* ========== FIM: ESTILOS DO CARD MISTERIOSO DE VETERINÁRIO ========== */
 
 /* ================================================================== */
-/* ========== ESTILOS PARA A PÁGINA DE PROMOÇÕES ========== */
+/* ========== ESTILOS PARA A PÁGINA DE PROMOÇÕES (NOVO) ========== */
 /* ================================================================== */
 
 .promotions-header {
-    background-color: #fdfdfd;
-    padding: 3rem 1.5rem;
+    background-color: #ffffff; /* Fundo branco para um look clean */
+    background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 0l11 22 11 -22zm66 0l11 22 11 -22zm-33 0l11 22 11 -22z" fill="%23f7fafc"/%3E%3C/svg%3E'); /* Padrão sutil */
+    padding: 3.5rem 2rem; /* Aumentei o padding */
     border-radius: 1.5rem; /* 24px */
-    margin-bottom: 3rem;
-    border: 1px solid #ffeadd;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    margin-bottom: 3.5rem; /* Mais espaçamento */
+    border: 1px solid #e2e8f0; /* Borda mais suave */
+    box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada e profissional */
+    position: relative;
+    overflow: hidden; /* Para garantir que os elementos decorativos não vazem */
 }
 
+/* Elementos decorativos (opcional, para um toque extra) */
+.promotions-header::before,
+.promotions-header::after {
+    content: '';
+    position: absolute;
+    background-color: #FF6B00; /* Cor primária */
+    opacity: 0.05; /* Bem sutil */
+    border-radius: 50%;
+    filter: blur(50px);
+    z-index: 0;
+}
+
+.promotions-header::before {
+    width: 200px;
+    height: 200px;
+    top: -50px;
+    left: -50px;
+}
+
+.promotions-header::after {
+    width: 250px;
+    height: 250px;
+    bottom: -70px;
+    right: -70px;
+    background-color: #00A8A8; /* Cor secundária */
+}
+
+
 .promotions-header .icon-wrapper {
+    position: relative; /* Para ficar acima dos pseudo-elementos */
+    z-index: 1;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 1.5rem;
-    width: 5rem; /* 80px */
-    height: 5rem; /* 80px */
+    width: 5.5rem; /* Ligeiramente maior */
+    height: 5.5rem; /* Ligeiramente maior */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #FF6B00 0%, #00A8A8 100%);
+    background: linear-gradient(135deg, #FF6B00 0%, #00A8A8 100%); /* Gradiente chamativo */
     color: white;
-    font-size: 2.5rem; /* 40px */
-    box-shadow: 0 10px 20px rgba(0, 168, 168, 0.2);
-    animation: bounce-icon 2s ease-in-out infinite;
+    font-size: 2.75rem; /* Ícone maior */
+    box-shadow: 0 10px 25px rgba(0, 168, 168, 0.3); /* Sombra mais forte no ícone */
+    animation: pulse-icon 2s ease-out infinite; /* Animação mais suave */
 }
 
-@keyframes bounce-icon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+@keyframes pulse-icon {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,168,168,0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(0,168,168,0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,168,168,0); }
 }
 
 .promotions-header h1 {
+    position: relative;
+    z-index: 1;
     color: #FF6B00; /* Cor primária */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.08); /* Sombra de texto mais suave */
+    letter-spacing: -0.025em; /* Ajuste para melhor leitura */
+    line-height: 1.2;
 }
 
 .promotions-header p {
-    color: #334155; /* slate-700 */
+    position: relative;
+    z-index: 1;
+    color: #4a5568; /* slate-600 para um contraste melhor */
+    font-size: 1.15rem; /* Texto um pouco maior */
+    line-height: 1.6;
+    max-width: 38rem; /* Aumentei um pouco a largura máxima */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Garante que o conteúdo fique sobre os elementos decorativos */
+.promotions-page-container > header {
+    position: relative;
+    z-index: 10;
 }
