@@ -798,7 +798,45 @@ async function renderProdutosPage() {
         container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar os produtos. Tente novamente mais tarde.</p>';
     }
 }
+async function renderPromocoesPage() {
+    const container = document.getElementById('promotional-products-container');
+    if (!container) return;
 
+    container.innerHTML = '<p class="col-span-full text-center text-gray-500 text-lg">Buscando as melhores ofertas para você...</p>';
+
+    try {
+        const snapshot = await getDocs(query(collection(db, 'produtos')));
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhuma promoção encontrada no momento.</p>';
+            return;
+        }
+
+        const promotionalProducts = [];
+        snapshot.forEach(doc => {
+            const product = doc.data();
+            // Verifica se o produto tem variações e se alguma delas está em promoção
+            if (product.variations && Array.isArray(product.variations)) {
+                const isOnSale = product.variations.some(v => v.originalPrice && v.originalPrice > v.price);
+                if (isOnSale) {
+                    promotionalProducts.push({ id: doc.id, ...product });
+                }
+            }
+        });
+
+        if (promotionalProducts.length === 0) {
+            container.innerHTML = '<p class="col-span-full text-center text-gray-500">Nenhuma promoção encontrada no momento. Volte em breve!</p>';
+            return;
+        }
+
+        // Usa a função já existente para criar os cards dos produtos
+        container.innerHTML = promotionalProducts.map(product => createProductCardHTML(product, product.id)).join('');
+        updateAllHeartIcons();
+
+    } catch (error) {
+        console.error("Erro ao buscar produtos em promoção: ", error);
+        container.innerHTML = '<p class="col-span-full text-center text-red-500">Não foi possível carregar as promoções. Tente novamente mais tarde.</p>';
+    }
+}
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
     try {
@@ -2341,3 +2379,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
