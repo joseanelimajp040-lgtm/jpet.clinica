@@ -37,7 +37,20 @@ export function initPageModals() {
             e.preventDefault();
             openModal(document.getElementById('racao-modal'));
         }
+   const categorySearchBtn = e.target.closest('[data-category-search]');
+        if (categorySearchBtn) {
+            e.preventDefault();
+            const category = categorySearchBtn.dataset.categorySearch;
+            const modal = categorySearchBtn.closest('.modal');
+            
+            closeModal(modal); // Fecha o modal atual
 
+            // Dispara um evento personalizado para o main.js ouvir
+            const searchEvent = new CustomEvent('navigateToSearch', {
+                detail: { category: category }
+            });
+            document.dispatchEvent(searchEvent);
+        }
         // <<< INÍCIO DA CORREÇÃO >>>
         // Modal de Medicamentos (agora verifica os 3 botões possíveis)
         if (e.target.closest('#medicamentos-btn-nav') || e.target.closest('#medicamentos-btn-dropdown') || e.target.closest('#medicamentos-cat-btn')) {
@@ -76,3 +89,4 @@ export function initPageModals() {
         }
     });
 }
+
