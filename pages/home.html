@@ -32,14 +32,17 @@
     <div class="container mx-auto px-4">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Categorias em destaque</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            
             <a href="#" id="medicamentos-cat-btn" class="category-card bg-white rounded-lg shadow p-4 text-center transition duration-300">
                 <div class="bg-gray-100 rounded-full p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center"><i class="fas fa-pills text-3xl text-primary"></i></div>
                 <h3 class="font-medium text-gray-800">Medicamentos</h3>
             </a>
+
             <a href="#" id="racao-btn" class="category-card bg-white rounded-lg shadow p-4 text-center transition duration-300">
                 <div class="bg-gray-100 rounded-full p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center"><i class="fas fa-bone text-3xl text-primary"></i></div>
                 <h3 class="font-medium text-gray-800">Rações</h3>
             </a>
+
             <a href="#" class="category-card bg-white rounded-lg shadow p-4 text-center transition duration-300">
                 <div class="bg-gray-100 rounded-full p-4 mb-2 mx-auto w-20 h-20 flex items-center justify-center"><i class="fas fa-shield-alt text-3xl text-primary"></i></div>
                 <h3 class="font-medium text-gray-800">Antipulgas</h3>
@@ -60,31 +63,49 @@
     </div>
 </section>
 
+<div id="racao-modal" class="modal hidden">
+    <div class="modal-content relative"><span class="modal-close">×</span>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Selecione o seu Pet</h2>
+        <div class="animal-option" data-animal="cao"><i class="fas fa-dog text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Cães</h3>
+                <p class="text-gray-600 text-sm">Rações secas e molhadas</p>
+            </div>
+        </div>
+        <div class="animal-option" data-animal="gato"><i class="fas fa-cat text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Gatos</h3>
+                <p class="text-gray-600 text-sm">Rações secas e molhadas</p>
+            </div>
+        </div>
+        <div class="animal-option" data-animal="outros"><i class="fas fa-paw text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Outros Pets</h3>
+                <p class="text-gray-600 text-sm">Aves, roedores e peixes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="racao-caes-tipo-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
         <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
             <h2 class="text-2xl font-bold text-gray-800">Rações para Cães</h2>
         </div>
-
-        <div class="animal-option" data-tipo-racao="seca" data-category-search="Ração Seca">
-            <i class="fas fa-bone text-primary"></i>
+        <div class="animal-option" data-tipo-racao="seca" data-category-search="Ração Seca"><i class="fas fa-bone text-primary"></i>
             <div>
                 <h3 class="font-bold text-lg">Rações Secas</h3>
                 <p class="text-gray-600 text-sm">Tradicionais, grãos selecionados e alta absorção</p>
             </div>
         </div>
-
-        <div class="animal-option" data-tipo-racao="molhada" data-category-search="Ração Molhada">
-            <i class="fas fa-drumstick-bite text-primary"></i>
+        <div class="animal-option" data-tipo-racao="molhada" data-category-search="Ração Molhada"><i class="fas fa-drumstick-bite text-primary"></i>
             <div>
                 <h3 class="font-bold text-lg">Rações Molhadas</h3>
                 <p class="text-gray-600 text-sm">Sachês e patês com alta palatabilidade</p>
             </div>
         </div>
-        
-        <div class="animal-option" data-tipo-racao="medicamentosa" data-category-search="Ração Medicamentosa">
-            <i class="fas fa-briefcase-medical text-primary"></i>
+        <div class="animal-option" data-tipo-racao="medicamentosa" data-category-search="Ração Medicamentosa"><i class="fas fa-briefcase-medical text-primary"></i>
             <div>
                 <h3 class="font-bold text-lg">Rações Medicamentosas</h3>
                 <p class="text-gray-600 text-sm">Para necessidades dietéticas específicas</p>
@@ -93,130 +114,10 @@
     </div>
 </div>
 
-<div id="racao-caes-tipo-modal" class="modal hidden">
-    <div class="modal-content relative">
-        <span class="modal-close">×</span>
-        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Rações para Cães</h2>
-        </div>
-
-                <div class="animal-option" data-tipo-racao="seca" data-category-search="Ração Seca">
-            <div>
-                <h3 class="font-bold text-lg">Rações Secas</h3>
-                <p class="text-gray-600 text-sm">Tradicionais, grãos selecionados e alta absorção</p>
-            </div>
-        </div>
-
-                <div class="animal-option" data-tipo-racao="molhada" data-category-search="Ração Molhada">
-            <div>
-                <h3 class="font-bold text-lg">Rações Molhadas</h3>
-                <p class="text-gray-600 text-sm">Sachês e patês com alta palatabilidade</p>
-            </div>
-        </div>
-
-                <div class="animal-option" data-tipo-racao="medicamentosa" data-category-search="Ração Medicamentosa">
-            <div>
-                <h3 class="font-bold text-lg">Rações Medicamentosas</h3>
-                <p class="text-gray-600 text-sm">Para necessidades dietéticas específicas</p>
-            </div>
-        </div>
-    </div>
-</div>
 <div id="racao-gatos-tipo-modal" class="modal hidden">
-    <div class="modal-content relative"><span class="modal-close">×</span>
-        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Rações para Gatos</h2>
-        </div>
-        <div class="animal-option" data-tipo-racao-gato="seca"><i class="fas fa-cat text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Rações Secas</h3>
-                <p class="text-gray-600 text-sm">Nutrição completa e balanceada para o dia a dia</p>
-            </div>
-        </div>
-        <div class="animal-option" data-tipo-racao-gato="molhada"><i class="fas fa-fish text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Rações Molhadas</h3>
-                <p class="text-gray-600 text-sm">Sachês e patês que auxiliam na hidratação</p>
-            </div>
-        </div>
     </div>
-</div>
 <div id="racao-outros-tipo-modal" class="modal hidden">
-    <div class="modal-content relative"><span class="modal-close">×</span>
-        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
-            <h2 class="text-2xl font-bold text-gray-800">Selecione o Pet</h2>
-        </div>
-        <div class="animal-option" data-tipo-outro-pet="aves"><i class="fas fa-dove text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Aves</h3>
-                <p class="text-gray-600 text-sm">Rações e misturas de sementes</p>
-            </div>
-        </div>
-        <div class="animal-option" data-tipo-outro-pet="roedores"><i class="fas fa-paw text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Roedores</h3>
-                <p class="text-gray-600 text-sm">Alimentos para hamsters, coelhos e outros</p>
-            </div>
-        </div>
-        <div class="animal-option" data-tipo-outro-pet="peixes"><i class="fas fa-fish text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Peixes</h3>
-                <p class="text-gray-600 text-sm">Rações em flocos e granuladas</p>
-            </div>
-        </div>
     </div>
-</div>
-<div id="medicamentos-modal" class="modal hidden">
-    <div class="modal-content relative"><span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Selecione o tipo de medicamento</h2>
-        <div class="animal-option" data-tipo="farmacos"><i class="fas fa-pills text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Fármacos Simples</h3>
-                <p class="text-gray-600 text-sm">Analgésicos, anti-inflamatórios e outros</p>
-            </div>
-        </div>
-        <div class="animal-option" data-tipo="antibioticos"><i class="fas fa-virus-slash text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Antibióticos</h3>
-                <p class="text-gray-600 text-sm">Tratamento de infecções bacterianas</p>
-            </div>
-        </div>
-        <div class="animal-option" data-tipo="vitaminas"><i class="fas fa-capsules text-primary"></i>
-            <div>
-                <h3 class="font-bold text-lg">Vitaminas e Suplementos</h3>
-                <p class="text-gray-600 text-sm">Complexos vitamínicos e nutricionais</p>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="adocao-caes-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50">
-    <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-lg w-full text-center relative animate-fade-in-up">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">×</button>
-        <div class="mb-4">
-            <span class="fa-stack fa-3x text-primary">
-                <i class="fas fa-heart fa-stack-2x"></i>
-                <i class="fas fa-dog fa-stack-1x text-white"></i>
-            </span>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-3">Adoção Responsável de Cães</h2>
-        <p class="text-gray-600 mb-6">Adotar um cãozinho é um ato de amor que muda vidas! Ao adotar, você dá uma nova chance a um animal que precisa de um lar e ganha um amigo leal para toda a vida.</p>
-        <button class="nav-link w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors" data-page="adocao-caes">Ver Cãezinhos para Adoção</button>
-    </div>
-</div>
-<div id="adocao-gatos-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50">
-    <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-lg w-full text-center relative animate-fade-in-up">
-        <button class="modal-close absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">×</button>
-        <div class="mb-4">
-            <span class="fa-stack fa-3x text-primary">
-                <i class="fas fa-heart fa-stack-2x"></i>
-                <i class="fas fa-cat fa-stack-1x text-white"></i>
-            </span>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-3">Adoção Responsável de Gatos</h2>
-        <p class="text-gray-600 mb-6">Gatos são companheiros incríveis e independentes. Adotar um gatinho é trazer mais alegria e carinho para sua casa. Considere a adoção!</p>
-        <button class="nav-link w-full bg-secondary text-white py-3 rounded-lg font-medium hover:bg-teal-700 transition-colors" data-page="adocao-gatos">Ver Gatinhos para Adoção</button>
-    </div>
-</div>
 
 <section class="bg-secondary text-white py-8">
     <div class="container mx-auto px-4 text-center">
@@ -492,5 +393,6 @@
         </div>
     </div>
 </section>
+
 
 
