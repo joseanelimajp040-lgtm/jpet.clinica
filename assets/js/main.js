@@ -1078,6 +1078,8 @@ function renderStarRating(reviews) {
 // --- Funções da Página de Busca ---
 async function renderBuscaPage(params) {
     const searchTerm = params.query || '';
+    const searchCategory = params.category || ''; // <-- NOVA LINHA
+
     const grid = document.getElementById('products-grid');
     const countEl = document.getElementById('products-count');
     const titleEl = document.querySelector('#app-root h1');
@@ -1090,6 +1092,7 @@ async function renderBuscaPage(params) {
         currentSearchResults = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         let initialProducts = currentSearchResults;
+
         if (searchTerm) {
             if (titleEl) titleEl.textContent = `Resultados para "${searchTerm}"`;
             const lowerCaseTerm = searchTerm.toLowerCase();
@@ -1110,6 +1113,12 @@ async function renderBuscaPage(params) {
                 );
                 return nameMatch || brandMatch || keywordMatch || variationMatch;
             });
+        } else if (searchCategory) { // <-- BLOCO MODIFICADO/ADICIONADO
+            if (titleEl) titleEl.textContent = `Categoria: "${searchCategory}"`;
+            const lowerCaseCategory = searchCategory.toLowerCase();
+            initialProducts = currentSearchResults.filter(p => 
+                p.category && p.category.toLowerCase() === lowerCaseCategory
+            );
         } else {
             if (titleEl) titleEl.textContent = 'Todos os Produtos';
         }
@@ -2382,5 +2391,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
