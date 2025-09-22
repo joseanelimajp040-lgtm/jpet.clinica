@@ -3696,3 +3696,47 @@ input[type='number'] {
 .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: REDESIGN DA SEÇÃO DE SERVIÇOS (MOBILE) ========== */
+/* ================================================================== */
+
+/* Aplicamos estas regras apenas em telas com largura de até 767px */
+@media (max-width: 767px) {
+
+    /* Transforma o card para o layout horizontal */
+    .service-card {
+        display: flex;
+        flex-direction: row; /* Alinha os itens lado a lado */
+        align-items: center;  /* Centraliza verticalmente */
+        text-align: left;     /* Alinha o texto à esquerda */
+        padding: 1rem;
+    }
+
+    /* Ajusta o ícone */
+    .service-card .service-icon-bg {
+        flex-shrink: 0; /* Impede que o ícone seja espremido */
+        width: 4.5rem;  /* Deixa o círculo do ícone um pouco menor */
+        height: 4.5rem;
+        margin-right: 1rem; /* Cria um espaço entre o ícone e o texto */
+        margin-bottom: 0;   /* Remove a margem inferior que não é mais necessária */
+    }
+
+    /* Cria um container para o texto crescer e ocupar o espaço */
+    .service-card .service-text-content {
+        flex-grow: 1;
+    }
+    
+    /* Ajusta o espaçamento do texto */
+    .service-card h3 {
+        margin-bottom: 0.25rem;
+    }
+    .service-card p {
+        margin-bottom: 0; /* Remove a margem para melhor alinhamento */
+    }
+
+    /* Ajusta o botão de agendamento no card de "Banho e Tosa" */
+    .service-card .service-action-btn {
+        margin-top: 0.75rem; /* Adiciona um espaço acima do botão */
+    }
+}
