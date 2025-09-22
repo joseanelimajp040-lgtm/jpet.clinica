@@ -3667,3 +3667,44 @@ input[type='number'] {
 .promotions-banner-v2 p {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: CORREÇÃO DOS CARDS DE PRODUTO NO MOBILE ========== */
+/* ================================================================== */
+
+/* Aplicamos estas regras apenas em telas com largura máxima de 640px (padrão de celular) */
+@media (max-width: 640px) {
+
+    /* 1. Garante que o card tenha uma altura mínima para evitar cortes. */
+    .product-card-v2 {
+        min-height: 420px; /* Ajuste este valor se necessário */
+    }
+
+    /* 2. Força os botões de variação a ficarem em uma única linha. */
+    .product-card-v2 .variations-container-v2 {
+        flex-wrap: nowrap; /* A mudança mais importante: impede a quebra de linha. */
+        gap: 6px;          /* Reduz o espaço entre os botões. */
+    }
+
+    /* 3. Deixa os botões de variação um pouco menores para caberem lado a lado. */
+    .product-card-v2 .variation-btn-v2 {
+        padding: 4px 10px;   /* Diminui o espaçamento interno. */
+        font-size: 0.8rem;  /* Reduz um pouco o tamanho da fonte. */
+        white-space: nowrap; /* Garante que o texto do botão (ex: '15 kg') não quebre. */
+    }
+
+    /* 4. Ajusta o nome do produto para evitar que ele "empurre" o resto do conteúdo. */
+    .product-card-v2 .product-name-display {
+        font-size: 0.9rem; /* Reduz ligeiramente a fonte do nome. */
+        line-height: 1.3; /* Melhora o espaçamento entre linhas se o nome for grande. */
+        min-height: 50px; /* Ajusta a altura mínima para o novo tamanho da fonte. */
+    }
+
+    /* 5. Reduz um pouco o tamanho da fonte do preço para economizar espaço. */
+    .product-card-v2 .current-price {
+        font-size: 1.25rem; /* Reduz o preço de 24px para 20px. */
+    }
+    .product-card-v2 .original-price {
+        font-size: 0.8rem;
+    }
+}
