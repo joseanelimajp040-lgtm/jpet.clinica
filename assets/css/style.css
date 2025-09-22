@@ -3696,3 +3696,27 @@ input[type='number'] {
 .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: ESTILO DO CARROSSEL DE SERVIÇOS (MOBILE) ========== */
+/* ================================================================== */
+
+/* Regras aplicadas apenas em telas menores que 768px */
+@media (max-width: 767px) {
+
+    /* Define a largura de cada card dentro do carrossel */
+    #services-container > .service-card {
+        flex: 0 0 70%; /* O card ocupará 70% da largura da tela */
+        width: 70%;
+        scroll-snap-align: start; /* Alinha o card no início ao rolar */
+    }
+}
+
+/* Utilitário para esconder a barra de rolagem */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE e Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari e Opera */
+}
