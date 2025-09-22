@@ -531,86 +531,91 @@ async function renderAdminProductEditView(productId) {
 }
 
 function createProductCardHTML(productData, productId) {
-    if (!productData.variations || productData.variations.length === 0) {
-        console.warn(`O produto "${productData.nome}" (ID: ${productId}) não possui a estrutura de 'variations' e não será exibido.`);
-        return '';
-    }
+    if (!productData.variations || productData.variations.length === 0) {
+        console.warn(`O produto "${productData.nome}" (ID: ${productId}) não possui a estrutura de 'variations' e não será exibido.`);
+        return '';
+    }
 
-    const defaultIndex = productData.defaultVariationIndex || 0;
-    const defaultVariation = productData.variations[defaultIndex];
-    const isFav = state.favorites.some(fav => fav.id === productId);
-    const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-400';
-    const isDefaultOutOfStock = defaultVariation.stock <= 0;
+    const defaultIndex = productData.defaultVariationIndex || 0;
+    const defaultVariation = productData.variations[defaultIndex];
+    const isFav = state.favorites.some(fav => fav.id === productId);
+    const favIconClass = isFav ? 'fas text-red-500' : 'far text-gray-400';
+    const isDefaultOutOfStock = defaultVariation.stock <= 0;
 
-    const variationsHTML = productData.variations.map((v, index) => {
-        const isUnavailable = v.stock <= 0;
-        const buttonText = v.weight;
-        const extraClasses = isUnavailable ? 'unavailable' : '';
-        const disabledAttr = isUnavailable ? 'disabled' : '';
+    const variationsHTML = productData.variations.map((v, index) => {
+        const isUnavailable = v.stock <= 0;
+        const buttonText = v.weight;
+        const extraClasses = isUnavailable ? 'unavailable' : '';
+        const disabledAttr = isUnavailable ? 'disabled' : '';
 
-        return `
-        <button
-            class="variation-btn-v2 ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
-            data-index="${index}"
-            data-price="${v.price}"
-            data-original-price="${v.originalPrice || ''}"
-            data-weight="${v.weight}"
-            data-stock="${v.stock}"
-            data-image="${v.image || productData.image}"
-            data-full-name="${v.fullName || productData.nome}"
-            ${disabledAttr}>
-            ${buttonText}
-        </button>
-        `;
-    }).join('');
+        // MUDANÇA AQUI: Adicionamos classes para diminuir o botão no mobile
+        return `
+        <button
+            class="variation-btn-v2 px-2.5 py-1 text-xs md:px-3 md:py-1.5 md:text-sm ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
+            data-index="${index}"
+            data-price="${v.price}"
+            data-original-price="${v.originalPrice || ''}"
+            data-weight="${v.weight}"
+            data-stock="${v.stock}"
+            data-image="${v.image || productData.image}"
+            data-full-name="${v.fullName || productData.nome}"
+            ${disabledAttr}>
+            ${buttonText}
+        </button>
+        `;
+    }).join('');
 
-    let priceHTML = '';
-    let discountBadgeHTML = '';
+    let priceHTML = '';
+    let discountBadgeHTML = '';
 
-    if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
-        priceHTML = `
-            <span class="original-price">${formatCurrency(defaultVariation.originalPrice)}</span>
-            <span class="current-price">${formatCurrency(defaultVariation.price)}</span>
-        `;
-        const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
-        discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-${discount}%</div>`;
-    } else {
-        priceHTML = `<span class="current-price">${formatCurrency(defaultVariation.price)}</span>`;
-    }
+    if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+        // MUDANÇA AQUI: Adicionamos classes para diminuir o preço no mobile
+        priceHTML = `
+            <span class="original-price text-sm md:text-base">${formatCurrency(defaultVariation.originalPrice)}</span>
+            <span class="current-price !text-xl md:!text-2xl">${formatCurrency(defaultVariation.price)}</span>
+        `;
+        const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.price) * 100);
+        discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-${discount}%</div>`;
+    } else {
+        // MUDANÇA AQUI: Adicionamos classes para diminuir o preço no mobile
+        priceHTML = `<span class="current-price !text-xl md:!text-2xl">${formatCurrency(defaultVariation.price)}</span>`;
+    }
 
-    return `
-        <div class="product-card-v2 flex flex-col" data-product-id="${productId}">
-            <div class="product-image-container relative">
-                ${discountBadgeHTML}
-                <button class="favorite-btn absolute top-3 right-3 text-2xl z-10" data-id="${productId}">
-                    <i class="${favIconClass} fa-heart"></i>
-                </button>
-                <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
-                    <img src="${defaultVariation.image || productData.image}" alt="${productData.nome}" class="product-card-image w-full h-48 object-contain p-4">
-                </a>
-            </div>
+    return `
+        <div class="product-card-v2 flex flex-col" data-product-id="${productId}">
+            <div class="product-image-container relative">
+                ${discountBadgeHTML}
+                <button class="favorite-btn absolute top-3 right-3 text-2xl z-10" data-id="${productId}">
+                    <i class="${favIconClass} fa-heart"></i>
+                </button>
+                <a href="#" class="nav-link block" data-page="produto" data-id="${productId}">
+                    <img src="${defaultVariation.image || productData.image}" alt="${productData.nome}" class="product-card-image w-full h-48 object-contain p-4">
+                </a>
+            </div>
 
-            <div class="product-details p-4 flex flex-col flex-grow">
-                <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem]">${defaultVariation.fullName || productData.nome}</h3>
-                <div class="price-container mb-3">${priceHTML}</div>
+            <div class="product-details p-4 flex flex-col flex-grow">
+                {/* MUDANÇA AQUI: Adicionamos classes para diminuir o nome do produto no mobile */}
+                <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem] text-sm md:text-base">${defaultVariation.fullName || productData.nome}</h3>
+                <div class="price-container mb-3">${priceHTML}</div>
 
-                <div class="variations-container-v2 mb-4 flex flex-wrap gap-2">${variationsHTML}</div>
+                {/* MUDANÇA AQUI: Removemos o flex-wrap e ajustamos o espaçamento */}
+                <div class="variations-container-v2 mb-4 flex items-center gap-1.5">${variationsHTML}</div>
 
-                <div class="product-actions mt-auto pt-3">
-                     <button class="add-to-cart-btn-v2 w-full bg-secondary text-white font-medium flex items-center justify-center"
-                        data-id="${productId}"
-                        data-name="${defaultVariation.fullName || productData.nome}"
-                        data-price="${defaultVariation.price}"
-                        data-image="${defaultVariation.image || productData.image}"
-                        data-weight="${defaultVariation.weight}"
-                        ${isDefaultOutOfStock ? 'disabled' : ''}>
-                        <i class="fas fa-shopping-cart text-lg"></i>
-                        <span class="add-to-cart-reveal">${isDefaultOutOfStock ? 'Indisponível' : 'Adicionar'}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+                <div class="product-actions mt-auto pt-3">
+                    <button class="add-to-cart-btn-v2 w-full bg-secondary text-white font-medium flex items-center justify-center"
+                        data-id="${productId}"
+                        data-name="${defaultVariation.fullName || productData.nome}"
+                        data-price="${defaultVariation.price}"
+                        data-image="${defaultVariation.image || productData.image}"
+                        data-weight="${defaultVariation.weight}"
+                        ${isDefaultOutOfStock ? 'disabled' : ''}>
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span class="add-to-cart-reveal">${isDefaultOutOfStock ? 'Indisponível' : 'Adicionar'}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function renderCart() {
@@ -2391,6 +2396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
