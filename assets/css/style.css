@@ -3669,42 +3669,30 @@ input[type='number'] {
 }
 
 /* ================================================================== */
-/* ========== INÍCIO: CORREÇÃO DOS CARDS DE PRODUTO NO MOBILE ========== */
+/* ========== INÍCIO: ESTILO DO CARROSSEL DE DESTAQUES (MOBILE) ========== */
 /* ================================================================== */
 
-/* Aplicamos estas regras apenas em telas com largura máxima de 640px (padrão de celular) */
-@media (max-width: 640px) {
+/* Regras aplicadas apenas em telas menores que o breakpoint 'md' (768px) */
+@media (max-width: 767px) {
 
-    /* 1. Garante que o card tenha uma altura mínima para evitar cortes. */
-    .product-card-v2 {
-        min-height: 420px; /* Ajuste este valor se necessário */
-    }
+    /* Define a largura de cada card dentro do carrossel */
+    #featured-products-container > .product-card-v2 {
+        flex: 0 0 75%; /* Não encolhe, não estica, e ocupa 75% da largura da tela */
+        width: 75%;
+        scroll-snap-align: start; /* Alinha o card no início da tela ao rolar */
+    }
 
-    /* 2. Força os botões de variação a ficarem em uma única linha. */
-    .product-card-v2 .variations-container-v2 {
-        flex-wrap: nowrap; /* A mudança mais importante: impede a quebra de linha. */
-        gap: 6px;          /* Reduz o espaço entre os botões. */
-    }
+    /* Adiciona um espaçamento no final do último card para um acabamento melhor */
+    #featured-products-container > .product-card-v2:last-child {
+        margin-right: 16px;
+    }
+}
 
-    /* 3. Deixa os botões de variação um pouco menores para caberem lado a lado. */
-    .product-card-v2 .variation-btn-v2 {
-        padding: 4px 10px;   /* Diminui o espaçamento interno. */
-        font-size: 0.8rem;  /* Reduz um pouco o tamanho da fonte. */
-        white-space: nowrap; /* Garante que o texto do botão (ex: '15 kg') não quebre. */
-    }
-
-    /* 4. Ajusta o nome do produto para evitar que ele "empurre" o resto do conteúdo. */
-    .product-card-v2 .product-name-display {
-        font-size: 0.9rem; /* Reduz ligeiramente a fonte do nome. */
-        line-height: 1.3; /* Melhora o espaçamento entre linhas se o nome for grande. */
-        min-height: 50px; /* Ajusta a altura mínima para o novo tamanho da fonte. */
-    }
-
-    /* 5. Reduz um pouco o tamanho da fonte do preço para economizar espaço. */
-    .product-card-v2 .current-price {
-        font-size: 1.25rem; /* Reduz o preço de 24px para 20px. */
-    }
-    .product-card-v2 .original-price {
-        font-size: 0.8rem;
-    }
+/* Utilitário para esconder a barra de rolagem em todos os navegadores */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
