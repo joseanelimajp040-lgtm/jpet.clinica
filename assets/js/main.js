@@ -548,7 +548,6 @@ function createProductCardHTML(productData, productId) {
         const extraClasses = isUnavailable ? 'unavailable' : '';
         const disabledAttr = isUnavailable ? 'disabled' : '';
 
-        // VOLTAMOS AO BOTÃO ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO
         return `
         <button
             class="variation-btn-v2 ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
@@ -569,7 +568,6 @@ function createProductCardHTML(productData, productId) {
     let discountBadgeHTML = '';
 
     if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
-        // VOLTAMOS AOS PREÇOS ORIGINAIS, SEM CLASSES DE TAMANHO RESPONSIVO
         priceHTML = `
             <span class="original-price">${formatCurrency(defaultVariation.originalPrice)}</span>
             <span class="current-price">${formatCurrency(defaultVariation.price)}</span>
@@ -577,7 +575,6 @@ function createProductCardHTML(productData, productId) {
         const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
         discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-${discount}%</div>`;
     } else {
-        // VOLTAMOS AO PREÇO ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO
         priceHTML = `<span class="current-price">${formatCurrency(defaultVariation.price)}</span>`;
     }
 
@@ -594,11 +591,8 @@ function createProductCardHTML(productData, productId) {
             </div>
 
             <div class="product-details p-4 flex flex-col flex-grow">
-                {/* VOLTAMOS AO NOME ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO */}
                 <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem]">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="price-container mb-3">${priceHTML}</div>
-                
-                {/* MANTEMOS A CORREÇÃO DO FLEX-WRAP, MAS VOLTAMOS AO GAP/MARGINAL ORIGINAIS */}
                 <div class="variations-container-v2 mb-4 flex flex-wrap gap-2">${variationsHTML}</div>
 
                 <div class="product-actions mt-auto pt-3">
@@ -2396,6 +2390,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
