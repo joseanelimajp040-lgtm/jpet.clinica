@@ -548,9 +548,10 @@ function createProductCardHTML(productData, productId) {
         const extraClasses = isUnavailable ? 'unavailable' : '';
         const disabledAttr = isUnavailable ? 'disabled' : '';
 
+        // VOLTAMOS AO BOTÃO ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO
         return `
         <button
-            class="variation-btn-v2 px-2.5 py-1 text-xs md:px-3 md:py-1.5 md:text-sm ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
+            class="variation-btn-v2 ${index === defaultIndex ? 'selected' : ''} ${extraClasses}"
             data-index="${index}"
             data-price="${v.price}"
             data-original-price="${v.originalPrice || ''}"
@@ -568,14 +569,16 @@ function createProductCardHTML(productData, productId) {
     let discountBadgeHTML = '';
 
     if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+        // VOLTAMOS AOS PREÇOS ORIGINAIS, SEM CLASSES DE TAMANHO RESPONSIVO
         priceHTML = `
-            <span class="original-price text-sm md:text-base">${formatCurrency(defaultVariation.originalPrice)}</span>
-            <span class="current-price !text-xl md:!text-2xl">${formatCurrency(defaultVariation.price)}</span>
+            <span class="original-price">${formatCurrency(defaultVariation.originalPrice)}</span>
+            <span class="current-price">${formatCurrency(defaultVariation.price)}</span>
         `;
         const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
         discountBadgeHTML = `<div class="product-discount-badge absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-${discount}%</div>`;
     } else {
-        priceHTML = `<span class="current-price !text-xl md:!text-2xl">${formatCurrency(defaultVariation.price)}</span>`;
+        // VOLTAMOS AO PREÇO ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO
+        priceHTML = `<span class="current-price">${formatCurrency(defaultVariation.price)}</span>`;
     }
 
     return `
@@ -591,9 +594,12 @@ function createProductCardHTML(productData, productId) {
             </div>
 
             <div class="product-details p-4 flex flex-col flex-grow">
-                <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem] text-sm md:text-base">${defaultVariation.fullName || productData.nome}</h3>
+                {/* VOLTAMOS AO NOME ORIGINAL, SEM CLASSES DE TAMANHO RESPONSIVO */}
+                <h3 class="product-name-display font-semibold text-gray-800 mb-2 min-h-[3.5rem]">${defaultVariation.fullName || productData.nome}</h3>
                 <div class="price-container mb-3">${priceHTML}</div>
-                <div class="variations-container-v2 mb-4 flex items-center gap-1.5">${variationsHTML}</div>
+                
+                {/* MANTEMOS A CORREÇÃO DO FLEX-WRAP, MAS VOLTAMOS AO GAP/MARGINAL ORIGINAIS */}
+                <div class="variations-container-v2 mb-4 flex flex-wrap gap-2">${variationsHTML}</div>
 
                 <div class="product-actions mt-auto pt-3">
                     <button class="add-to-cart-btn-v2 w-full bg-secondary text-white font-medium flex items-center justify-center"
@@ -2390,6 +2396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
