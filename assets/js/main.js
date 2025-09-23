@@ -158,6 +158,32 @@ function updateAllHeartIcons() {
         }
     });
 }
+/**
+ * ATUALIZA O TEXTO DE PARCELAMENTO COM BASE NO PREÇO DO PRODUTO.
+ * @param {HTMLElement} element - O elemento HTML onde o texto será exibido (ex: #product-installments).
+ * @param {number} price - O preço do produto para calcular as parcelas.
+ */
+function renderInstallmentsText(element, price) {
+    if (!element) return; // Se o elemento não existir na página, não faz nada.
+
+    const numericPrice = parseFloat(price);
+
+    if (numericPrice >= 100) {
+        // Produtos a partir de R$ 100,00: 3x sem juros
+        const installmentValue = numericPrice / 3;
+        element.innerHTML = `ou em <strong>3x de ${formatCurrency(installmentValue)}</strong> sem juros`;
+        element.style.display = 'block'; // Garante que o elemento esteja visível
+    } else if (numericPrice >= 60) {
+        // Produtos a partir de R$ 60,00: 2x sem juros
+        const installmentValue = numericPrice / 2;
+        element.innerHTML = `ou em <strong>2x de ${formatCurrency(installmentValue)}</strong> sem juros`;
+        element.style.display = 'block'; // Garante que o elemento esteja visível
+    } else {
+        // Produtos abaixo de R$ 60,00: Esconde o texto de parcelamento
+        element.innerHTML = '';
+        element.style.display = 'none';
+    }
+}
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderAdminOrdersView() {
@@ -864,12 +890,8 @@ async function renderProductPage(productId) {
         if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
         if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
 
-        // --- INÍCIO DA MODIFICAÇÃO: Cálculo de Parcelas ---
-        const installmentsEl = el('product-installments');
-        if (installmentsEl) {
-            const installmentValue = defaultVariation.price / 3;
-            installmentsEl.innerHTML = `ou em <strong>3x de ${formatCurrency(installmentValue)}</strong> sem juros`;
-        }
+        // Atualiza o texto de parcelamento usando a nova lógica
+renderInstallmentsText(el('product-installments'), defaultVariation.price);
         // --- FIM DA MODIFICAÇÃO ---
 
         const descriptionContainer = el('product-description');
@@ -1974,11 +1996,8 @@ async function startApplication() {
             if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
             
             // --- INÍCIO DA MODIFICAÇÃO: Atualiza parcelas ao trocar variação ---
-            const installmentsEl = el('product-installments');
-            if (installmentsEl) {
-                const installmentValue = parseFloat(data.price) / 3;
-                installmentsEl.innerHTML = `ou em <strong>3x de ${formatCurrency(installmentValue)}</strong> sem juros`;
-            }
+           // Atualiza o texto de parcelamento usando a nova lógica
+renderInstallmentsText(el('product-installments'), data.price);
             // --- FIM DA MODIFICAÇÃO ---
 
             const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
@@ -2525,6 +2544,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
