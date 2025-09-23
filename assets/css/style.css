@@ -2118,11 +2118,6 @@ input[type='number'] {
 
 /* ========== INÍCIO: NOVOS ESTILOS PÁGINA DE PRODUTO ========== */
 
-/* 1. Efeito de Zoom na Imagem Principal */
-#main-image-container:hover #main-product-image {
-    transform: scale(1.5); /* Aumenta a imagem em 50% */
-}
-
 /* 2. Seletor de Quantidade Melhorado */
 .quantity-selector {
     display: inline-flex;
@@ -3719,4 +3714,101 @@ input[type='number'] {
 }
 .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari e Opera */
+}
+
+/* ================================================================== */
+/* ========== NOVOS ESTILOS - PÁGINA DE PRODUTO (COBASI) ========== */
+/* ================================================================== */
+
+/* --- 1. Ícones de Ação (Compartilhar e Favoritar) --- */
+.product-actions-container {
+    display: flex;
+    gap: 0.75rem; /* 12px */
+    align-items: center;
+}
+.product-action-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem; /* 24px */
+    color: #6b7280; /* text-gray-500 */
+    cursor: pointer;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.product-action-btn:hover {
+    color: #1f2937; /* text-gray-800 */
+    transform: scale(1.1);
+}
+.product-action-btn.favorite-btn i.fas {
+    color: #ef4444; /* text-red-500 */
+}
+
+/* --- 2. Texto de Parcelamento --- */
+.installments-text {
+    font-size: 1rem; /* 16px */
+    color: #4b5563; /* text-gray-600 */
+    font-weight: 500;
+}
+
+/* --- 3. Gatilho "Clique para ampliar" --- */
+.enlarge-image-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* 8px */
+    color: #6b7280; /* text-gray-500 */
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+.enlarge-image-trigger:hover {
+    color: var(--primary-color);
+}
+
+/* --- 4. Modal de Zoom da Imagem --- */
+.image-zoom-modal {
+    display: none; /* Começa escondido */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 5000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+.image-zoom-modal.active {
+    display: flex; /* Classe que ativa o modal */
+}
+.modal-content-image {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: hidden; /* O segredo do zoom está aqui */
+    border-radius: 8px;
+}
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 5001;
+    transition: transform 0.2s;
+}
+.modal-close-btn:hover {
+    transform: scale(1.2);
+}
+.modal-image {
+    display: block;
+    max-width: 100%;
+    max-height: 90vh; /* Para não ocupar a tela toda em altura */
+    transition: transform 0.3s ease-in-out;
+}
+/* EFEITO DE ZOOM DENTRO DO MODAL */
+.modal-content-image:hover .modal-image {
+    transform: scale(1.5);
 }
