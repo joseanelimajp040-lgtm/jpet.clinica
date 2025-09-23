@@ -1680,78 +1680,81 @@ async function loadPage(pageName, params = {}) {
 
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
-    const tabContainer = document.getElementById('info-tabs');
-    if (tabContainer) {
-        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
-        tabContainer.addEventListener('click', (e) => {
-            const clickedTab = e.target.closest('.tab-btn');
-            if (!clickedTab) return;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
-            clickedTab.classList.add('active');
-            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
-        });
-    }
+    const tabContainer = document.getElementById('info-tabs');
+    if (tabContainer) {
+        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabContainer.addEventListener('click', (e) => {
+            const clickedTab = e.target.closest('.tab-btn');
+            if (!clickedTab) return;
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanels.forEach(panel => panel.classList.remove('active'));
+            clickedTab.classList.add('active');
+            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
+        });
+    }
 
-    const quantityInput = document.getElementById('product-quantity');
-    const minusBtn = document.getElementById('quantity-minus');
-    const plusBtn = document.getElementById('quantity-plus');
-    if (minusBtn && plusBtn && quantityInput) {
-        minusBtn.addEventListener('click', () => {
-            let val = parseInt(quantityInput.value);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        plusBtn.addEventListener('click', () => {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
-        });
-    }
+    const quantityInput = document.getElementById('product-quantity');
+    const minusBtn = document.getElementById('quantity-minus');
+    const plusBtn = document.getElementById('quantity-plus');
+    if (minusBtn && plusBtn && quantityInput) {
+        minusBtn.addEventListener('click', () => {
+            let val = parseInt(quantityInput.value);
+            if (val > 1) quantityInput.value = val - 1;
+        });
+        plusBtn.addEventListener('click', () => {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        });
+    }
 
-    // --- INÍCIO DA ADIÇÃO: Lógica do Modal e Compartilhamento ---
-    const openModalBtn = document.getElementById('open-image-modal');
-    const imageModal = document.getElementById('image-zoom-modal');
-    const closeModalBtn = document.getElementById('close-image-modal');
-    const modalImage = document.getElementById('modal-image-content');
-    const mainImage = document.getElementById('main-product-image');
+    // --- INÍCIO DA LÓGICA DO MODAL (VERSÃO CORRIGIDA) ---
+    const openModalBtn = document.getElementById('open-image-modal');
+    const imageModal = document.getElementById('image-zoom-modal');
+    const closeModalBtn = document.getElementById('close-image-modal');
+    const modalImage = document.getElementById('modal-image-content');
+    const mainImage = document.getElementById('main-product-image');
 
-    if (openModalBtn && imageModal && closeModalBtn && modalImage && mainImage) {
-        openModalBtn.addEventListener('click', () => {
-            modalImage.src = mainImage.src;
-            imageModal.classList.add('active');
-        });
+    if (openModalBtn && imageModal && closeModalBtn && modalImage && mainImage) {
+        // Função para abrir o modal
+        openModalBtn.addEventListener('click', () => {
+            modalImage.src = mainImage.src;
+            imageModal.classList.add('active'); // Usa classe para ativar
+        });
 
-        const closeModal = () => imageModal.classList.remove('active');
+        // Função para fechar o modal
+        const closeModal = () => imageModal.classList.remove('active'); // Usa classe para desativar
 
-        closeModalBtn.addEventListener('click', closeModal);
-        imageModal.addEventListener('click', (e) => {
-            if (e.target === imageModal) { // Fecha se clicar no fundo
-                closeModal();
-            }
-        });
-    }
+        closeModalBtn.addEventListener('click', closeModal);
+        imageModal.addEventListener('click', (e) => {
+            // Fecha se clicar no fundo (o próprio overlay)
+            if (e.target === imageModal) {
+                closeModal();
+            }
+        });
+    }
 
-    const shareBtn = document.getElementById('share-btn');
-    if(shareBtn) {
-        shareBtn.addEventListener('click', async () => {
-            const shareData = {
-                title: document.getElementById('product-name').textContent,
-                text: `Confira este produto que encontrei na J.A Pet Clínica: ${document.getElementById('product-name').textContent}`,
-                url: window.location.href
-            };
-            try {
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                } else {
-                    // Fallback para copiar o link
-                    navigator.clipboard.writeText(window.location.href);
-                    alert('Link do produto copiado para a área de transferência!');
-                }
-            } catch (err) {
-                console.error('Erro ao compartilhar:', err);
-            }
-        });
-    }
-    // --- FIM DA ADIÇÃO ---
+    const shareBtn = document.getElementById('share-btn');
+    if(shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+            const shareData = {
+                title: document.getElementById('product-name').textContent,
+                text: `Confira este produto que encontrei na J.A Pet Clínica: ${document.getElementById('product-name').textContent}`,
+                url: window.location.href
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback para copiar o link
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link do produto copiado para a área de transferência!');
+                }
+            } catch (err) {
+                console.error('Erro ao compartilhar:', err);
+            }
+        });
+    }
+    // --- FIM DA LÓGICA DO MODAL ---
 }
 
 function initBanhoTosaEventListeners() {
@@ -2468,6 +2471,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
