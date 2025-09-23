@@ -838,80 +838,104 @@ async function renderPromocoesPage() {
 }
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
-    try {
-        const docRef = doc(db, 'produtos', productId);
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
-            return;
-        }
+    try {
+        const docRef = doc(db, 'produtos', productId);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
+            return;
+        }
 
-        const productData = docSnap.data();
-        if (!productData.variations || productData.variations.length === 0) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
-            return;
-        }
+        const productData = docSnap.data();
+        if (!productData.variations || productData.variations.length === 0) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
+            return;
+        }
 
-        const defaultIndex = productData.defaultVariationIndex || 0;
-        const defaultVariation = productData.variations[defaultIndex];
-        const categoryForReviews = productData.category || 'geral';
-        const reviews = generateRealisticReviews(productId, categoryForReviews);
+        const defaultIndex = productData.defaultVariationIndex || 0;
+        const defaultVariation = productData.variations[defaultIndex];
+        const categoryForReviews = productData.category || 'geral';
+        const reviews = generateRealisticReviews(productId, categoryForReviews);
 
-        const el = (id) => document.getElementById(id);
-        if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
-        if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
-        if (el('product-brand')) el('product-brand').querySelector('span').textContent = productData.brand || "N/A";
-        if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
-        if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
+        const el = (id) => document.getElementById(id);
+        if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
+        if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
+        if (el('product-brand')) el('product-brand').querySelector('span').textContent = productData.brand || "N/A";
+        if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
+        if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
 
-        const descriptionContainer = el('product-description');
-        if (descriptionContainer) {
-            descriptionContainer.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
-        }
+        // --- INÍCIO DA MODIFICAÇÃO: Cálculo de Parcelas ---
+        const installmentsEl = el('product-installments');
+        if (installmentsEl) {
+            const installmentValue = defaultVariation.price / 3;
+            installmentsEl.innerHTML = `ou em <strong>3x de ${formatCurrency(installmentValue)}</strong> sem juros`;
+        }
+        // --- FIM DA MODIFICAÇÃO ---
 
-        renderStockStatus(defaultVariation.stock);
-        renderReviews(reviews);
-        renderStarRating(reviews);
-        renderProductSpecs(productData.specifications);
-        renderRelatedProducts(productData.category, productId);
-
-        const originalPriceEl = el('product-original-price');
-        const discountBadgeEl = el('product-discount-badge');
-        if (originalPriceEl && discountBadgeEl) {
-            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
-                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
-                originalPriceEl.classList.remove('hidden');
-                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
-                discountBadgeEl.textContent = `-${discount}%`;
-                discountBadgeEl.classList.remove('hidden');
+        const descriptionContainer = el('product-description');
+        if (descriptionContainer) {
+            descriptionContainer.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
+        }
+        
+        // --- INÍCIO DA MODIFICAÇÃO: Botão Favoritar ---
+        const favBtnPage = el('favorite-btn-page');
+        if(favBtnPage) {
+            favBtnPage.dataset.id = productId;
+            const isFav = state.favorites.some(fav => fav.id === productId);
+            const icon = favBtnPage.querySelector('i');
+            if (isFav) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-red-500');
             } else {
-                originalPriceEl.classList.add('hidden');
-                discountBadgeEl.classList.add('hidden');
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far');
             }
         }
+        // --- FIM DA MODIFICAÇÃO ---
 
-        const variationsContainer = document.querySelector('#product-variations .variations-container');
-        if (variationsContainer) {
-            variationsContainer.innerHTML = productData.variations.map((v, index) => `
-                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}" data-full-name="${v.fullName || productData.nome}">
-                    ${v.weight}
-                </button>`).join('');
-        }
+        renderStockStatus(defaultVariation.stock);
+        renderReviews(reviews);
+        renderStarRating(reviews);
+        renderProductSpecs(productData.specifications);
+        renderRelatedProducts(productData.category, productId);
 
-        const addToCartBtn = el('add-to-cart-product-page');
-        if (addToCartBtn) {
-            addToCartBtn.dataset.id = productId;
-            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
-            addToCartBtn.dataset.price = defaultVariation.price;
-            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
-            addToCartBtn.dataset.weight = defaultVariation.weight;
-            addToCartBtn.classList.add('add-to-cart-btn');
-        }
+        const originalPriceEl = el('product-original-price');
+        const discountBadgeEl = el('product-discount-badge');
+        if (originalPriceEl && discountBadgeEl) {
+            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
+                originalPriceEl.classList.remove('hidden');
+                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
+                discountBadgeEl.textContent = `-${discount}%`;
+                discountBadgeEl.classList.remove('hidden');
+            } else {
+                originalPriceEl.classList.add('hidden');
+                discountBadgeEl.classList.add('hidden');
+            }
+        }
 
-    } catch (error) {
-        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
-    }
+        const variationsContainer = document.querySelector('#product-variations .variations-container');
+        if (variationsContainer) {
+            variationsContainer.innerHTML = productData.variations.map((v, index) => `
+                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}" data-full-name="${v.fullName || productData.nome}">
+                    ${v.weight}
+                </button>`).join('');
+        }
+
+        const addToCartBtn = el('add-to-cart-product-page');
+        if (addToCartBtn) {
+            addToCartBtn.dataset.id = productId;
+            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
+            addToCartBtn.dataset.price = defaultVariation.price;
+            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
+            addToCartBtn.dataset.weight = defaultVariation.weight;
+            addToCartBtn.classList.add('add-to-cart-btn');
+        }
+
+    } catch (error) {
+        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
+    }
 }
 
 function renderStockStatus(stock = 0) {
@@ -1656,32 +1680,78 @@ async function loadPage(pageName, params = {}) {
 
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
-    const tabContainer = document.getElementById('info-tabs');
-    if (tabContainer) {
-        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
-        tabContainer.addEventListener('click', (e) => {
-            const clickedTab = e.target.closest('.tab-btn');
-            if (!clickedTab) return;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
-            clickedTab.classList.add('active');
-            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
-        });
-    }
+    const tabContainer = document.getElementById('info-tabs');
+    if (tabContainer) {
+        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabContainer.addEventListener('click', (e) => {
+            const clickedTab = e.target.closest('.tab-btn');
+            if (!clickedTab) return;
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanels.forEach(panel => panel.classList.remove('active'));
+            clickedTab.classList.add('active');
+            document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
+        });
+    }
 
-    const quantityInput = document.getElementById('product-quantity');
-    const minusBtn = document.getElementById('quantity-minus');
-    const plusBtn = document.getElementById('quantity-plus');
-    if (minusBtn && plusBtn && quantityInput) {
-        minusBtn.addEventListener('click', () => {
-            let val = parseInt(quantityInput.value);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        plusBtn.addEventListener('click', () => {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
-        });
-    }
+    const quantityInput = document.getElementById('product-quantity');
+    const minusBtn = document.getElementById('quantity-minus');
+    const plusBtn = document.getElementById('quantity-plus');
+    if (minusBtn && plusBtn && quantityInput) {
+        minusBtn.addEventListener('click', () => {
+            let val = parseInt(quantityInput.value);
+            if (val > 1) quantityInput.value = val - 1;
+        });
+        plusBtn.addEventListener('click', () => {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        });
+    }
+
+    // --- INÍCIO DA ADIÇÃO: Lógica do Modal e Compartilhamento ---
+    const openModalBtn = document.getElementById('open-image-modal');
+    const imageModal = document.getElementById('image-zoom-modal');
+    const closeModalBtn = document.getElementById('close-image-modal');
+    const modalImage = document.getElementById('modal-image-content');
+    const mainImage = document.getElementById('main-product-image');
+
+    if (openModalBtn && imageModal && closeModalBtn && modalImage && mainImage) {
+        openModalBtn.addEventListener('click', () => {
+            modalImage.src = mainImage.src;
+            imageModal.classList.add('active');
+        });
+
+        const closeModal = () => imageModal.classList.remove('active');
+
+        closeModalBtn.addEventListener('click', closeModal);
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) { // Fecha se clicar no fundo
+                closeModal();
+            }
+        });
+    }
+
+    const shareBtn = document.getElementById('share-btn');
+    if(shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+            const shareData = {
+                title: document.getElementById('product-name').textContent,
+                text: `Confira este produto que encontrei na J.A Pet Clínica: ${document.getElementById('product-name').textContent}`,
+                url: window.location.href
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback para copiar o link
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link do produto copiado para a área de transferência!');
+                }
+            } catch (err) {
+                console.error('Erro ao compartilhar:', err);
+            }
+        });
+    }
+    // --- FIM DA ADIÇÃO ---
 }
 
 function initBanhoTosaEventListeners() {
@@ -1790,95 +1860,103 @@ async function startApplication() {
         }
         
         // CORREÇÃO: Lógica unificada para lidar com clique nas variações de produto
-        const variationBtn = target.closest('.variation-btn, .variation-btn-v2');
-        if (variationBtn) {
-            e.preventDefault();
-            const data = variationBtn.dataset;
-            variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
-            variationBtn.classList.add('selected');
+        const variationBtn = e.target.closest('.variation-btn, .variation-btn-v2');
+    if (variationBtn) {
+        e.preventDefault();
+        const data = variationBtn.dataset;
+        variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
+        variationBtn.classList.add('selected');
 
-            const stock = parseInt(data.stock, 10);
-            const isOutOfStock = stock <= 0;
-            
-            // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
-            const card = variationBtn.closest('.product-card, .product-card-v2');
-            if (card) { // Lógica para o card na página de listagem
-                const priceContainer = card.querySelector('.price-container');
-                const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
-                const cardImage = card.querySelector('.product-card-image');
-                const cardName = card.querySelector('.product-name-display');
+        const stock = parseInt(data.stock, 10);
+        const isOutOfStock = stock <= 0;
+        
+        // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
+        const card = variationBtn.closest('.product-card, .product-card-v2');
+        if (card) { // Lógica para o card na página de listagem
+            const priceContainer = card.querySelector('.price-container');
+            const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
+            const cardImage = card.querySelector('.product-card-image');
+            const cardName = card.querySelector('.product-name-display');
 
-                if (priceContainer) {
-                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
-                        priceContainer.innerHTML = `
-                            <span class="original-price">${formatCurrency(data.originalPrice)}</span>
-                            <span class="current-price">${formatCurrency(data.price)}</span>
-                        `;
-                    } else {
-                        priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
-                    }
-                }
-                
-                if (cardImage && data.image && cardImage.src !== data.image) {
-                    cardImage.style.opacity = '0';
-                    setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
-                }
-                
-                if (cardName && data.fullName) cardName.textContent = data.fullName;
-                
-                if (addToCartBtn) {
-                    addToCartBtn.dataset.price = data.price;
-                    addToCartBtn.dataset.weight = data.weight;
-                    addToCartBtn.dataset.image = data.image;
-                    addToCartBtn.dataset.name = data.fullName;
+            if (priceContainer) {
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    priceContainer.innerHTML = `
+                        <span class="original-price">${formatCurrency(data.originalPrice)}</span>
+                        <span class="current-price">${formatCurrency(data.price)}</span>
+                    `;
+                } else {
+                    priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
+                }
+            }
+            
+            if (cardImage && data.image && cardImage.src !== data.image) {
+                cardImage.style.opacity = '0';
+                setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
+            }
+            
+            if (cardName && data.fullName) cardName.textContent = data.fullName;
+            
+            if (addToCartBtn) {
+                addToCartBtn.dataset.price = data.price;
+                addToCartBtn.dataset.weight = data.weight;
+                addToCartBtn.dataset.image = data.image;
+                addToCartBtn.dataset.name = data.fullName;
 
-                    addToCartBtn.disabled = isOutOfStock;
-                    const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
-                    if(textSpan) {
-                         textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
-                    } else { // Fallback para botões sem o span
-                        addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
-                    }
-                }
+                addToCartBtn.disabled = isOutOfStock;
+                const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
+                if(textSpan) {
+                     textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
+                } else { // Fallback para botões sem o span
+                    addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                }
+            }
 
-            } else { // Lógica para a página de detalhes do produto
-                const el = (id) => document.getElementById(id);
-                renderStockStatus(parseInt(data.stock));
-                if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
-                
-                const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
-                if (originalPrice && discountBadge) {
-                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
-                        originalPrice.textContent = formatCurrency(data.originalPrice);
-                        const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
-                        discountBadge.textContent = `-${discount}%`;
-                        originalPrice.classList.remove('hidden');
-                        discountBadge.classList.remove('hidden');
-                    } else {
-                        originalPrice.classList.add('hidden');
-                        discountBadge.classList.add('hidden');
-                    }
-                }
-                
-                const pageImage = el('main-product-image');
-                if (pageImage && data.image && pageImage.src !== data.image) {
-                    pageImage.style.opacity = '0';
-                    setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
-                }
-                
-                if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
-                
-                const pageCartBtn = el('add-to-cart-product-page');
-                if (pageCartBtn) {
-                    pageCartBtn.dataset.price = data.price;
-                    pageCartBtn.dataset.weight = data.weight;
-                    pageCartBtn.dataset.image = data.image;
-                    pageCartBtn.dataset.name = data.fullName;
-                    pageCartBtn.disabled = isOutOfStock;
-                    pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Comprar Agora';
-                }
+        } else { // Lógica para a página de detalhes do produto
+            const el = (id) => document.getElementById(id);
+            renderStockStatus(parseInt(data.stock));
+            if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+            
+            // --- INÍCIO DA MODIFICAÇÃO: Atualiza parcelas ao trocar variação ---
+            const installmentsEl = el('product-installments');
+            if (installmentsEl) {
+                const installmentValue = parseFloat(data.price) / 3;
+                installmentsEl.innerHTML = `ou em <strong>3x de ${formatCurrency(installmentValue)}</strong> sem juros`;
             }
-        }
+            // --- FIM DA MODIFICAÇÃO ---
+
+            const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
+            if (originalPrice && discountBadge) {
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    originalPrice.textContent = formatCurrency(data.originalPrice);
+                    const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
+                    discountBadge.textContent = `-${discount}%`;
+                    originalPrice.classList.remove('hidden');
+                    discountBadge.classList.remove('hidden');
+                } else {
+                    originalPrice.classList.add('hidden');
+                    discountBadge.classList.add('hidden');
+                }
+            }
+            
+            const pageImage = el('main-product-image');
+            if (pageImage && data.image && pageImage.src !== data.image) {
+                pageImage.style.opacity = '0';
+                setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
+            }
+            
+            if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
+            
+            const pageCartBtn = el('add-to-cart-product-page');
+            if (pageCartBtn) {
+                pageCartBtn.dataset.price = data.price;
+                pageCartBtn.dataset.weight = data.weight;
+                pageCartBtn.dataset.image = data.image;
+                pageCartBtn.dataset.name = data.fullName;
+                pageCartBtn.disabled = isOutOfStock;
+                pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+            }
+        }
+    }
         
         if (target.closest('.logout-btn')) handleLogout();
         if (target.closest('#google-login-btn')) handleSocialLogin('google');
@@ -2390,6 +2468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
