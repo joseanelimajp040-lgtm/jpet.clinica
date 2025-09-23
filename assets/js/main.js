@@ -1680,8 +1680,10 @@ async function loadPage(pageName, params = {}) {
 
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
+    // Lógica das abas de informação (permanece a mesma)
     const tabContainer = document.getElementById('info-tabs');
     if (tabContainer) {
+        // ... (o código das abas continua aqui, sem alterações)
         const tabButtons = tabContainer.querySelectorAll('.tab-btn');
         const tabPanels = document.querySelectorAll('.tab-panel');
         tabContainer.addEventListener('click', (e) => {
@@ -1694,10 +1696,12 @@ function initProductPageListeners() {
         });
     }
 
+    // Lógica da quantidade (permanece a mesma)
     const quantityInput = document.getElementById('product-quantity');
     const minusBtn = document.getElementById('quantity-minus');
     const plusBtn = document.getElementById('quantity-plus');
     if (minusBtn && plusBtn && quantityInput) {
+        // ... (o código da quantidade continua aqui, sem alterações)
         minusBtn.addEventListener('click', () => {
             let val = parseInt(quantityInput.value);
             if (val > 1) quantityInput.value = val - 1;
@@ -1707,34 +1711,86 @@ function initProductPageListeners() {
         });
     }
 
-    // --- INÍCIO DA LÓGICA DO MODAL (VERSÃO CORRIGIDA) ---
-    const openModalBtn = document.getElementById('open-image-modal');
+    // --- INÍCIO DA NOVA LÓGICA DO MODAL DE IMAGEM ---
     const imageModal = document.getElementById('image-zoom-modal');
-    const closeModalBtn = document.getElementById('close-image-modal');
-    const modalImage = document.getElementById('modal-image-content');
-    const mainImage = document.getElementById('main-product-image');
+    if (imageModal) {
+        const openModalBtn = document.getElementById('open-image-modal');
+        const closeModalBtn = document.getElementById('close-image-modal');
+        const modalMainImage = document.getElementById('modal-main-image');
+        const thumbnailsContainer = document.getElementById('modal-thumbnails-container');
+        const prevBtn = document.getElementById('modal-prev-btn');
+        const nextBtn = document.getElementById('modal-next-btn');
 
-    if (openModalBtn && imageModal && closeModalBtn && modalImage && mainImage) {
-        // Função para abrir o modal
+        let productImages = [];
+        let currentImageIndex = 0;
+        
+        // Função para atualizar a imagem principal e a miniatura ativa
+        const updateModalImage = (index) => {
+            if (index < 0 || index >= productImages.length) return;
+            
+            currentImageIndex = index;
+            modalMainImage.src = productImages[index];
+            
+            // Atualiza a classe 'active' nas miniaturas
+            thumbnailsContainer.querySelectorAll('.modal-thumbnail-item').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        };
+
+        // Evento para ABRIR o modal
         openModalBtn.addEventListener('click', () => {
-            modalImage.src = mainImage.src;
-            imageModal.classList.add('active'); // Usa classe para ativar
+            // Pega todas as URLs das imagens dos botões de variação
+            const variationButtons = document.querySelectorAll('#product-variations .variation-btn');
+            productImages = Array.from(variationButtons).map(btn => btn.dataset.image);
+
+            // Limpa miniaturas antigas e popula com as novas
+            thumbnailsContainer.innerHTML = productImages.map((src, index) => 
+                `<img src="${src}" class="modal-thumbnail-item" data-index="${index}" alt="Miniatura ${index + 1}">`
+            ).join('');
+            
+            // Determina qual imagem abrir. Procura a variação selecionada.
+            const selectedVariation = document.querySelector('#product-variations .variation-btn.selected');
+            const startIndex = Array.from(variationButtons).indexOf(selectedVariation);
+            updateModalImage(startIndex >= 0 ? startIndex : 0);
+
+            // Esconde as setas se houver apenas uma imagem
+            const showArrows = productImages.length > 1;
+            prevBtn.style.display = showArrows ? 'flex' : 'none';
+            nextBtn.style.display = showArrows ? 'flex' : 'none';
+            
+            imageModal.classList.add('active');
         });
 
-        // Função para fechar o modal
-        const closeModal = () => imageModal.classList.remove('active'); // Usa classe para desativar
-
+        // Eventos para FECHAR o modal
+        const closeModal = () => imageModal.classList.remove('active');
         closeModalBtn.addEventListener('click', closeModal);
         imageModal.addEventListener('click', (e) => {
-            // Fecha se clicar no fundo (o próprio overlay)
-            if (e.target === imageModal) {
-                closeModal();
+            if (e.target === imageModal) closeModal();
+        });
+
+        // Evento para NAVEGAÇÃO
+        nextBtn.addEventListener('click', () => {
+            const nextIndex = (currentImageIndex + 1) % productImages.length;
+            updateModalImage(nextIndex);
+        });
+        prevBtn.addEventListener('click', () => {
+            const prevIndex = (currentImageIndex - 1 + productImages.length) % productImages.length;
+            updateModalImage(prevIndex);
+        });
+
+        // Evento para cliques nas MINIATURAS
+        thumbnailsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-thumbnail-item')) {
+                const index = parseInt(e.target.dataset.index);
+                updateModalImage(index);
             }
         });
     }
 
+    // Lógica de compartilhamento (permanece a mesma)
     const shareBtn = document.getElementById('share-btn');
     if(shareBtn) {
+        // ... (o código de compartilhamento continua aqui, sem alterações)
         shareBtn.addEventListener('click', async () => {
             const shareData = {
                 title: document.getElementById('product-name').textContent,
@@ -1745,7 +1801,6 @@ function initProductPageListeners() {
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else {
-                    // Fallback para copiar o link
                     navigator.clipboard.writeText(window.location.href);
                     alert('Link do produto copiado para a área de transferência!');
                 }
@@ -1754,7 +1809,6 @@ function initProductPageListeners() {
             }
         });
     }
-    // --- FIM DA LÓGICA DO MODAL ---
 }
 
 function initBanhoTosaEventListeners() {
@@ -2471,6 +2525,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
