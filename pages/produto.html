@@ -1,3 +1,22 @@
+<style>
+/* Aplica o layout de grid apenas em telas grandes (a partir de 1024px) */
+@media (min-width: 1024px) {
+    .product-layout-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 3rem; /* Equivalente a gap-12 do Tailwind */
+    }
+
+    .product-image-column {
+        grid-column: span 2 / span 2; /* Ocupa 2 de 5 colunas */
+    }
+
+    .product-details-column {
+        grid-column: span 3 / span 3; /* Ocupa 3 de 5 colunas */
+        margin-top: 0; /* Remove a margem extra em telas grandes */
+    }
+}
+</style>
 <div class="bg-gray-50">
         <div id="image-zoom-modal" class="image-zoom-modal">
         <span id="close-image-modal" class="modal-close-btn">&times;</span>
@@ -14,24 +33,24 @@
             <span id="breadcrumb-category" class="font-medium text-primary">Categoria</span>
         </div>
 
-        <div class="lg:grid lg:grid-cols-5 lg:gap-12">
-                        <div class="lg:col-span-2">
+                <div class="lg:grid lg:grid-cols-5 lg:gap-12 product-layout-grid">
+                        <div class="lg:col-span-2 product-image-column">
                 <div id="main-image-container" class="w-full aspect-w-1 aspect-h-1 bg-white rounded-lg shadow-sm p-4 border relative overflow-hidden">
-                                        <img id="main-product-image" src="" alt="Imagem principal do produto" class="w-full h-full object-center object-contain">
+                    <img id="main-product-image" src="" alt="Imagem principal do produto" class="w-full h-full object-center object-contain">
                 </div>
-                                <div id="open-image-modal" class="enlarge-image-trigger mt-4">
+                <div id="open-image-modal" class="enlarge-image-trigger mt-4">
                     <i class="fas fa-search-plus"></i>
                     <span>Clique para ampliar</span>
                 </div>
             </div>
 
-                        <div class="lg:col-span-3 mt-10 lg:mt-0">
+                        <div class="lg:col-span-3 mt-10 lg:mt-0 product-details-column">
                 <div class="flex justify-between items-start">
                     <div>
                         <p id="product-brand" class="text-md text-gray-500 mt-1">por <span class="font-semibold">Marca</span></p>
                         <h1 id="product-name" class="text-3xl font-bold tracking-tight text-gray-800">Carregando nome...</h1>
                     </div>
-                                        <div class="product-actions-container">
+                    <div class="product-actions-container">
                         <button id="share-btn" title="Compartilhar" class="product-action-btn"><i class="fas fa-share-alt"></i></button>
                         <button id="favorite-btn-page" title="Favoritar" class="product-action-btn favorite-btn"><i class="far fa-heart"></i></button>
                     </div>
@@ -51,7 +70,7 @@
                             <span id="product-discount-badge" class="hidden text-sm font-semibold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">-0%</span>
                         </div>
                     </div>
-                                        <div id="product-installments" class="installments-text mt-2"></div>
+                    <div id="product-installments" class="installments-text mt-2"></div>
                 </div>
 
                <div class="mt-8">
