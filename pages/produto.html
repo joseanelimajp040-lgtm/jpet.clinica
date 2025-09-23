@@ -1,10 +1,19 @@
 <div class="bg-gray-50">
     <div id="image-zoom-modal" class="image-zoom-modal">
+    <div class="modal-box">
         <span id="close-image-modal" class="modal-close-btn">&times;</span>
-        <div class="modal-content-image">
-            <img id="modal-image-content" src="" alt="Imagem do produto em zoom" class="modal-image">
+        
+        <div id="modal-thumbnails-container" class="modal-thumbnails">
+            </div>
+
+        <div class="modal-main-image-wrapper">
+            <img id="modal-main-image" src="" alt="Imagem do produto em zoom">
+            
+            <button id="modal-prev-btn" class="modal-nav-arrow left">&lt;</button>
+            <button id="modal-next-btn" class="modal-nav-arrow right">&gt;</button>
         </div>
     </div>
+</div>
 
     <div class="max-w-7xl mx-auto py-8 px-4 sm:py-12 sm:px-8">
 
@@ -114,3 +123,4 @@
         </div>
     </section>
 </div>
+
