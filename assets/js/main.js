@@ -2156,7 +2156,9 @@ async function startApplication() {
             e.preventDefault();
             const searchTerm = mobileSearchInput.value.trim();
             if (searchTerm) {
-                loadPage('busca', { query: searchTerm });
+                loadPage('busca', {
+                    query: searchTerm
+                });
                 mobileSearchModal.classList.remove('active');
                 mobileSearchInput.value = '';
             }
@@ -2175,116 +2177,128 @@ async function startApplication() {
         const navLink = target.closest('.nav-link');
         if (navLink && navLink.dataset.page) {
             e.preventDefault();
-            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
+            loadPage(navLink.dataset.page, {
+                id: navLink.dataset.id,
+                query: navLink.dataset.query
+            });
         }
-        
+
         // CORREÇÃO: Lógica unificada para lidar com clique nas variações de produto
         const variationBtn = e.target.closest('.variation-btn, .variation-btn-v2');
-    if (variationBtn) {
-        e.preventDefault();
-        const data = variationBtn.dataset;
-        variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
-        variationBtn.classList.add('selected');
+        if (variationBtn) {
+            e.preventDefault();
+            const data = variationBtn.dataset;
+            variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
+            variationBtn.classList.add('selected');
 
-        const stock = parseInt(data.stock, 10);
-        const isOutOfStock = stock <= 0;
-        
-        // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
-        const card = variationBtn.closest('.product-card, .product-card-v2');
-        if (card) { // Lógica para o card na página de listagem
-            const priceContainer = card.querySelector('.price-container');
-            const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
-            const cardImage = card.querySelector('.product-card-image');
-            const cardName = card.querySelector('.product-name-display');
+            const stock = parseInt(data.stock, 10);
+            const isOutOfStock = stock <= 0;
 
-            if (priceContainer) {
-                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
-                    priceContainer.innerHTML = `
-                        <span class="original-price">${formatCurrency(data.originalPrice)}</span>
-                        <span class="current-price">${formatCurrency(data.price)}</span>
-                    `;
-                } else {
-                    priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
-                }
-            }
-            
-            if (cardImage && data.image && cardImage.src !== data.image) {
-                cardImage.style.opacity = '0';
-                setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
-            }
-            
-            if (cardName && data.fullName) cardName.textContent = data.fullName;
-            
-            if (addToCartBtn) {
-                addToCartBtn.dataset.price = data.price;
-                addToCartBtn.dataset.weight = data.weight;
-                addToCartBtn.dataset.image = data.image;
-                addToCartBtn.dataset.name = data.fullName;
+            // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
+            const card = variationBtn.closest('.product-card, .product-card-v2');
+            if (card) { // Lógica para o card na página de listagem
+                const priceContainer = card.querySelector('.price-container');
+                const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
+                const cardImage = card.querySelector('.product-card-image');
+                const cardName = card.querySelector('.product-name-display');
 
-                addToCartBtn.disabled = isOutOfStock;
-                const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
-                if(textSpan) {
-                     textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
-                } else { // Fallback para botões sem o span
-                    addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
-                }
-            }
+                if (priceContainer) {
+                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                        priceContainer.innerHTML = `
+                            <span class="original-price">${formatCurrency(data.originalPrice)}</span>
+                            <span class="current-price">${formatCurrency(data.price)}</span>
+                        `;
+                    } else {
+                        priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
+                    }
+                }
 
-        } else { // Lógica para a página de detalhes do produto
-            const el = (id) => document.getElementById(id);
-            renderStockStatus(parseInt(data.stock));
-            if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
-            
-            // --- INÍCIO DA MODIFICAÇÃO: Atualiza parcelas ao trocar variação ---
-           // Atualiza o texto de parcelamento usando a nova lógica
-renderInstallmentsText(el('product-installments'), data.price);
-            // --- FIM DA MODIFICAÇÃO ---
+                if (cardImage && data.image && cardImage.src !== data.image) {
+                    cardImage.style.opacity = '0';
+                    setTimeout(() => {
+                        cardImage.src = data.image;
+                        cardImage.style.opacity = '1';
+                    }, 200);
+                }
 
-            const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
-            if (originalPrice && discountBadge) {
-                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
-                    originalPrice.textContent = formatCurrency(data.originalPrice);
-                    const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
-                    discountBadge.textContent = `-${discount}%`;
-                    originalPrice.classList.remove('hidden');
-                    discountBadge.classList.remove('hidden');
-                } else {
-                    originalPrice.classList.add('hidden');
-                    discountBadge.classList.add('hidden');
-                }
-            }
-            
-            const pageImage = el('main-product-image');
-            if (pageImage && data.image && pageImage.src !== data.image) {
-                pageImage.style.opacity = '0';
-                setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
-            }
-            
-            if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
-            
-            const pageCartBtn = el('add-to-cart-product-page');
-            if (pageCartBtn) {
-                pageCartBtn.dataset.price = data.price;
-                pageCartBtn.dataset.weight = data.weight;
-                pageCartBtn.dataset.image = data.image;
-                pageCartBtn.dataset.name = data.fullName;
-                pageCartBtn.disabled = isOutOfStock;
-                pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
-            }
-        }
-    }
-        
+                if (cardName && data.fullName) cardName.textContent = data.fullName;
+
+                if (addToCartBtn) {
+                    addToCartBtn.dataset.price = data.price;
+                    addToCartBtn.dataset.weight = data.weight;
+                    addToCartBtn.dataset.image = data.image;
+                    addToCartBtn.dataset.name = data.fullName;
+
+                    addToCartBtn.disabled = isOutOfStock;
+                    const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
+                    if (textSpan) {
+                        textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
+                    } else { // Fallback para botões sem o span
+                        addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                    }
+                }
+
+            } else { // Lógica para a página de detalhes do produto
+                const el = (id) => document.getElementById(id);
+                renderStockStatus(parseInt(data.stock));
+                if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+
+                // --- INÍCIO DA MODIFICAÇÃO: Atualiza parcelas ao trocar variação ---
+                // Atualiza o texto de parcelamento usando a nova lógica
+                renderInstallmentsText(el('product-installments'), data.price);
+                // --- FIM DA MODIFICAÇÃO ---
+
+                const originalPrice = el('product-original-price'),
+                    discountBadge = el('product-discount-badge');
+                if (originalPrice && discountBadge) {
+                    if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                        originalPrice.textContent = formatCurrency(data.originalPrice);
+                        const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
+                        discountBadge.textContent = `-${discount}%`;
+                        originalPrice.classList.remove('hidden');
+                        discountBadge.classList.remove('hidden');
+                    } else {
+                        originalPrice.classList.add('hidden');
+                        discountBadge.classList.add('hidden');
+                    }
+                }
+
+                const pageImage = el('main-product-image');
+                if (pageImage && data.image && pageImage.src !== data.image) {
+                    pageImage.style.opacity = '0';
+                    setTimeout(() => {
+                        pageImage.src = data.image;
+                        pageImage.style.opacity = '1';
+                    }, 200);
+                }
+
+                if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
+
+                const pageCartBtn = el('add-to-cart-product-page');
+                if (pageCartBtn) {
+                    pageCartBtn.dataset.price = data.price;
+                    pageCartBtn.dataset.weight = data.weight;
+                    pageCartBtn.dataset.image = data.image;
+                    pageCartBtn.dataset.name = data.fullName;
+                    pageCartBtn.disabled = isOutOfStock;
+                    pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                }
+            }
+        }
+
         if (target.closest('.logout-btn')) handleLogout();
         if (target.closest('#google-login-btn')) handleSocialLogin('google');
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
-        
+
         // CORREÇÃO: Delegadores de evento unificados
         if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2')) handleAddToCart(e);
         if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
         if (target.closest('.remove-from-cart')) {
             state.cart = state.cart.filter(item => item.id !== target.closest('.remove-from-cart').dataset.id);
-            save.cart(); updateCounters(); renderCart();
+            save.cart();
+            updateCounters();
+            renderCart();
         }
         if (target.closest('.quantity-change')) {
             const btn = target.closest('.quantity-change');
@@ -2292,17 +2306,25 @@ renderInstallmentsText(el('product-installments'), data.price);
             if (item) {
                 item.quantity += parseInt(btn.dataset.change);
                 if (item.quantity < 1) item.quantity = 1;
-                save.cart(); updateCounters(); renderCart();
+                save.cart();
+                updateCounters();
+                renderCart();
             }
         }
         if (target.closest('#clear-cart-btn') && confirm('Limpar o carrinho?')) {
             showAnimation('clear-cart-animation-overlay', 5800, () => {
-                state.cart = []; save.cart(); updateCounters(); renderCart();
+                state.cart = [];
+                save.cart();
+                updateCounters();
+                renderCart();
             });
         }
         if (target.closest('#clear-favorites-btn') && confirm('Limpar favoritos?')) {
             showAnimation('unfavorite-animation-overlay', 1500, () => {
-                state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
+                state.favorites = [];
+                save.favorites();
+                updateCounters();
+                renderFavoritesPage();
             });
         }
 
@@ -2321,69 +2343,73 @@ renderInstallmentsText(el('product-installments'), data.price);
             loadPage('checkout');
         }
 
-      if (target.closest('#confirm-purchase-btn')) {
-    if (!state.loggedInUser) {
-        alert('Você precisa estar logado para finalizar um pedido!');
-        loadPage('login');
-        return;
-    }
-
-    // Captura os dados usando os IDs corretos do seu checkout.html
-    const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
-    const cep = document.getElementById('cep')?.value;
-    const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
-    const number = document.getElementById('number')?.value;
-    const neighborhood = document.getElementById('neighborhood')?.value;
-    const city = document.getElementById('city')?.value;
-    const stateValue = document.getElementById('state')?.value;
-    
-    // Lógica para pegar a forma de pagamento dos DIVs clicáveis
-    const selectedPaymentEl = document.querySelector('.payment-option.selected');
-    let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
-    // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
-    paymentMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
-
-    const newOrder = {
-        userId: state.loggedInUser.uid,
-        userEmail: state.loggedInUser.email,
-        userName: fullName,
-        orderDate: serverTimestamp(),
-        items: [...state.cart],
-        shipping: {
-            fee: state.shipping.fee || 0,
-            neighborhood: state.shipping.neighborhood || neighborhood,
-            address: {
-                cep: cep,
-                street: street,
-                number: number,
-                neighborhood: neighborhood,
-                city: city,
-                state: stateValue
+        if (target.closest('#confirm-purchase-btn')) {
+            if (!state.loggedInUser) {
+                alert('Você precisa estar logado para finalizar um pedido!');
+                loadPage('login');
+                return;
             }
-        },
-        total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
-        status: 'Processando',
-        paymentMethod: paymentMethod,
-        estimatedDelivery: ''
-    };
 
-    addDoc(collection(db, 'orders'), newOrder)
-        .then(docRef => {
-            console.log("Pedido salvo no Firestore com ID: ", docRef.id);
-            state.cart = [];
-            state.shipping = { fee: 0, neighborhood: '' };
-            save.cart();
-            updateCounters();
-            showAnimation('success-animation-overlay', 2000, () => {
-                loadPage('meus-pedidos');
-            });
-        })
-        .catch(error => {
-            console.error("Erro ao salvar o pedido no Firestore: ", error);
-            alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
-        });
-}
-		
+            // Captura os dados usando os IDs corretos do seu checkout.html
+            const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
+            const cep = document.getElementById('cep')?.value;
+            const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
+            const number = document.getElementById('number')?.value;
+            const neighborhood = document.getElementById('neighborhood')?.value;
+            const city = document.getElementById('city')?.value;
+            const stateValue = document.getElementById('state')?.value;
+
+            // Lógica para pegar a forma de pagamento dos DIVs clicáveis
+            const selectedPaymentEl = document.querySelector('.payment-option.selected');
+            let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
+            // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
+            paymentMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+
+            const newOrder = {
+                userId: state.loggedInUser.uid,
+                userEmail: state.loggedInUser.email,
+                userName: fullName,
+                orderDate: serverTimestamp(),
+                items: [...state.cart],
+                shipping: {
+                    fee: state.shipping.fee || 0,
+                    neighborhood: state.shipping.neighborhood || neighborhood,
+                    address: {
+                        cep: cep,
+                        street: street,
+                        number: number,
+                        neighborhood: neighborhood,
+                        city: city,
+                        state: stateValue
+                    }
+                },
+                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
+                status: 'Processando',
+                paymentMethod: paymentMethod,
+                estimatedDelivery: ''
+            };
+
+            addDoc(collection(db, 'orders'), newOrder)
+                .then(docRef => {
+                    console.log("Pedido salvo no Firestore com ID: ", docRef.id);
+                    state.cart = [];
+                    state.shipping = {
+                        fee: 0,
+                        neighborhood: ''
+                    };
+                    save.cart();
+                    updateCounters();
+                    showAnimation('success-animation-overlay', 2000, () => {
+                        loadPage('meus-pedidos');
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao salvar o pedido no Firestore: ", error);
+                    alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
+                });
+        }
+    }); // <-- CORREÇÃO: Fechando o addEventListener de 'click' que estava faltando
+
     document.body.addEventListener('submit', e => {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
@@ -2393,7 +2419,7 @@ renderInstallmentsText(el('product-installments'), data.price);
             const form = e.target;
             const button = form.querySelector('button[type="submit"]');
             const productId = form.dataset.productId;
-            
+
             button.textContent = 'Salvando...';
             button.disabled = true;
 
@@ -2446,7 +2472,9 @@ renderInstallmentsText(el('product-installments'), data.price);
                     searchInput.classList.remove('animate-shake');
                 }, 2000);
             } else {
-                loadPage('busca', { query: searchTerm });
+                loadPage('busca', {
+                    query: searchTerm
+                });
                 searchInput.value = '';
             }
         }
@@ -2500,7 +2528,6 @@ renderInstallmentsText(el('product-installments'), data.price);
     updateCounters();
     await loadPage('home');
 }
-								   
 // ======================================================================
 // --- INÍCIO: FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
 // ======================================================================
@@ -2811,6 +2838,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
