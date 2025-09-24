@@ -4105,7 +4105,7 @@ input[type='number'] {
 }
 
 /* ================================================================== */
-/* ========== AJUSTE FINO: Reduz o tamanho do botão de login no mobile ========== */
+/* ========== AJUSTE FINO: Reduz o tamanho do botão de login no mobile (VERSÃO FINAL) ========== */
 /* ================================================================== */
 
 /* Regra aplicada apenas em telas com largura máxima de 768px (celulares) */
@@ -4114,14 +4114,14 @@ input[type='number'] {
     /* Alvo: O link (botão) dentro do placeholder específico para mobile */
     #login-placeholder-mobile .nav-link {
         
-        /* 1. Reduz o preenchimento nas laterais (antes era 1rem ou px-4) */
-        padding-left: 0.8rem;  /* 12.8px */
-        padding-right: 0.8rem; /* 12.8px */
+        /* Reduzindo AINDA MAIS o preenchimento (antes era 0.8rem) */
+        padding-left: 0.65rem;  /* 10.4px */
+        padding-right: 0.65rem; /* 10.4px */
 
-        /* 2. Reduz o espaçamento entre o ícone e o texto (antes era 0.5rem ou space-x-2) */
-        gap: 0.25rem; /* 4px */
+        /* Reduzindo AINDA MAIS o espaço (antes era 0.25rem) */
+        gap: 0.2rem; /* 3.2px */
 
-        /* 3. (Opcional) Reduz um pouco o tamanho da fonte se ainda for necessário */
-        font-size: 0.8rem; /* 12.8px, um pouco menor que o text-sm padrão */
+        /* Reduzindo AINDA MAIS a fonte (antes era 0.8rem) */
+        font-size: 0.75rem; /* 12px, equivalente ao 'text-xs' do Tailwind */
     }
 }
