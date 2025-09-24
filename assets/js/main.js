@@ -2117,215 +2117,388 @@ function initBanhoTosaEventListeners() {
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 async function startApplication() {
-    await Promise.all([
-        loadComponent('components/header.html', 'header-placeholder'),
-        loadComponent('components/footer.html', 'footer-placeholder')
-    ]);
+    await Promise.all([
+        loadComponent('components/header.html', 'header-placeholder'),
+        loadComponent('components/footer.html', 'footer-placeholder')
+    ]);
 
-    // --- LISTENERS GLOBAIS ---
-    const mobileSearchIcon = document.getElementById('mobile-search-icon');
-    const mobileSearchModal = document.getElementById('mobile-search-modal');
-    const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
-    const mobileSearchForm = document.getElementById('mobile-search-form');
-    const mobileSearchInput = document.getElementById('mobile-search-input');
+    // --- LISTENERS GLOBAIS ---
+    const mobileSearchIcon = document.getElementById('mobile-search-icon');
+    const mobileSearchModal = document.getElementById('mobile-search-modal');
+    const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
+    const mobileSearchForm = document.getElementById('mobile-search-form');
+    const mobileSearchInput = document.getElementById('mobile-search-input');
 
-    if (mobileSearchIcon && mobileSearchModal) {
-        mobileSearchIcon.addEventListener('click', (e) => {
-            e.preventDefault();
-            mobileSearchModal.classList.add('active');
-            setTimeout(() => mobileSearchInput.focus(), 100);
-        });
-    }
+    if (mobileSearchIcon && mobileSearchModal) {
+        mobileSearchIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            mobileSearchModal.classList.add('active');
+            setTimeout(() => mobileSearchInput.focus(), 100);
+        });
+    }
 
-    if (mobileSearchCloseBtn) {
-        mobileSearchCloseBtn.addEventListener('click', () => {
-            mobileSearchModal.classList.remove('active');
-        });
-    }
+    if (mobileSearchCloseBtn) {
+        mobileSearchCloseBtn.addEventListener('click', () => {
+            mobileSearchModal.classList.remove('active');
+        });
+    }
 
-    if (mobileSearchModal) {
-        mobileSearchModal.addEventListener('click', (e) => {
-            if (e.target === mobileSearchModal) {
-                mobileSearchModal.classList.remove('active');
-            }
-        });
-    }
+    if (mobileSearchModal) {
+        mobileSearchModal.addEventListener('click', (e) => {
+            if (e.target === mobileSearchModal) {
+                mobileSearchModal.classList.remove('active');
+            }
+        });
+    }
 
-    if (mobileSearchForm) {
-        mobileSearchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const searchTerm = mobileSearchInput.value.trim();
-            if (searchTerm) {
-                loadPage('busca', { query: searchTerm });
-                mobileSearchModal.classList.remove('active');
-                mobileSearchInput.value = '';
-            }
-        });
-    }
+    if (mobileSearchForm) {
+        mobileSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchTerm = mobileSearchInput.value.trim();
+            if (searchTerm) {
+                loadPage('busca', { query: searchTerm });
+                mobileSearchModal.classList.remove('active');
+                mobileSearchInput.value = '';
+            }
+        });
+    }
 
-    document.body.addEventListener('click', (e) => {
-        const target = e.target;
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
 
-        const adminProductItem = target.closest('.product-list-item');
-        if (adminProductItem && adminProductItem.dataset.productId) {
-            e.preventDefault();
-            renderAdminProductEditView(adminProductItem.dataset.productId);
-        }
+        const adminProductItem = target.closest('.product-list-item');
+        if (adminProductItem && adminProductItem.dataset.productId) {
+            e.preventDefault();
+            renderAdminProductEditView(adminProductItem.dataset.productId);
+        }
 
-        const navLink = target.closest('.nav-link');
-        if (navLink && navLink.dataset.page) {
-            e.preventDefault();
-            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
-        }
-        
-        const variationBtn = e.target.closest('.variation-btn, .variation-btn-v2');
-		if (variationBtn) {
-			// ... (toda a sua lógica de variationBtn permanece aqui, sem alterações)
-		}
-        
-        if (target.closest('.logout-btn')) handleLogout();
-        if (target.closest('#google-login-btn')) handleSocialLogin('google');
-        if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
-        
-        if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2')) handleAddToCart(e);
-        if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
-
-        if (target.closest('.remove-from-cart')) {
-            state.cart = state.cart.filter(item => item.id !== target.closest('.remove-from-cart').dataset.id);
-            save.cart(); updateCounters(); renderCart();
-        }
-        if (target.closest('.quantity-change')) {
-            const btn = target.closest('.quantity-change');
-            const item = state.cart.find(i => i.id === btn.dataset.id);
-            if (item) {
-                item.quantity += parseInt(btn.dataset.change);
-                if (item.quantity < 1) item.quantity = 1;
-                save.cart(); updateCounters(); renderCart();
-            }
-        }
-        if (target.closest('#clear-cart-btn') && confirm('Limpar o carrinho?')) {
-            showAnimation('clear-cart-animation-overlay', 5800, () => {
-                state.cart = []; save.cart(); updateCounters(); renderCart();
-            });
-        }
-        if (target.closest('#clear-favorites-btn') && confirm('Limpar favoritos?')) {
-            showAnimation('unfavorite-animation-overlay', 1500, () => {
-                state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
-            });
-        }
-
-        if (target.closest('#checkout-btn')) {
-            e.preventDefault();
-            if (state.cart.length === 0) {
-                alert("Seu carrinho está vazio.");
-                return;
-            }
-            if (!state.shipping.neighborhood) {
-                alert("Por favor, selecione uma taxa de entrega antes de prosseguir.");
-                const shippingModal = document.getElementById('shipping-modal');
-                if (shippingModal) shippingModal.style.display = 'flex';
-                return;
-            }
-            loadPage('checkout');
-        }
+        const navLink = target.closest('.nav-link');
+        if (navLink && navLink.dataset.page) {
+            e.preventDefault();
+            loadPage(navLink.dataset.page, { id: navLink.dataset.id, query: navLink.dataset.query });
+        }
         
-        // ====================================================================
-        // AQUI ESTÁ O BLOCO DE CONFIRMAÇÃO DE COMPRA TOTALMENTE CORRIGIDO
-        // ====================================================================
-        if (target.closest('#confirm-purchase-btn')) {
-            if (!state.loggedInUser) {
-                alert('Você precisa estar logado para finalizar um pedido!');
-                loadPage('login');
-                return;
+        // CORREÇÃO: Lógica unificada para lidar com clique nas variações de produto
+        const variationBtn = e.target.closest('.variation-btn, .variation-btn-v2');
+    if (variationBtn) {
+        e.preventDefault();
+        const data = variationBtn.dataset;
+        variationBtn.parentElement.querySelectorAll('.variation-btn, .variation-btn-v2').forEach(btn => btn.classList.remove('selected'));
+        variationBtn.classList.add('selected');
+
+        const stock = parseInt(data.stock, 10);
+        const isOutOfStock = stock <= 0;
+        
+        // CORREÇÃO: Busca o card correto (seja o novo v2 ou o antigo)
+        const card = variationBtn.closest('.product-card, .product-card-v2');
+        if (card) { // Lógica para o card na página de listagem
+            const priceContainer = card.querySelector('.price-container');
+            const addToCartBtn = card.querySelector('.add-to-cart-btn, .add-to-cart-btn-v2');
+            const cardImage = card.querySelector('.product-card-image');
+            const cardName = card.querySelector('.product-name-display');
+
+            if (priceContainer) {
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    priceContainer.innerHTML = `
+                        <span class="original-price">${formatCurrency(data.originalPrice)}</span>
+                        <span class="current-price">${formatCurrency(data.price)}</span>
+                    `;
+                } else {
+                    priceContainer.innerHTML = `<span class="current-price">${formatCurrency(data.price)}</span>`;
+                }
+            }
+            
+            if (cardImage && data.image && cardImage.src !== data.image) {
+                cardImage.style.opacity = '0';
+                setTimeout(() => { cardImage.src = data.image; cardImage.style.opacity = '1'; }, 200);
+            }
+            
+            if (cardName && data.fullName) cardName.textContent = data.fullName;
+            
+            if (addToCartBtn) {
+                addToCartBtn.dataset.price = data.price;
+                addToCartBtn.dataset.weight = data.weight;
+                addToCartBtn.dataset.image = data.image;
+                addToCartBtn.dataset.name = data.fullName;
+
+                addToCartBtn.disabled = isOutOfStock;
+                const textSpan = addToCartBtn.querySelector('.add-to-cart-reveal');
+                if(textSpan) {
+                     textSpan.textContent = isOutOfStock ? 'Indisponível' : 'Adicionar';
+                } else { // Fallback para botões sem o span
+                    addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+                }
             }
 
-            // Captura os dados usando os IDs corretos do seu checkout.html
-            const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
-            const cep = document.getElementById('cep')?.value;
-            const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
-            const number = document.getElementById('number')?.value;
-            const neighborhood = document.getElementById('neighborhood')?.value;
-            const city = document.getElementById('city')?.value;
-            const stateValue = document.getElementById('state')?.value;
-            
-            // Lógica para pegar a forma de pagamento dos DIVs clicáveis
-            const selectedPaymentEl = document.querySelector('.payment-option.selected');
-            let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
-            // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
-            paymentMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+        } else { // Lógica para a página de detalhes do produto
+            const el = (id) => document.getElementById(id);
+            renderStockStatus(parseInt(data.stock));
+            if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+            
+            // --- INÍCIO DA MODIFICAÇÃO: Atualiza parcelas ao trocar variação ---
+           // Atualiza o texto de parcelamento usando a nova lógica
+renderInstallmentsText(el('product-installments'), data.price);
+            // --- FIM DA MODIFICAÇÃO ---
 
-            const newOrder = {
-                userId: state.loggedInUser.uid,
-                userEmail: state.loggedInUser.email,
-                userName: fullName,
-                orderDate: serverTimestamp(),
-                items: [...state.cart],
-                shipping: {
-                    fee: state.shipping.fee || 0,
-                    neighborhood: state.shipping.neighborhood || neighborhood,
-                    address: {
-                        cep: cep,
-                        street: street,
-                        number: number,
-                        neighborhood: neighborhood,
-                        city: city,
-                        state: stateValue
-                    }
-                },
-                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
-                status: 'Processando',
-                paymentMethod: paymentMethod,
-                estimatedDelivery: ''
-            };
-
-            addDoc(collection(db, 'orders'), newOrder)
-                .then(docRef => {
-                    console.log("Pedido salvo no Firestore com ID: ", docRef.id);
-                    state.cart = [];
-                    state.shipping = { fee: 0, neighborhood: '' };
-                    save.cart();
-                    updateCounters();
-                    showAnimation('success-animation-overlay', 2000, () => {
-                        loadPage('meus-pedidos');
-                    });
-                })
-                .catch(error => {
-                    console.error("Erro ao salvar o pedido no Firestore: ", error);
-                    alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
-                });
+            const originalPrice = el('product-original-price'), discountBadge = el('product-discount-badge');
+            if (originalPrice && discountBadge) {
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    originalPrice.textContent = formatCurrency(data.originalPrice);
+                    const discount = Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100);
+                    discountBadge.textContent = `-${discount}%`;
+                    originalPrice.classList.remove('hidden');
+                    discountBadge.classList.remove('hidden');
+                } else {
+                    originalPrice.classList.add('hidden');
+                    discountBadge.classList.add('hidden');
+                }
+            }
+            
+            const pageImage = el('main-product-image');
+            if (pageImage && data.image && pageImage.src !== data.image) {
+                pageImage.style.opacity = '0';
+                setTimeout(() => { pageImage.src = data.image; pageImage.style.opacity = '1'; }, 200);
+            }
+            
+            if (el('product-name') && data.fullName) el('product-name').textContent = data.fullName;
+            
+            const pageCartBtn = el('add-to-cart-product-page');
+            if (pageCartBtn) {
+                pageCartBtn.dataset.price = data.price;
+                pageCartBtn.dataset.weight = data.weight;
+                pageCartBtn.dataset.image = data.image;
+                pageCartBtn.dataset.name = data.fullName;
+                pageCartBtn.disabled = isOutOfStock;
+                pageCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-2"></i> Adicionar';
+            }
         }
-    });
-
-    document.body.addEventListener('submit', e => {
-        if (e.target.id === 'login-form') handleLogin(e);
-        if (e.target.id === 'create-account-form') handleCreateAccount(e);
-
-        if (e.target.id === 'edit-product-form') {
-			// ... (sua lógica de edit-product-form)
-        }
-
-        if (e.target.id === 'search-form') {
-			// ... (sua lógica de search-form)
-        }
-    });
-
-    document.addEventListener('shippingSelected', (e) => {
-        state.shipping = e.detail;
-        document.getElementById('shipping-modal').style.display = 'none';
-        updateTotals();
-    });
-
-    const marrieButton = document.getElementById('marrie-chat-button');
-    // ... (todo o resto da sua função startApplication permanece igual até o final)
-    // ...
-    // ...
-    if (chatInput && chatSendButton) {
-        chatSendButton.addEventListener('click', handleSendMessage);
-        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
     }
+        
+        if (target.closest('.logout-btn')) handleLogout();
+        if (target.closest('#google-login-btn')) handleSocialLogin('google');
+        if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
+        
+        // CORREÇÃO: Delegadores de evento unificados
+        if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2')) handleAddToCart(e);
+        if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
-    updateCounters();
-    await loadPage('home');
+        if (target.closest('.remove-from-cart')) {
+            state.cart = state.cart.filter(item => item.id !== target.closest('.remove-from-cart').dataset.id);
+            save.cart(); updateCounters(); renderCart();
+        }
+        if (target.closest('.quantity-change')) {
+            const btn = target.closest('.quantity-change');
+            const item = state.cart.find(i => i.id === btn.dataset.id);
+            if (item) {
+                item.quantity += parseInt(btn.dataset.change);
+                if (item.quantity < 1) item.quantity = 1;
+                save.cart(); updateCounters(); renderCart();
+            }
+        }
+        if (target.closest('#clear-cart-btn') && confirm('Limpar o carrinho?')) {
+            showAnimation('clear-cart-animation-overlay', 5800, () => {
+                state.cart = []; save.cart(); updateCounters(); renderCart();
+            });
+        }
+        if (target.closest('#clear-favorites-btn') && confirm('Limpar favoritos?')) {
+            showAnimation('unfavorite-animation-overlay', 1500, () => {
+                state.favorites = []; save.favorites(); updateCounters(); renderFavoritesPage();
+            });
+        }
+
+        if (target.closest('#checkout-btn')) {
+            e.preventDefault();
+            if (state.cart.length === 0) {
+                alert("Seu carrinho está vazio.");
+                return;
+            }
+            if (!state.shipping.neighborhood) {
+                alert("Por favor, selecione uma taxa de entrega antes de prosseguir.");
+                const shippingModal = document.getElementById('shipping-modal');
+                if (shippingModal) shippingModal.style.display = 'flex';
+                return;
+            }
+            loadPage('checkout');
+        }
+
+      if (target.closest('#confirm-purchase-btn')) {
+    if (!state.loggedInUser) {
+        alert('Você precisa estar logado para finalizar um pedido!');
+        loadPage('login');
+        return;
+    }
+
+    // Captura os dados usando os IDs corretos do seu checkout.html
+    const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
+    const cep = document.getElementById('cep')?.value;
+    const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
+    const number = document.getElementById('number')?.value;
+    const neighborhood = document.getElementById('neighborhood')?.value;
+    const city = document.getElementById('city')?.value;
+    const stateValue = document.getElementById('state')?.value;
+    
+    // Lógica para pegar a forma de pagamento dos DIVs clicáveis
+    const selectedPaymentEl = document.querySelector('.payment-option.selected');
+    let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
+    // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
+    paymentMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+
+    const newOrder = {
+        userId: state.loggedInUser.uid,
+        userEmail: state.loggedInUser.email,
+        userName: fullName,
+        orderDate: serverTimestamp(),
+        items: [...state.cart],
+        shipping: {
+            fee: state.shipping.fee || 0,
+            neighborhood: state.shipping.neighborhood || neighborhood,
+            address: {
+                cep: cep,
+                street: street,
+                number: number,
+                neighborhood: neighborhood,
+                city: city,
+                state: stateValue
+            }
+        },
+        total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
+        status: 'Processando',
+        paymentMethod: paymentMethod,
+        estimatedDelivery: ''
+    };
+
+    addDoc(collection(db, 'orders'), newOrder)
+        .then(docRef => {
+            console.log("Pedido salvo no Firestore com ID: ", docRef.id);
+            state.cart = [];
+            state.shipping = { fee: 0, neighborhood: '' };
+            save.cart();
+            updateCounters();
+            showAnimation('success-animation-overlay', 2000, () => {
+                loadPage('meus-pedidos');
+            });
+        })
+        .catch(error => {
+            console.error("Erro ao salvar o pedido no Firestore: ", error);
+            alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
+        });
+}
+		
+    document.body.addEventListener('submit', e => {
+        if (e.target.id === 'login-form') handleLogin(e);
+        if (e.target.id === 'create-account-form') handleCreateAccount(e);
+
+        if (e.target.id === 'edit-product-form') {
+            e.preventDefault();
+            const form = e.target;
+            const button = form.querySelector('button[type="submit"]');
+            const productId = form.dataset.productId;
+            
+            button.textContent = 'Salvando...';
+            button.disabled = true;
+
+            try {
+                const updatedData = {
+                    nome: document.getElementById('product-nome').value,
+                    category: document.getElementById('product-category').value,
+                    description: document.getElementById('product-description').value,
+                    variations: []
+                };
+
+                document.querySelectorAll('.variation-editor-group').forEach(group => {
+                    const variation = {};
+                    group.querySelectorAll('input').forEach(input => {
+                        const field = input.dataset.field;
+                        const value = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
+                        variation[field] = value;
+                    });
+                    updatedData.variations.push(variation);
+                });
+
+                updateDoc(doc(db, 'produtos', productId), updatedData).then(() => {
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i> Salvo com Sucesso!';
+                    button.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Alterações';
+                        button.classList.remove('bg-green-500');
+                        button.disabled = false;
+                    }, 2500);
+                });
+
+            } catch (error) {
+                console.error("Erro ao salvar o produto:", error);
+                alert('Ocorreu um erro ao salvar as alterações.');
+                button.textContent = 'Salvar Alterações';
+                button.disabled = false;
+            }
+        }
+
+        if (e.target.id === 'search-form') {
+            e.preventDefault();
+            const searchInput = document.getElementById('search-input');
+            const searchTerm = searchInput.value.trim();
+            const searchError = document.getElementById('search-error');
+            if (!searchTerm) {
+                searchError.classList.remove('hidden');
+                searchInput.classList.add('animate-shake');
+                setTimeout(() => {
+                    searchError.classList.add('hidden');
+                    searchInput.classList.remove('animate-shake');
+                }, 2000);
+            } else {
+                loadPage('busca', { query: searchTerm });
+                searchInput.value = '';
+            }
+        }
+    });
+
+    document.addEventListener('shippingSelected', (e) => {
+        state.shipping = e.detail;
+        document.getElementById('shipping-modal').style.display = 'none';
+        updateTotals();
+    });
+
+    const marrieButton = document.getElementById('marrie-chat-button');
+    const marrieWindow = document.getElementById('marrie-chat-window');
+    const chatInput = document.getElementById('marrie-chat-input');
+    const chatSendButton = document.getElementById('marrie-chat-send');
+    const plaqueContainer = document.getElementById('marrie-plaque-container');
+
+    if (plaqueContainer && marrieButton) {
+        let plaqueTimer;
+        const showPlaque = () => {
+            plaqueContainer.classList.add('active');
+            plaqueTimer = setTimeout(() => plaqueContainer.classList.remove('active'), 20000);
+        };
+        setTimeout(showPlaque, 2000);
+        const hidePlaque = () => {
+            clearTimeout(plaqueTimer);
+            plaqueContainer.classList.remove('active');
+            marrieButton.removeEventListener('click', hidePlaque);
+        };
+        marrieButton.addEventListener('click', hidePlaque);
+    }
+
+    if (marrieButton && marrieWindow) {
+        const toggleChat = () => {
+            marrieWindow.classList.toggle('active');
+            if (marrieWindow.classList.contains('active')) {
+                marrieWindow.classList.remove('hidden');
+            } else {
+                setTimeout(() => marrieWindow.classList.add('hidden'), 500);
+            }
+        };
+        marrieButton.addEventListener('click', toggleChat);
+        document.getElementById('marrie-chat-close')?.addEventListener('click', toggleChat);
+    }
+
+    if (chatInput && chatSendButton) {
+        chatSendButton.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+    }
+
+    updateCounters();
+    await loadPage('home');
 }
 								   
 // ======================================================================
@@ -2638,8 +2811,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
 
 
 
