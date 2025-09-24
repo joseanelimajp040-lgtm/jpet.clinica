@@ -2732,26 +2732,6 @@ input[type='number'] {
     }
 }
 
-/* ========== CORREÇÃO BOTÃO LOGIN/CADASTRO NO MOBILE ========== */
-
-@media (max-width: 380px) {
-  /* Alvo: Telas muito estreitas onde o botão geralmente quebra */
-
-  #login-placeholder-mobile .nav-link span,
-  #login-placeholder-desktop .nav-link span {
-    white-space: normal; /* Permite que o texto quebre em duas linhas */
-    text-align: center;  /* Centraliza o texto quando ele quebra */
-    line-height: 1.2;    /* Melhora o espaçamento entre as linhas */
-  }
-
-  #login-placeholder-mobile .nav-link,
-  #login-placeholder-desktop .nav-link {
-    /* Ajusta o padding para acomodar o texto em duas linhas */
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-}
-
 /* Layout principal do Dashboard com CSS Grid */
 .admin-dashboard-layout {
     display: grid;
@@ -4096,5 +4076,30 @@ input[type='number'] {
         right: 0.5rem;
         background-color: rgba(0,0,0,0.5);
         color: white;
+    }
+}
+
+/* ================================================================== */
+/* ========== CONTROLE DE VISIBILIDADE LOGIN DESKTOP/MOBILE ========== */
+/* ================================================================== */
+
+/* Por padrão, o botão de desktop fica escondido. */
+#login-placeholder-desktop {
+    display: none;
+}
+/* E o de mobile fica visível. */
+#login-placeholder-mobile {
+    display: block; /* ou flex, dependendo do seu layout */
+}
+
+/* Em telas maiores (a partir de 768px, o breakpoint 'md' do Tailwind) */
+@media (min-width: 768px) {
+    /* Escondemos o botão de mobile. */
+    #login-placeholder-mobile {
+        display: none;
+    }
+    /* E mostramos o botão de desktop. */
+    #login-placeholder-desktop {
+        display: block; /* ou flex */
     }
 }
