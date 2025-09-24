@@ -2322,46 +2322,68 @@ renderInstallmentsText(el('product-installments'), data.price);
         }
 
         if (target.closest('#confirm-purchase-btn')) {
-            if (!state.loggedInUser) {
-                alert('Você precisa estar logado para finalizar um pedido!');
-                loadPage('login');
-                return;
+    if (!state.loggedInUser) {
+        alert('Você precisa estar logado para finalizar um pedido!');
+        loadPage('login');
+        return;
+    }
+
+    // NOVO: Captura todos os dados do formulário usando os IDs corretos do seu checkout.html
+    const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
+    const cep = document.getElementById('cep')?.value;
+    const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
+    const number = document.getElementById('number')?.value;
+    const neighborhood = document.getElementById('neighborhood')?.value;
+    const city = document.getElementById('city')?.value;
+    const stateValue = document.getElementById('state')?.value;
+    
+    // CORRIGIDO: Lógica para pegar a forma de pagamento dos DIVs clicáveis
+    const selectedPaymentEl = document.querySelector('.payment-option.selected');
+    let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
+    // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
+    paymentMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+
+    const newOrder = {
+        userId: state.loggedInUser.uid,
+        userEmail: state.loggedInUser.email,
+        userName: fullName, // <-- CORRIGIDO para usar o nome completo do formulário
+        orderDate: serverTimestamp(),
+        items: [...state.cart],
+        shipping: {
+            fee: state.shipping.fee || 0,
+            neighborhood: state.shipping.neighborhood || neighborhood,
+            // NOVO: Objeto com o endereço detalhado
+            address: {
+                cep: cep,
+                street: street,
+                number: number,
+                neighborhood: neighborhood,
+                city: city,
+                state: stateValue
             }
+        },
+        total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
+        status: 'Processando',
+        paymentMethod: paymentMethod,
+        estimatedDelivery: ''
+    };
 
-              // Captura a forma de pagamento selecionada no checkout
-            const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || 'Não especificado';
-
-            const newOrder = {
-                userId: state.loggedInUser.uid,
-                userEmail: state.loggedInUser.email,
-                userName: state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0],
-                orderDate: serverTimestamp(),
-                items: [...state.cart],
-                shipping: { ...state.shipping },
-                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (state.shipping.fee || 0),
-                status: 'Processando',
-                paymentMethod: paymentMethod, // <-- LINHA ADICIONADA
-                estimatedDelivery: ''
-            };
-
-            addDoc(collection(db, 'orders'), newOrder)
-                .then(docRef => {
-                    console.log("Pedido salvo no Firestore com ID: ", docRef.id);
-                    state.cart = [];
-                    state.shipping = { fee: 0, neighborhood: '' };
-                    save.cart();
-                    updateCounters();
-                    showAnimation('success-animation-overlay', 2000, () => {
-                        loadPage('meus-pedidos');
-                    });
-                })
-                .catch(error => {
-                    console.error("Erro ao salvar o pedido no Firestore: ", error);
-                    alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
-                });
-        }
-    });
-
+    addDoc(collection(db, 'orders'), newOrder)
+        .then(docRef => {
+            console.log("Pedido salvo no Firestore com ID: ", docRef.id);
+            state.cart = [];
+            state.shipping = { fee: 0, neighborhood: '' };
+            save.cart();
+            updateCounters();
+            showAnimation('success-animation-overlay', 2000, () => {
+                loadPage('meus-pedidos');
+            });
+        })
+        .catch(error => {
+            console.error("Erro ao salvar o pedido no Firestore: ", error);
+            alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
+        });
+}
     document.body.addEventListener('submit', e => {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
@@ -2788,6 +2810,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
