@@ -2321,14 +2321,14 @@ renderInstallmentsText(el('product-installments'), data.price);
             loadPage('checkout');
         }
 
-        if (target.closest('#confirm-purchase-btn')) {
+      if (target.closest('#confirm-purchase-btn')) {
     if (!state.loggedInUser) {
         alert('Você precisa estar logado para finalizar um pedido!');
         loadPage('login');
         return;
     }
 
-    // NOVO: Captura todos os dados do formulário usando os IDs corretos do seu checkout.html
+    // Captura os dados usando os IDs corretos do seu checkout.html
     const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
     const cep = document.getElementById('cep')?.value;
     const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
@@ -2337,7 +2337,7 @@ renderInstallmentsText(el('product-installments'), data.price);
     const city = document.getElementById('city')?.value;
     const stateValue = document.getElementById('state')?.value;
     
-    // CORRIGIDO: Lógica para pegar a forma de pagamento dos DIVs clicáveis
+    // Lógica para pegar a forma de pagamento dos DIVs clicáveis
     const selectedPaymentEl = document.querySelector('.payment-option.selected');
     let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
     // Formata o nome para ficar mais bonito (ex: "pix" vira "Pix")
@@ -2346,13 +2346,12 @@ renderInstallmentsText(el('product-installments'), data.price);
     const newOrder = {
         userId: state.loggedInUser.uid,
         userEmail: state.loggedInUser.email,
-        userName: fullName, // <-- CORRIGIDO para usar o nome completo do formulário
+        userName: fullName,
         orderDate: serverTimestamp(),
         items: [...state.cart],
         shipping: {
             fee: state.shipping.fee || 0,
             neighborhood: state.shipping.neighborhood || neighborhood,
-            // NOVO: Objeto com o endereço detalhado
             address: {
                 cep: cep,
                 street: street,
@@ -2384,6 +2383,7 @@ renderInstallmentsText(el('product-installments'), data.price);
             alert("Ocorreu um erro ao finalizar seu pedido. Tente novamente.");
         });
 }
+		
     document.body.addEventListener('submit', e => {
         if (e.target.id === 'login-form') handleLogin(e);
         if (e.target.id === 'create-account-form') handleCreateAccount(e);
@@ -2500,6 +2500,7 @@ renderInstallmentsText(el('product-installments'), data.price);
     updateCounters();
     await loadPage('home');
 }
+								   
 // ======================================================================
 // --- INÍCIO: FUNÇÕES PARA IMPORTAÇÃO DE PRODUTOS VIA XML ---
 // ======================================================================
@@ -2810,6 +2811,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
