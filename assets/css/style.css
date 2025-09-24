@@ -4125,3 +4125,37 @@ input[type='number'] {
         font-size: 0.75rem; /* 12px, equivalente ao 'text-xs' do Tailwind */
     }
 }
+
+/* ================================================================== */
+/* ========== ESTILOS PARA O MODAL DE DETALHES DO PEDIDO ========== */
+/* ================================================================== */
+
+.admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 41, 59, 0.6);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.admin-modal-content {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    animation: slideInUp 0.4s ease-out;
+}
