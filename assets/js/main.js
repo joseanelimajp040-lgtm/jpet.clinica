@@ -202,6 +202,124 @@ function renderInstallmentsText(element, price) {
         element.style.display = 'none';
     }
 }
+async function renderAdminDashboard() {
+    console.log("Iniciando renderização do Dashboard Admin...");
+
+    // Seleciona os elementos no HTML que vamos atualizar
+    const totalClientsEl = document.getElementById('total-clients-value');
+    const pendingOrdersEl = document.getElementById('pending-orders-value');
+    const monthlySalesEl = document.getElementById('monthly-sales-value');
+    const activeProductsEl = document.getElementById('active-products-value');
+    const recentOrdersBodyEl = document.getElementById('recent-orders-body');
+
+    // Verifica se todos os elementos necessários existem na página
+    if (!totalClientsEl || !pendingOrdersEl || !monthlySalesEl || !activeProductsEl || !recentOrdersBodyEl) {
+        console.error("Um ou mais elementos do dashboard não foram encontrados no HTML.");
+        return;
+    }
+
+    // Define um estado inicial de carregamento
+    const loadingHTML = `<i class="fas fa-spinner fa-spin text-gray-400"></i>`;
+    totalClientsEl.innerHTML = loadingHTML;
+    pendingOrdersEl.innerHTML = loadingHTML;
+    monthlySalesEl.innerHTML = loadingHTML;
+    activeProductsEl.innerHTML = loadingHTML;
+    recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">${loadingHTML} Carregando...</td></tr>`;
+
+    try {
+        // Busca todos os dados necessários do Firebase em paralelo para maior eficiência
+        const [usersSnapshot, productsSnapshot, ordersSnapshot] = await Promise.all([
+            getDocs(collection(db, 'users')),
+            getDocs(collection(db, 'produtos')),
+            getDocs(query(collection(db, 'orders'), orderBy('orderDate', 'desc')))
+        ]);
+
+        // --- 1. Calcular Total de Clientes ---
+        const totalClients = usersSnapshot.size;
+        totalClientsEl.textContent = totalClients;
+
+        // --- 2. Calcular Produtos Ativos ---
+        const activeProducts = productsSnapshot.size;
+        activeProductsEl.textContent = activeProducts;
+
+        // --- 3. Calcular Pedidos Pendentes e Vendas do Mês ---
+        let pendingOrdersCount = 0;
+        let monthlySales = 0;
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        ordersSnapshot.forEach(doc => {
+            const order = doc.data();
+
+            // Contagem de pedidos pendentes (Processando ou Enviado)
+            if (order.status === 'Processando' || order.status === 'Enviado') {
+                pendingOrdersCount++;
+            }
+
+            // Soma das vendas do mês atual
+            if (order.orderDate && order.status !== 'Cancelado') {
+                const orderDate = order.orderDate.toDate();
+                if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+                    monthlySales += order.total || 0;
+                }
+            }
+        });
+
+        pendingOrdersEl.textContent = pendingOrdersCount;
+        monthlySalesEl.textContent = formatCurrency(monthlySales);
+
+        // --- 4. Renderizar Pedidos Recentes (os 5 primeiros) ---
+        const recentOrders = ordersSnapshot.docs.slice(0, 5);
+        
+        const getStatusBadgeHTML = (status) => {
+             switch (status.toLowerCase()) {
+                case 'processando':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Processando</span>`;
+                case 'enviado':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Enviado</span>`;
+                case 'entregue':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Entregue</span>`;
+                case 'cancelado':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Cancelado</span>`;
+                default:
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">${status}</span>`;
+            }
+        };
+
+        if (recentOrders.length === 0) {
+            recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum pedido encontrado.</td></tr>`;
+        } else {
+            const recentOrdersHTML = recentOrders.map(doc => {
+                const order = doc.data();
+                const orderId = `#JPET-${doc.id.substring(0, 6).toUpperCase()}`;
+                const clientName = order.userName || 'Cliente Anônimo';
+                const total = formatCurrency(order.total || 0);
+                const statusBadge = getStatusBadgeHTML(order.status);
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 text-gray-700 font-mono">${orderId}</td>
+                        <td class="p-3 text-gray-700">${clientName}</td>
+                        <td class="p-3 text-gray-700 font-medium">${total}</td>
+                        <td class="p-3">${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+            recentOrdersBodyEl.innerHTML = recentOrdersHTML;
+        }
+
+    } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error);
+        // Exibe uma mensagem de erro em todos os campos
+        const errorMsg = `<span class="text-xs text-red-500">Erro!</span>`;
+        totalClientsEl.innerHTML = errorMsg;
+        pendingOrdersEl.innerHTML = errorMsg;
+        monthlySalesEl.innerHTML = errorMsg;
+        activeProductsEl.innerHTML = errorMsg;
+        recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Falha ao carregar os pedidos.</td></tr>`;
+    }
+}
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderAdminOrdersView() {
@@ -1655,41 +1773,40 @@ async function loadPage(pageName, params = {}) {
                 }
                 break;
             case 'admin':
-                const adminUserNameEl = document.getElementById('admin-user-name');
-                if (adminUserNameEl) {
-                    adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-                }
+    // Configurações básicas do painel
+    const adminUserNameEl = document.getElementById('admin-user-name');
+    if (adminUserNameEl) {
+        adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    }
+    document.querySelector('#admin-user-profile .logout-btn')?.addEventListener('click', handleLogout);
 
-                const adminLogoutBtn = document.querySelector('#admin-user-profile .logout-btn');
-                if (adminLogoutBtn) {
-                    adminLogoutBtn.addEventListener('click', handleLogout);
-                }
-                
-                document.querySelector('.admin-nav-link[data-admin-page="dashboard"]')?.classList.add('active');
+    // CHAMA A NOVA FUNÇÃO PARA PREENCHER OS DADOS DA DASHBOARD
+    renderAdminDashboard();
+    
+    // Lógica de navegação da barra lateral
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
 
-                document.querySelectorAll('.admin-nav-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
-                        link.classList.add('active');
-
-                        const adminPage = link.dataset.adminPage;
-                        if (adminPage === 'pedidos') {
-                            renderAdminOrdersView();
-                        } else if (adminPage === 'clientes') {
-                            renderAdminClientsView();
-                        } else if (adminPage === 'produtos') { 
-                            renderAdminProductsView();
-                        } else if (adminPage === 'importar-xml') { 
-                            renderAdminImportXMLView();
-                        } else if (adminPage === 'dashboard') {
-                            loadPage('admin'); 
-                        } else {
-                            document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
-                        }
-                    });
-                });
-                break;
+            const adminPage = link.dataset.adminPage;
+            if (adminPage === 'dashboard') {
+                loadPage('admin'); // Recarrega a página do admin para mostrar o dashboard
+            } else if (adminPage === 'pedidos') {
+                renderAdminOrdersView();
+            } else if (adminPage === 'clientes') {
+                renderAdminClientsView();
+            } else if (adminPage === 'produtos') { 
+                renderAdminProductsView();
+            } else if (adminPage === 'importar-xml') { 
+                renderAdminImportXMLView();
+            } else {
+                document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
+            }
+        });
+    });
+    break;
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -2562,6 +2679,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
