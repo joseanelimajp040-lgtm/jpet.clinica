@@ -363,14 +363,14 @@ async function renderDetailedOrderView(orderId) {
         const modalHTML = `
             <div id="order-details-modal" class="admin-modal-overlay">
                 <div class="admin-modal-content">
-                    <button id="modal-close-btn" class="modal-close-button">&times;</button>
+                    <button id="modal-close-btn" class="modal-close-button">×</button>
                     <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
                         Detalhes do Pedido <span class="text-primary font-mono">#${orderId.substring(0, 6).toUpperCase()}</span>
                     </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                         
-                        <div class="space-y-4">
+                                                <div class="space-y-4">
                             <div>
                                 <h4 class="font-bold text-gray-600 mb-1">CLIENTE</h4>
                                 <p>${order.userName || 'Nome não informado'}</p>
@@ -385,10 +385,10 @@ async function renderDetailedOrderView(orderId) {
                                 <a id="google-maps-link" href="#" target="_blank" class="btn-google-maps mt-2 inline-flex items-center gap-2 text-sm font-medium">
                                     <i class="fas fa-map-marker-alt"></i> Ver no Google Maps
                                 </a>
-                                                            </div>
+                            </div>
                         </div>
 
-                        <div class="space-y-4">
+                                                <div class="space-y-4">
                              <div>
                                 <h4 class="font-bold text-gray-600 mb-1">RESUMO FINANCEIRO</h4>
                                 <div class="flex justify-between border-b py-1"><span>Subtotal</span> <span>${formatCurrency(order.total - order.shipping.fee)}</span></div>
@@ -414,7 +414,7 @@ async function renderDetailedOrderView(orderId) {
         document.getElementById('order-details-modal')?.remove();
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // ✅ INÍCIO DA MODIFICAÇÃO: Lógica para criar a URL do Google Maps
+        // Lógica para criar a URL do Google Maps (permanece a mesma)
         const addressParts = [
             order.shipping.address?.street,
             order.shipping.address?.number,
@@ -422,7 +422,6 @@ async function renderDetailedOrderView(orderId) {
             order.shipping.address?.city,
             order.shipping.address?.state,
         ];
-        // Filtra partes vazias e junta com vírgulas
         const fullAddress = addressParts.filter(part => part).join(', ');
         
         if (fullAddress) {
@@ -433,7 +432,6 @@ async function renderDetailedOrderView(orderId) {
                 mapsLink.href = mapsUrl;
             }
         }
-        // ✅ FIM DA MODIFICAÇÃO
 
         // Adiciona os listeners para fechar o modal
         const modal = document.getElementById('order-details-modal');
@@ -2862,6 +2860,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
