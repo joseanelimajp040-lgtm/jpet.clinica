@@ -323,130 +323,124 @@ async function renderAdminDashboard() {
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderDetailedOrderView(orderId) {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
 
-    // Mostra um feedback de carregamento
-    const loadingModal = `
-        <div id="order-details-modal" class="admin-modal-overlay">
-            <div class="admin-modal-content">
-                <p>Carregando detalhes do pedido...</p>
-            </div>
-        </div>`;
-    document.body.insertAdjacentHTML('beforeend', loadingModal);
+    // Mostra um feedback de carregamento
+    const loadingModal = `
+        <div id="order-details-modal" class="admin-modal-overlay">
+            <div class="admin-modal-content">
+                <p>Carregando detalhes do pedido...</p>
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', loadingModal);
 
-    try {
-        const orderSnap = await getDoc(doc(db, 'orders', orderId));
-        if (!orderSnap.exists()) {
-            alert("Erro: Pedido não encontrado.");
-            document.getElementById('order-details-modal')?.remove();
-            return;
-        }
+    try {
+        const orderSnap = await getDoc(doc(db, 'orders', orderId));
+        if (!orderSnap.exists()) {
+            alert("Erro: Pedido não encontrado.");
+            document.getElementById('order-details-modal')?.remove();
+            return;
+        }
 
-        const order = orderSnap.data();
+        const order = orderSnap.data();
 
-        // Gera o HTML para a lista de itens do pedido
-        const itemsHTML = order.items.map(item => `
-            <div class="flex items-center justify-between py-2 border-b last:border-b-0">
-                <div class="flex items-center gap-3">
-                    <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-contain rounded border p-1">
-                    <div>
-                        <p class="font-semibold text-gray-800">${item.name}</p>
-                        <p class="text-sm text-gray-500">Qtd: ${item.quantity} | Unit: ${formatCurrency(item.price)}</p>
-                    </div>
-                </div>
-                <p class="font-bold text-gray-800">${formatCurrency(item.quantity * item.price)}</p>
-            </div>
-        `).join('');
+        // Gera o HTML para a lista de itens do pedido
+        const itemsHTML = order.items.map(item => `
+            <div class="flex items-center justify-between py-2 border-b last:border-b-0">
+                <div class="flex items-center gap-3">
+                    <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-contain rounded border p-1">
+                    <div>
+                        <p class="font-semibold text-gray-800">${item.name}</p>
+                        <p class="text-sm text-gray-500">Qtd: ${item.quantity} | Unit: ${formatCurrency(item.price)}</p>
+                    </div>
+                </div>
+                <p class="font-bold text-gray-800">${formatCurrency(item.quantity * item.price)}</p>
+            </div>
+        `).join('');
 
-        // Monta o HTML completo do modal
-        const modalHTML = `
-            <div id="order-details-modal" class="admin-modal-overlay">
-                <div class="admin-modal-content">
-                    <button id="modal-close-btn" class="modal-close-button">×</button>
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
-                        Detalhes do Pedido <span class="text-primary font-mono">#${orderId.substring(0, 6).toUpperCase()}</span>
-                    </h3>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                        
-                                                <div class="space-y-4">
-                            <div>
-                                <h4 class="font-bold text-gray-600 mb-1">CLIENTE</h4>
-                                <p>${order.userName || 'Nome não informado'}</p>
-                                <p class="text-gray-500">${order.userEmail || 'Email não informado'}</p>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-600 mb-1">ENDEREÇO DE ENTREGA</h4>
-                                <p>${order.shipping.address?.street || 'Rua não informada'}, ${order.shipping.address?.number || 'S/N'}</p>
-                                <p>${order.shipping.address?.neighborhood || order.shipping.neighborhood || 'Bairro não informado'}</p>
-                                <p>${order.shipping.address?.city || 'Cidade não informada'} - ${order.shipping.address?.state || 'Estado não informado'}</p>
-                                <p class="text-gray-500">CEP: ${order.shipping.address?.cep || 'CEP não informado'}</p>
-                                <a id="google-maps-link" href="#" target="_blank" class="btn-google-maps mt-2 inline-flex items-center gap-2 text-sm font-medium">
-                                    <i class="fas fa-map-marker-alt"></i> Ver no Google Maps
-                                </a>
-                            </div>
-                        </div>
-
-                                                <div class="space-y-4">
-                             <div>
-                                <h4 class="font-bold text-gray-600 mb-1">RESUMO FINANCEIRO</h4>
-                                <div class="flex justify-between border-b py-1"><span>Subtotal</span> <span>${formatCurrency(order.total - order.shipping.fee)}</span></div>
-                                <div class="flex justify-between border-b py-1"><span>Frete</span> <span>${formatCurrency(order.shipping.fee)}</span></div>
-                                <div class="flex justify-between font-bold text-lg pt-1"><span>TOTAL</span> <span>${formatCurrency(order.total)}</span></div>
-                            </div>
-                             <div>
-                                <h4 class="font-bold text-gray-600 mb-1">FORMA DE PAGAMENTO</h4>
-                                <p class="font-semibold text-secondary">${order.paymentMethod || 'Não especificada'}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                         <h4 class="font-bold text-gray-600 mb-2">ITENS DO PEDIDO</h4>
-                         <div class="space-y-2">${itemsHTML}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Remove o modal de loading e insere o modal com os detalhes
-        document.getElementById('order-details-modal')?.remove();
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        // Lógica para criar a URL do Google Maps (permanece a mesma)
+        // ✅ LÓGICA DO GOOGLE MAPS (MELHORADA)
+        // Cria o endereço completo e filtra partes vazias
         const addressParts = [
             order.shipping.address?.street,
             order.shipping.address?.number,
             order.shipping.address?.neighborhood,
             order.shipping.address?.city,
             order.shipping.address?.state,
-        ];
-        const fullAddress = addressParts.filter(part => part).join(', ');
+        ].filter(part => part); // Filtra valores como null, undefined ou string vazia
         
-        if (fullAddress) {
-            const encodedAddress = encodeURIComponent(fullAddress);
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-            const mapsLink = document.getElementById('google-maps-link');
-            if (mapsLink) {
-                mapsLink.href = mapsUrl;
+        const fullAddress = addressParts.join(', ');
+        
+        // Gera o HTML do link somente se existir um endereço válido
+        const googleMapsLinkHTML = fullAddress 
+            ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}" target="_blank" class="btn-google-maps mt-2 inline-flex items-center gap-2 text-sm font-medium">
+                   <i class="fas fa-map-marker-alt"></i> Ver no Google Maps
+               </a>` 
+            : '';
+
+        // Monta o HTML completo do modal
+        const modalHTML = `
+            <div id="order-details-modal" class="admin-modal-overlay">
+                <div class="admin-modal-content">
+                    <button id="modal-close-btn" class="modal-close-button">×</button>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                        Detalhes do Pedido <span class="text-primary font-mono">#${orderId.substring(0, 6).toUpperCase()}</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">CLIENTE</h4>
+                                <p>${order.userName || 'Nome não informado'}</p>
+                                <p class="text-gray-500">${order.userEmail || 'Email não informado'}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">ENDEREÇO DE ENTREGA</h4>
+                                <p>${order.shipping.address?.street || 'Rua não informada'}, ${order.shipping.address?.number || 'S/N'}</p>
+                                <p>${order.shipping.address?.neighborhood || order.shipping.neighborhood || 'Bairro não informado'}</p>
+                                <p>${order.shipping.address?.city || 'Cidade não informada'} - ${order.shipping.address?.state || 'Estado não informado'}</p>
+                                <p class="text-gray-500">CEP: ${order.shipping.address?.cep || 'CEP não informado'}</p>
+                                
+                                ${googleMapsLinkHTML}
+                                
+                            </div> </div> <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">RESUMO FINANCEIRO</h4>
+                                <div class="flex justify-between border-b py-1"><span>Subtotal</span> <span>${formatCurrency(order.total - order.shipping.fee)}</span></div>
+                                <div class="flex justify-between border-b py-1"><span>Frete</span> <span>${formatCurrency(order.shipping.fee)}</span></div>
+                                <div class="flex justify-between font-bold text-lg pt-1"><span>TOTAL</span> <span>${formatCurrency(order.total)}</span></div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">FORMA DE PAGAMENTO</h4>
+                                <p class="font-semibold text-secondary">${order.paymentMethod || 'Não especificada'}</p>
+                            </div>
+                        </div> </div> <div class="mt-6">
+                        <h4 class="font-bold text-gray-600 mb-2">ITENS DO PEDIDO</h4>
+                        <div class="space-y-2">${itemsHTML}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove o modal de loading e insere o modal com os detalhes
+        document.getElementById('order-details-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Adiciona os listeners para fechar o modal
+        const modal = document.getElementById('order-details-modal');
+        document.getElementById('modal-close-btn').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
             }
-        }
+        });
 
-        // Adiciona os listeners para fechar o modal
-        const modal = document.getElementById('order-details-modal');
-        document.getElementById('modal-close-btn').addEventListener('click', () => modal.remove());
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
-            }
-        });
-
-    } catch (error) {
-        console.error("Erro ao buscar detalhes do pedido:", error);
-        alert("Não foi possível carregar os detalhes do pedido.");
-        document.getElementById('order-details-modal')?.remove();
-    }
+    } catch (error) {
+        console.error("Erro ao buscar detalhes do pedido:", error);
+        alert("Não foi possível carregar os detalhes do pedido.");
+        document.getElementById('order-details-modal')?.remove();
+    }
 }
 
 async function renderAdminOrdersView() {
@@ -2860,6 +2854,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
