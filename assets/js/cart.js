@@ -1,30 +1,77 @@
-// cart.js (VERSÃO ATUALIZADA)
+// cart.js (VERSÃO CORRIGIDA)
 
-// NOVO: Adicione as funções de abrir/fechar o modal aqui para manter a lógica de UI centralizada.
 function setupModalListeners() {
-    const shippingInfoBtn = document.getElementById('shipping-info-btn');
-    const shippingModal = document.getElementById('shipping-modal');
-    const modalCloseBtn = shippingModal?.querySelector('.modal-close');
+    const shippingInfoBtn = document.getElementById('shipping-info-btn');
+    const shippingModal = document.getElementById('shipping-modal');
+    const modalCloseBtn = shippingModal?.querySelector('.modal-close');
 
-    if (shippingInfoBtn && shippingModal) {
-        shippingInfoBtn.addEventListener('click', () => {
-            shippingModal.style.display = 'flex';
-        });
-    }
-    if (modalCloseBtn) {
-        modalCloseBtn.addEventListener('click', () => {
-            shippingModal.style.display = 'none';
-        });
-    }
-    if (shippingModal) {
-        shippingModal.addEventListener('click', (e) => {
-            if (e.target === shippingModal) {
-                shippingModal.style.display = 'none';
-            }
+    if (shippingInfoBtn && shippingModal) {
+        shippingInfoBtn.addEventListener('click', () => {
+            shippingModal.style.display = 'flex';
+        });
+    }
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => {
+            shippingModal.style.display = 'none';
+        });
+    }
+    if (shippingModal) {
+        shippingModal.addEventListener('click', (e) => {
+            if (e.target === shippingModal) {
+                shippingModal.style.display = 'none';
+            }
+        });
+    }
+}
+
+// ✅ MODIFICAÇÃO 1: A função agora aceita o objeto 'dependencies' que vem do main.js
+export function initCartPageListeners(state, dependencies) {
+    setupModalListeners();
+
+    // Listener para o botão de busca de CEP dentro do modal
+    const cepSearchBtn = document.getElementById('cep-search-btn');
+    if (cepSearchBtn) {
+        // ✅ MODIFICAÇÃO 2: Chamamos a função 'handleCepSearch' diretamente
+        cepSearchBtn.addEventListener('click', () => {
+            dependencies.handleCepSearch();
+        });
+    }
+
+    // Listener para a tecla Enter no campo de CEP
+    const cepInput = document.getElementById('cep-input');
+    if (cepInput) {
+        cepInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // ✅ MODIFICAÇÃO 3: Também chamamos a função aqui
+                dependencies.handleCepSearch();
+            }
+        });
+    }
+    
+    // Listener para o botão de confirmação de frete
+    const confirmShippingBtn = document.getElementById('confirm-shipping-btn');
+    if (confirmShippingBtn) {
+        confirmShippingBtn.addEventListener('click', () => {
+            const shippingData = {
+                cep: document.getElementById('cep-input')?.value,
+                street: document.getElementById('address-street')?.value,
+                number: document.getElementById('address-number')?.value,
+                complement: document.getElementById('address-complement')?.value,
+                neighborhood: document.getElementById('address-neighborhood')?.value,
+                // Adicione city e state se eles forem retornados e existirem no modal
+                fee: dependencies.getShippingFee(document.getElementById('address-neighborhood')?.value || '')
+            };
+            
+            // Atualiza o estado global no main.js
+            Object.assign(state.shipping, shippingData);
+            
+            // Fecha o modal e atualiza os totais
+            document.getElementById('shipping-modal').style.display = 'none';
+            dependencies.updateTotals();
         });
     }
 }
-
 
 export function initCartPageListeners() {
     // Chama a função para configurar os gatilhos do modal
@@ -88,54 +135,4 @@ export function initCartPageListeners() {
     }
 }
 export function initCheckoutPageListeners() {
-    const cepInput = document.getElementById('cep');
-    if (cepInput) {
-        cepInput.addEventListener('input', async (e) => {
-            const cepValue = e.target.value.replace(/\D/g, '');
-            if (cepValue.length !== 8) return;
-            
-            const cepLoader = document.getElementById('cep-loader');
-            const addressInput = document.getElementById('address');
-            const numberInput = document.getElementById('number');
-
-            cepLoader.classList.remove('hidden');
-            cepInput.disabled = true;
-            try {
-                const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
-                const data = await response.json();
-                if (data.erro) {
-                    alert('CEP não encontrado.');
-                } else {
-                    const setFieldValue = (el, val) => { if(el) el.value = val; };
-                    setFieldValue(addressInput, data.logradouro);
-                    setFieldValue(document.getElementById('neighborhood'), data.bairro);
-                    setFieldValue(document.getElementById('city'), data.localidade);
-                    setFieldValue(document.getElementById('state'), data.uf);
-                    numberInput.focus();
-                }
-            } catch (err) {
-                console.error("Erro ao buscar CEP:", err);
-            } finally {
-                cepLoader.classList.add('hidden');
-                cepInput.disabled = false;
-            }
-        });
-    }
-
-    const paymentMethodSelector = document.getElementById('payment-method-selector');
-    if (paymentMethodSelector) {
-        paymentMethodSelector.addEventListener('click', (e) => {
-            const selectedOption = e.target.closest('.payment-option');
-            if (!selectedOption) return;
-            paymentMethodSelector.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
-            selectedOption.classList.add('selected');
-            const method = selectedOption.dataset.method;
-            document.getElementById('pix-info').classList.toggle('hidden', method !== 'pix');
-            document.getElementById('credit-card-info').classList.toggle('hidden', method !== 'credit');
-            document.getElementById('debit-card-info').classList.toggle('hidden', method !== 'debit');
-        });
-    }
-
-    const confirmBtn = document.getElementById('confirm-purchase-btn');
-    if(confirmBtn) confirmBtn.addEventListener('click', () => document.dispatchEvent(new Event('confirmPurchase')));
 }
