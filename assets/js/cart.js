@@ -1,4 +1,4 @@
-// cart.js (VERSÃO CORRIGIDA)
+// cart.js (VERSÃO FINAL CORRIGIDA)
 
 function setupModalListeners() {
     const shippingInfoBtn = document.getElementById('shipping-info-btn');
@@ -24,51 +24,51 @@ function setupModalListeners() {
     }
 }
 
-// ✅ MODIFICAÇÃO 1: A função agora aceita o objeto 'dependencies' que vem do main.js
 export function initCartPageListeners(state, dependencies) {
     setupModalListeners();
 
-    // Listener para o botão de busca de CEP dentro do modal
     const cepSearchBtn = document.getElementById('cep-search-btn');
     if (cepSearchBtn) {
-        // ✅ MODIFICAÇÃO 2: Chamamos a função 'handleCepSearch' diretamente
         cepSearchBtn.addEventListener('click', () => {
             dependencies.handleCepSearch();
         });
     }
 
-    // Listener para a tecla Enter no campo de CEP
     const cepInput = document.getElementById('cep-input');
     if (cepInput) {
         cepInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                // ✅ MODIFICAÇÃO 3: Também chamamos a função aqui
                 dependencies.handleCepSearch();
             }
         });
     }
     
-    // Listener para o botão de confirmação de frete
     const confirmShippingBtn = document.getElementById('confirm-shipping-btn');
     if (confirmShippingBtn) {
         confirmShippingBtn.addEventListener('click', () => {
+            const neighborhoodValue = document.getElementById('address-neighborhood')?.value || '';
             const shippingData = {
                 cep: document.getElementById('cep-input')?.value,
                 street: document.getElementById('address-street')?.value,
                 number: document.getElementById('address-number')?.value,
                 complement: document.getElementById('address-complement')?.value,
-                neighborhood: document.getElementById('address-neighborhood')?.value,
-                // Adicione city e state se eles forem retornados e existirem no modal
-                fee: dependencies.getShippingFee(document.getElementById('address-neighborhood')?.value || '')
+                neighborhood: neighborhoodValue,
+                fee: dependencies.getShippingFee(neighborhoodValue)
             };
             
-            // Atualiza o estado global no main.js
             Object.assign(state.shipping, shippingData);
             
-            // Fecha o modal e atualiza os totais
             document.getElementById('shipping-modal').style.display = 'none';
             dependencies.updateTotals();
         });
     }
+}
+
+// ✅ FUNÇÃO RESTAURADA: Esta função precisa existir e ser exportada,
+// pois o main.js tenta importá-la. Mesmo que esteja vazia por enquanto,
+// ela evita o erro de importação.
+export function initCheckoutPageListeners(state) {
+    // Listeners específicos para a página de checkout podem ser adicionados aqui no futuro.
+    console.log("Listeners da página de Checkout iniciados.");
 }
