@@ -66,7 +66,8 @@ export function initCartPageListeners(state, utils) {
             }
         });
     }
-}
+
+    // A CHAVE ERRADA ESTAVA AQUI. EU A REMOVI.
 
     const paymentMethodSelector = document.getElementById('payment-method-selector');
     if (paymentMethodSelector) {
@@ -84,5 +85,5 @@ export function initCartPageListeners(state, utils) {
 
     const confirmBtn = document.getElementById('confirm-purchase-btn');
     if(confirmBtn) confirmBtn.addEventListener('click', () => document.dispatchEvent(new Event('confirmPurchase')));
-}
 
+} // A CHAVE DE FECHAMENTO DA FUNÇÃO AGORA ESTÁ AQUI, NO LUGAR CORRETO.
