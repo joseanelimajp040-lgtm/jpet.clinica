@@ -2964,14 +2964,24 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
 // ======================================================================
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    state = {
-        cart: JSON.parse(localStorage.getItem('cart')) || [],
-        loggedInUser: null,
-        favorites: JSON.parse(localStorage.getItem('favorites')) || [],
-        appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
-        orders: JSON.parse(localStorage.getItem('orders')) || [],
-        shipping: { fee: 0, neighborhood: '' }
-    };
+    state = {
+        cart: JSON.parse(localStorage.getItem('cart')) || [],
+        loggedInUser: null,
+        favorites: JSON.parse(localStorage.getItem('favorites')) || [],
+        appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
+        // MODIFICADO: Estrutura do objeto shipping
+        shipping: { 
+            fee: 0, 
+            cep: '', 
+            street: '', 
+            number: '', 
+            complement: '',
+            neighborhood: '',
+            city: '',
+            state: ''
+        }
+    };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
@@ -2993,6 +3003,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
