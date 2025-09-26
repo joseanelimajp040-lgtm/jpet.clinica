@@ -71,6 +71,136 @@ function managePageStyles(pageName) {
     document.body.classList.toggle('body-has-decorations', ['instalar-ios', 'login'].includes(pageName));
 }
 
+/**
+ * Calcula a taxa de entrega com base no nome do bairro.
+ * @param {string} neighborhood - O nome do bairro.
+ * @returns {number|null} - Retorna o valor da taxa ou null se o bairro não for atendido.
+ */
+function getShippingFee(neighborhood) {
+    const lowerCaseNeighborhood = neighborhood.toLowerCase();
+    
+    // Mapeamento de bairros e suas taxas
+    const feeMap = {
+        'valentina de figueiredo': 5.00,
+        'parque do sol': 5.00,
+        'gramame': 5.00,
+        'mangabeira': 10.00,
+        'josé américo de almeida': 10.00
+    };
+
+    // Procura por correspondências exatas ou parciais
+    for (const key in feeMap) {
+        if (lowerCaseNeighborhood.includes(key)) {
+            return feeMap[key];
+        }
+    }
+
+    // Se não encontrou nenhuma correspondência, retorna null
+    return null;
+}
+
+/**
+ * Busca o endereço usando a API ViaCEP e atualiza o modal de frete.
+ */
+async function handleCepSearch() {
+    const cepInput = document.getElementById('cep-input');
+    const feedbackEl = document.getElementById('cep-feedback');
+    const addressContainer = document.getElementById('address-result-container');
+    const confirmBtn = document.getElementById('confirm-shipping-btn');
+    const unsupportedMsg = document.getElementById('unsupported-area-message');
+    const calculatedFeeContainer = document.getElementById('calculated-fee-container');
+
+
+    if (!cepInput || !feedbackEl || !addressContainer) return;
+
+    let cep = cepInput.value.replace(/\D/g, ''); // Remove tudo que não for número
+
+    if (cep.length !== 8) {
+        feedbackEl.innerHTML = `<span class="text-red-500">CEP inválido. Digite 8 números.</span>`;
+        return;
+    }
+
+    feedbackEl.innerHTML = `<div class="flex items-center gap-2 text-gray-500"><i class="fas fa-spinner fa-spin"></i><span>Buscando endereço...</span></div>`;
+    addressContainer.classList.add('hidden');
+    unsupportedMsg.classList.add('hidden');
+
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        if (!response.ok) throw new Error('Erro na rede.');
+        
+        const data = await response.json();
+
+        if (data.erro) {
+            throw new Error('CEP não encontrado.');
+        }
+
+        // Preenche os campos do modal
+        document.getElementById('address-street').value = data.logradouro || '';
+        document.getElementById('address-neighborhood').value = data.bairro || '';
+        // Os campos de cidade e estado não estão no novo modal, mas poderiam ser adicionados se necessário.
+
+        // Calcula a taxa
+        const fee = getShippingFee(data.bairro || '');
+        
+        feedbackEl.innerHTML = ''; // Limpa o feedback
+
+        if (fee !== null) {
+            document.getElementById('calculated-fee').textContent = formatCurrency(fee);
+            calculatedFeeContainer.classList.remove('hidden');
+            unsupportedMsg.classList.add('hidden');
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+
+        } else {
+            // Bairro não atendido
+            calculatedFeeContainer.classList.add('hidden');
+            unsupportedMsg.classList.remove('hidden');
+            confirmBtn.disabled = true;
+            confirmBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
+        
+        addressContainer.classList.remove('hidden');
+        document.getElementById('address-number').focus();
+
+
+    } catch (error) {
+        feedbackEl.innerHTML = `<span class="text-red-500">${error.message}</span>`;
+    }
+}
+
+// ======================================================================
+// FIM DAS NOVAS FUNÇÕES
+// ======================================================================
+
+// ======================================================================
+// NOVO: Função para popular o formulário de checkout
+// ======================================================================
+function populateCheckoutAddress() {
+    // Verifica se há um endereço salvo no estado da aplicação
+    if (state.shipping && state.shipping.cep) {
+        // Seleciona os campos do formulário de checkout
+        const cepField = document.getElementById('cep');
+        const addressField = document.getElementById('address');
+        const numberField = document.getElementById('number');
+        const complementField = document.getElementById('complement');
+        const neighborhoodField = document.getElementById('neighborhood');
+        const cityField = document.getElementById('city');
+        const stateField = document.getElementById('state');
+
+        // Preenche os campos com os valores do estado
+        if (cepField) cepField.value = state.shipping.cep;
+        if (addressField) addressField.value = state.shipping.street;
+        if (numberField) numberField.value = state.shipping.number;
+        if (complementField) complementField.value = state.shipping.complement;
+        if (neighborhoodField) neighborhoodField.value = state.shipping.neighborhood;
+        if (cityField) cityField.value = state.shipping.city;
+        if (stateField) stateField.value = state.shipping.state;
+    }
+}
+// ======================================================================
+// FIM DA NOVA FUNÇÃO
+// ======================================================================
+
 // --- FUNÇÕES DE ATUALIZAÇÃO DA UI ---
 function updateCounters() {
     const cartCountEl = document.getElementById('cart-count');
@@ -149,17 +279,18 @@ function updateLoginStatus() {
 }
 
 function updateTotals() {
-    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = state.shipping.fee || 0;
-    let shippingDisplayText = state.cart.length > 0 ? (state.shipping.neighborhood ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
-    const total = subtotal + shippingFee;
-    const updateElementText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-    updateElementText('cart-subtotal', formatCurrency(subtotal));
-    updateElementText('cart-shipping', shippingDisplayText);
-    updateElementText('cart-total', formatCurrency(total));
-    updateElementText('checkout-subtotal', formatCurrency(subtotal));
-    updateElementText('checkout-shipping', formatCurrency(shippingFee));
-    updateElementText('checkout-total', formatCurrency(total));
+    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingFee = state.shipping.fee || 0;
+    // MODIFICADO: A lógica de exibição do frete agora checa pelo CEP
+    let shippingDisplayText = state.cart.length > 0 ? (state.shipping.cep ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
+    const total = subtotal + shippingFee;
+    const updateElementText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    updateElementText('cart-subtotal', formatCurrency(subtotal));
+    updateElementText('cart-shipping', shippingDisplayText);
+    updateElementText('cart-total', formatCurrency(total));
+    updateElementText('checkout-subtotal', formatCurrency(subtotal));
+    updateElementText('checkout-shipping', formatCurrency(shippingFee));
+    updateElementText('checkout-total', formatCurrency(total));
 }
 
 function updateAllHeartIcons() {
@@ -1851,10 +1982,16 @@ async function loadPage(pageName, params = {}) {
                 initComparisonSlider();
                 await renderFeaturedProducts();
                 break;
-            case 'cart':
-                renderCart();
-                initCartPageListeners(state);
-                break;
+           case 'cart':
+                    renderCart();
+                    // MODIFICADO: Passando as funções para initCartPageListeners
+                    initCartPageListeners(state, { 
+                        handleCepSearch, 
+                        getShippingFee, 
+                        formatCurrency,
+                        updateTotals 
+                    });
+                    break;
             case 'produtos':
                 await renderProdutosPage();
                 break;
@@ -1872,10 +2009,12 @@ async function loadPage(pageName, params = {}) {
             case 'busca':
                 await renderBuscaPage(params);
                 break;
-            case 'checkout':
-                renderCheckoutSummary();
-                initCheckoutPageListeners(state);
-                break;
+             case 'checkout':
+                    renderCheckoutSummary();
+                    initCheckoutPageListeners(state);
+                    // NOVO: Chama a função para preencher o endereço no checkout
+                    populateCheckoutAddress(); 
+                    break;
             case 'favorites':
                 await renderFavoritesPage();
                 break;
@@ -2854,6 +2993,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
