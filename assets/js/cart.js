@@ -1,58 +1,72 @@
-export function initCartPageListeners() {
-    document.body.addEventListener('click', e => {
-        if (e.target.closest('.remove-from-cart')) {
-            const id = e.target.closest('.remove-from-cart').dataset.id;
-            document.dispatchEvent(new CustomEvent('removeFromCart', { detail: { id } }));
-        }
-        if (e.target.closest('.quantity-change')) {
-            const button = e.target.closest('.quantity-change');
-            const id = button.dataset.id;
-            const change = parseInt(button.dataset.change);
-            document.dispatchEvent(new CustomEvent('updateQuantity', { detail: { id, change } }));
-        }
-        if (e.target.closest('#clear-cart-btn')) {
-            document.dispatchEvent(new Event('clearCart'));
-        }
-        if (e.target.closest('#checkout-btn')) {
-            document.dispatchEvent(new Event('goToCheckout'));
-        }
-    });
-}
+export function initCartPageListeners(state, utils) {
+    const { handleCepSearch, getShippingFee, formatCurrency, updateTotals } = utils;
 
-export function initCheckoutPageListeners() {
-    const cepInput = document.getElementById('cep');
-    if (cepInput) {
-        cepInput.addEventListener('input', async (e) => {
-            const cepValue = e.target.value.replace(/\D/g, '');
-            if (cepValue.length !== 8) return;
-            
-            const cepLoader = document.getElementById('cep-loader');
-            const addressInput = document.getElementById('address');
-            const numberInput = document.getElementById('number');
+    // Listeners que já existiam
+    const shippingInfoBtn = document.getElementById('shipping-info-btn');
+    const shippingModal = document.getElementById('shipping-modal');
+    const modalCloseBtn = shippingModal?.querySelector('.modal-close');
 
-            cepLoader.classList.remove('hidden');
-            cepInput.disabled = true;
-            try {
-                const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
-                const data = await response.json();
-                if (data.erro) {
-                    alert('CEP não encontrado.');
-                } else {
-                    const setFieldValue = (el, val) => { if(el) el.value = val; };
-                    setFieldValue(addressInput, data.logradouro);
-                    setFieldValue(document.getElementById('neighborhood'), data.bairro);
-                    setFieldValue(document.getElementById('city'), data.localidade);
-                    setFieldValue(document.getElementById('state'), data.uf);
-                    numberInput.focus();
-                }
-            } catch (err) {
-                console.error("Erro ao buscar CEP:", err);
-            } finally {
-                cepLoader.classList.add('hidden');
-                cepInput.disabled = false;
+    if (shippingInfoBtn && shippingModal) {
+        shippingInfoBtn.addEventListener('click', () => {
+            shippingModal.style.display = 'flex';
+        });
+    }
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => {
+            shippingModal.style.display = 'none';
+        });
+    }
+    if (shippingModal) {
+        shippingModal.addEventListener('click', (e) => {
+            if (e.target === shippingModal) {
+                shippingModal.style.display = 'none';
             }
         });
     }
+    
+    // NOVOS Listeners para o formulário de CEP
+    const cepSearchBtn = document.getElementById('cep-search-btn');
+    const cepInput = document.getElementById('cep-input');
+    const confirmShippingBtn = document.getElementById('confirm-shipping-btn');
+
+    if (cepSearchBtn) {
+        cepSearchBtn.addEventListener('click', handleCepSearch);
+    }
+    if (cepInput) {
+        cepInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleCepSearch();
+            }
+        });
+    }
+    if (confirmShippingBtn) {
+        confirmShippingBtn.addEventListener('click', () => {
+            const neighborhood = document.getElementById('address-neighborhood').value;
+            const fee = getShippingFee(neighborhood);
+
+            if (fee !== null) {
+                // Atualiza o estado global da aplicação
+                state.shipping = {
+                    fee: fee,
+                    cep: document.getElementById('cep-input').value,
+                    street: document.getElementById('address-street').value,
+                    number: document.getElementById('address-number').value,
+                    complement: document.getElementById('address-complement').value,
+                    neighborhood: neighborhood,
+                    city: 'João Pessoa', // ViaCEP retorna a cidade
+                    state: 'PB' // ViaCEP retorna o estado
+                };
+                
+                // Fecha o modal e atualiza os totais
+                shippingModal.style.display = 'none';
+                updateTotals();
+            } else {
+                alert("Não é possível confirmar, pois este bairro não é atendido.");
+            }
+        });
+    }
+}
 
     const paymentMethodSelector = document.getElementById('payment-method-selector');
     if (paymentMethodSelector) {
@@ -71,3 +85,4 @@ export function initCheckoutPageListeners() {
     const confirmBtn = document.getElementById('confirm-purchase-btn');
     if(confirmBtn) confirmBtn.addEventListener('click', () => document.dispatchEvent(new Event('confirmPurchase')));
 }
+
