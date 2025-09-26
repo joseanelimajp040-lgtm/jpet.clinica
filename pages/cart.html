@@ -39,32 +39,50 @@
 <div id="shipping-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Selecione a Taxa de Entrega</h2>
-        <div id="shipping-options-container">
-            <div class="animal-option shipping-option" data-fee="5.00"><i class="fas fa-motorcycle text-primary"></i>
+        <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Calcular Taxa de Entrega</h2>
+        <p class="text-center text-gray-500 mb-6 text-sm">Digite seu CEP para calcular o frete e ver o endereço de entrega.</p>
+        
+        <div id="cep-form-container">
+            <div class="flex items-center gap-2 mb-2">
+                <input type="tel" id="cep-input" placeholder="Digite seu CEP (só números)" class="form-input flex-grow" maxlength="8">
+                <button id="cep-search-btn" class="bg-primary hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-md h-full flex items-center justify-center">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="cep-feedback" class="text-sm h-5"></div> </div>
+
+        <div id="address-result-container" class="hidden mt-4 space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="md:col-span-2">
+                    <label class="form-label">Rua</label>
+                    <input type="text" id="address-street" class="form-input bg-gray-100" readonly>
+                </div>
                 <div>
-                    <h3 class="font-bold text-lg">Valentina</h3>
-                    <p class="text-gray-600 text-sm">Taxa: R$ 5,00</p>
+                    <label class="form-label">Número</label>
+                    <input type="text" id="address-number" class="form-input" placeholder="Ex: 123">
                 </div>
             </div>
-            <div class="animal-option shipping-option" data-fee="5.00"><i class="fas fa-motorcycle text-primary"></i>
-                <div>
-                    <h3 class="font-bold text-lg">Parque do Sol</h3>
-                    <p class="text-gray-600 text-sm">Taxa: R$ 5,00</p>
+            <div>
+                <label class="form-label">Bairro</label>
+                <input type="text" id="address-neighborhood" class="form-input bg-gray-100" readonly>
+            </div>
+            <div>
+                <label class="form-label">Complemento (Opcional)</label>
+                <input type="text" id="address-complement" class="form-input" placeholder="Ex: Apto 404">
+            </div>
+            
+            <div id="calculated-fee-container" class="bg-teal-50 border-l-4 border-secondary text-secondary p-4 rounded-md mt-4">
+                <div class="flex items-center justify-between">
+                    <p class="font-bold">Taxa de Entrega:</p>
+                    <p id="calculated-fee" class="text-lg font-bold">R$ 0,00</p>
                 </div>
             </div>
-            <div class="animal-option shipping-option" data-fee="10.00"><i class="fas fa-motorcycle text-primary"></i>
-                <div>
-                    <h3 class="font-bold text-lg">Mangabeira</h3>
-                    <p class="text-gray-600 text-sm">Taxa: R$ 10,00</p>
-                </div>
+             <div id="unsupported-area-message" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mt-4">
+                <p class="font-bold">Bairro não atendido</p>
+                <p>No momento, não realizamos entregas para esta região. <a href="#" class="underline">Fale conosco</a>.</p>
             </div>
-            <div class="animal-option shipping-option" data-fee="10.00"><i class="fas fa-motorcycle text-primary"></i>
-                <div>
-                    <h3 class="font-bold text-lg">José Américo</h3>
-                    <p class="text-gray-600 text-sm">Taxa: R$ 10,00</p>
-                </div>
-            </div>
+
+            <button id="confirm-shipping-btn" class="w-full bg-secondary hover:bg-teal-700 text-white py-3 rounded-lg font-bold transition duration-300 mt-4">Confirmar Endereço e Frete</button>
         </div>
     </div>
 </div>
