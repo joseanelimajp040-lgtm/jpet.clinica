@@ -87,8 +87,55 @@ export function initCartPageListeners() {
         });
     }
 }
-
-// Sua função initCheckoutPageListeners está ótima e não precisa de alterações.
 export function initCheckoutPageListeners() {
-    // ... (seu código original aqui, sem mudanças)
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('input', async (e) => {
+            const cepValue = e.target.value.replace(/\D/g, '');
+            if (cepValue.length !== 8) return;
+            
+            const cepLoader = document.getElementById('cep-loader');
+            const addressInput = document.getElementById('address');
+            const numberInput = document.getElementById('number');
+
+            cepLoader.classList.remove('hidden');
+            cepInput.disabled = true;
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
+                const data = await response.json();
+                if (data.erro) {
+                    alert('CEP não encontrado.');
+                } else {
+                    const setFieldValue = (el, val) => { if(el) el.value = val; };
+                    setFieldValue(addressInput, data.logradouro);
+                    setFieldValue(document.getElementById('neighborhood'), data.bairro);
+                    setFieldValue(document.getElementById('city'), data.localidade);
+                    setFieldValue(document.getElementById('state'), data.uf);
+                    numberInput.focus();
+                }
+            } catch (err) {
+                console.error("Erro ao buscar CEP:", err);
+            } finally {
+                cepLoader.classList.add('hidden');
+                cepInput.disabled = false;
+            }
+        });
+    }
+
+    const paymentMethodSelector = document.getElementById('payment-method-selector');
+    if (paymentMethodSelector) {
+        paymentMethodSelector.addEventListener('click', (e) => {
+            const selectedOption = e.target.closest('.payment-option');
+            if (!selectedOption) return;
+            paymentMethodSelector.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            selectedOption.classList.add('selected');
+            const method = selectedOption.dataset.method;
+            document.getElementById('pix-info').classList.toggle('hidden', method !== 'pix');
+            document.getElementById('credit-card-info').classList.toggle('hidden', method !== 'credit');
+            document.getElementById('debit-card-info').classList.toggle('hidden', method !== 'debit');
+        });
+    }
+
+    const confirmBtn = document.getElementById('confirm-purchase-btn');
+    if(confirmBtn) confirmBtn.addEventListener('click', () => document.dispatchEvent(new Event('confirmPurchase')));
 }
