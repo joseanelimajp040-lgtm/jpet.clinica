@@ -3091,7 +3091,7 @@ document.addEventListener('DOMContentLoaded', () => {
             neighborhood: '',
             city: '',
             state: ''
-        }
+        },
     };
 	coupon: {
             code: null,         // Ex: '10OFF'
@@ -3120,6 +3120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
