@@ -337,38 +337,39 @@ function updateTotals() {
         }
     }
 }
-// Objeto para simular um banco de dados de cupons.
-const validCoupons = {
-    '10OFF': { type: 'percentage', value: 10 }, // 10% de desconto
-    'JA5': { type: 'fixed', value: 5 },       // R$ 5,00 de desconto
-    'FRETEGRATIS': { type: 'free_shipping', value: 0 } // (Funcionalidade futura)
-};
-
-/**
- * Aplica um cupom de desconto.
- */
-function applyCoupon() {
+// banco de dados de cupons
+async function applyCoupon() {
     const input = document.getElementById('coupon-input');
     const feedbackEl = document.getElementById('coupon-feedback');
     if (!input || !feedbackEl) return;
 
     const code = input.value.trim().toUpperCase();
-    const coupon = validCoupons[code];
+    if (!code) return;
 
-    if (coupon) {
-        state.coupon.code = code;
-        state.coupon.type = coupon.type;
-        state.coupon.value = coupon.value;
-        
-        feedbackEl.textContent = 'Cupom aplicado com sucesso!';
-        feedbackEl.className = 'text-sm h-5 mt-1 text-center success';
+    try {
+        const couponRef = doc(db, 'coupons', code);
+        const couponSnap = await getDoc(couponRef);
 
-        updateCouponUI();
-        updateTotals();
-    } else {
-        feedbackEl.textContent = 'Cupom inválido ou expirado.';
+        if (couponSnap.exists() && couponSnap.data().active) {
+            const coupon = couponSnap.data();
+            state.coupon.code = code;
+            state.coupon.type = coupon.type;
+            state.coupon.value = coupon.value;
+            
+            feedbackEl.textContent = 'Cupom aplicado com sucesso!';
+            feedbackEl.className = 'text-sm h-5 mt-1 text-center success';
+
+            updateCouponUI();
+            updateTotals();
+        } else {
+            throw new Error('Cupom inválido, expirado ou inativo.');
+        }
+    } catch (error) {
+        state.coupon = { code: null, type: null, value: 0 }; // Limpa qualquer cupom antigo
+        feedbackEl.textContent = error.message;
         feedbackEl.className = 'text-sm h-5 mt-1 text-center error';
         input.value = '';
+        updateTotals(); // Recalcula totais sem o cupom
     }
 
     setTimeout(() => { feedbackEl.textContent = ''; }, 3000);
@@ -684,7 +685,156 @@ async function renderDetailedOrderView(orderId) {
         document.getElementById('order-details-modal')?.remove();
     }
 }
+async function renderAdminCouponsView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
 
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Gerenciamento de Cupons</h1>
+            <p>Crie, edite, ative ou desative os cupons de desconto da sua loja.</p>
+        </header>
+        
+        <div class="admin-card p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Criar Novo Cupom</h2>
+            <form id="create-coupon-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label for="coupon-code" class="admin-form-label">Código do Cupom</label>
+                    <input type="text" id="coupon-code" placeholder="EX: 15OFF" class="admin-form-input uppercase" required>
+                </div>
+                <div>
+                    <label for="coupon-type" class="admin-form-label">Tipo de Desconto</label>
+                    <select id="coupon-type" class="admin-form-select" required>
+                        <option value="percentage">Porcentagem (%)</option>
+                        <option value="fixed">Valor Fixo (R$)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="coupon-value" class="admin-form-label">Valor</label>
+                    <input type="number" id="coupon-value" step="0.01" placeholder="Ex: 15 ou 10.50" class="admin-form-input" required>
+                </div>
+                <button type="submit" class="admin-btn btn-primary h-11">
+                    <i class="fas fa-plus mr-2"></i> Criar Cupom
+                </button>
+            </form>
+        </div>
+
+        <div class="admin-card">
+             <div id="admin-coupons-list">
+                <p class="p-6 text-center">Carregando cupons...</p>
+            </div>
+        </div>
+    `;
+
+    const couponsListEl = document.getElementById('admin-coupons-list');
+    const createCouponForm = document.getElementById('create-coupon-form');
+
+    // Função para renderizar a lista de cupons
+    const renderList = (docs) => {
+        if (docs.length === 0) {
+            couponsListEl.innerHTML = '<p class="p-6 text-center text-gray-500">Nenhum cupom encontrado.</p>';
+            return;
+        }
+
+        couponsListEl.innerHTML = docs.map(doc => {
+            const coupon = doc.data();
+            const couponId = doc.id;
+            const isActive = coupon.active;
+            const valueDisplay = coupon.type === 'percentage'
+                ? `${coupon.value}%`
+                : formatCurrency(coupon.value);
+            
+            return `
+            <div class="coupon-list-item border-b last:border-b-0">
+                <div>
+                    <span class="coupon-code">${couponId}</span>
+                </div>
+                <div class="coupon-details">
+                    ${coupon.type === 'percentage' ? 'Porcentagem' : 'Valor Fixo'} de ${valueDisplay}
+                </div>
+                <div>
+                    <span class="coupon-status-badge ${isActive ? 'status-active' : 'status-inactive'}">
+                        ${isActive ? 'Ativo' : 'Inativo'}
+                    </span>
+                </div>
+                <div class="coupon-actions">
+                    <button class="admin-btn toggle-status-btn" data-id="${couponId}" data-active="${isActive}">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button class="admin-btn btn-danger delete-coupon-btn" data-id="${couponId}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            `;
+        }).join('');
+    };
+    
+    // Escuta por mudanças em tempo real na coleção de cupons
+    onSnapshot(query(collection(db, 'coupons')), (snapshot) => {
+        renderList(snapshot.docs);
+    });
+
+    // Event listener para CRIAR um novo cupom
+    createCouponForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const codeInput = document.getElementById('coupon-code');
+        const typeInput = document.getElementById('coupon-type');
+        const valueInput = document.getElementById('coupon-value');
+
+        const code = codeInput.value.trim().toUpperCase();
+        if (!code) {
+            alert('O código do cupom não pode estar em branco.');
+            return;
+        }
+
+        const newCouponData = {
+            type: typeInput.value,
+            value: parseFloat(valueInput.value),
+            active: true // Novos cupons são criados como ativos por padrão
+        };
+        
+        try {
+            await setDoc(doc(db, 'coupons', code), newCouponData);
+            createCouponForm.reset();
+            codeInput.focus();
+        } catch (error) {
+            console.error("Erro ao criar cupom: ", error);
+            alert('Não foi possível criar o cupom. Verifique o console para mais detalhes.');
+        }
+    });
+
+    // Event listeners para AÇÕES (Ativar/Desativar e Excluir)
+    couponsListEl.addEventListener('click', async (e) => {
+        const toggleBtn = e.target.closest('.toggle-status-btn');
+        const deleteBtn = e.target.closest('.delete-coupon-btn');
+
+        // Lógica para ATIVAR/DESATIVAR
+        if (toggleBtn) {
+            const couponId = toggleBtn.dataset.id;
+            const currentStatus = toggleBtn.dataset.active === 'true';
+            try {
+                await updateDoc(doc(db, 'coupons', couponId), { active: !currentStatus });
+            } catch (error) {
+                console.error("Erro ao alterar status do cupom:", error);
+                alert('Falha ao alterar o status.');
+            }
+        }
+        
+        // Lógica para EXCLUIR
+        if (deleteBtn) {
+            const couponId = deleteBtn.dataset.id;
+            if (confirm(`Tem certeza que deseja excluir o cupom "${couponId}"? Esta ação não pode ser desfeita.`)) {
+                try {
+                    await deleteDoc(doc(db, 'coupons', couponId));
+                } catch (error) {
+                    console.error("Erro ao excluir cupom:", error);
+                    alert('Falha ao excluir o cupom.');
+                }
+            }
+        }
+    });
+}
 async function renderAdminOrdersView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -2176,6 +2326,8 @@ async function loadPage(pageName, params = {}) {
                 renderAdminClientsView();
             } else if (adminPage === 'produtos') { 
                 renderAdminProductsView();
+			} else if (adminPage === 'cupons') { 
+                renderAdminCouponsView();
             } else if (adminPage === 'importar-xml') { 
                 renderAdminImportXMLView();
             } else {
@@ -3125,5 +3277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
