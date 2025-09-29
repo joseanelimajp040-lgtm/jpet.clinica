@@ -3075,14 +3075,13 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
 // ======================================================================
 // --- PONTO DE ENTRADA DA APLICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    state = {
-        cart: JSON.parse(localStorage.getItem('cart')) || [],
-        loggedInUser: null,
-        favorites: JSON.parse(localStorage.getItem('favorites')) || [],
-        appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
-        orders: JSON.parse(localStorage.getItem('orders')) || [],
-        // MODIFICADO: Estrutura do objeto shipping
-        shipping: { 
+    state = {
+        cart: JSON.parse(localStorage.getItem('cart')) || [],
+        loggedInUser: null,
+        favorites: JSON.parse(localStorage.getItem('favorites')) || [],
+        appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
+        shipping: { 
             fee: 0, 
             cep: '', 
             street: '', 
@@ -3092,13 +3091,13 @@ document.addEventListener('DOMContentLoaded', () => {
             city: '',
             state: ''
         },
-    };
-	coupon: {
-            code: null,         // Ex: '10OFF'
-            type: null,         // 'percentage' ou 'fixed'
-            value: 0            // O valor do desconto (ex: 10 para 10% ou 10 para R$10)
+        coupon: { // A propriedade 'coupon' agora está dentro do objeto state
+            code: null,
+            type: null,
+            value: 0
         }
-    };
+    }; // Apenas uma chave de fechamento e ponto e vírgula no final
+
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
@@ -3120,27 +3119,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
