@@ -2093,16 +2093,17 @@ async function loadPage(pageName, params = {}) {
                 initComparisonSlider();
                 await renderFeaturedProducts();
                 break;
-           case 'cart':
-                renderCart(); // Esta função já chama updateTotals()
-                updateCouponUI(); // Garante que a UI do cupom esteja correta ao carregar
-                initCartPageListeners(state, { 
-                    handleCepSearch, 
-                    getShippingFee, 
-                    formatCurrency,
-                    updateTotals 
-                });
-                break;
+            case 'cart':
+    renderCart(); // Esta função já chama updateTotals()
+    updateCouponUI(); // Garante que a UI do cupom esteja correta ao carregar
+    initCartPageListeners(state, { 
+        handleCepSearch, 
+        getShippingFee, 
+        formatCurrency,
+        updateTotals,
+        updateCouponUI // <-- ADICIONE ESTA LINHA
+         });
+          break;
             case 'produtos':
                 await renderProdutosPage();
                 break;
@@ -3119,3 +3120,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
