@@ -2094,16 +2094,21 @@ async function loadPage(pageName, params = {}) {
                 await renderFeaturedProducts();
                 break;
             case 'cart':
-    renderCart(); // Esta função já chama updateTotals()
-    updateCouponUI(); // Garante que a UI do cupom esteja correta ao carregar
-    initCartPageListeners(state, { 
-        handleCepSearch, 
-        getShippingFee, 
+    renderCart();
+    updateCouponUI();
+    initCartPageListeners(state, {
+        // Funções que já estavam:
+        handleCepSearch,
+        getShippingFee,
         formatCurrency,
         updateTotals,
-        updateCouponUI // <-- ADICIONE ESTA LINHA
+        updateCouponUI,
+
+        // Funções de cupom que estavam faltando:
+        applyCoupon,
+        removeCoupon
          });
-          break;
+             break;
             case 'produtos':
                 await renderProdutosPage();
                 break;
@@ -3120,4 +3125,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
