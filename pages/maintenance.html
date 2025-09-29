@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site em Manutenção</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #FF6B00, #00A8A8, #f97316, #14b8a6);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .dots-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .dot {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: move-dots 25s linear infinite;
+        }
+
+        .dot:nth-child(1) { width: 80px; height: 80px; left: 15%; top: 20%; animation-delay: 0s; }
+        .dot:nth-child(2) { width: 150px; height: 150px; left: 70%; top: 10%; animation-delay: -5s; }
+        .dot:nth-child(3) { width: 50px; height: 50px; left: 80%; top: 80%; animation-delay: -10s; }
+        .dot:nth-child(4) { width: 100px; height: 100px; left: 5%; top: 70%; animation-delay: -15s; }
+        .dot:nth-child(5) { width: 120px; height: 120px; left: 40%; top: 50%; animation-delay: -20s; }
+
+        @keyframes move-dots {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dots-container">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="container">
+        <div class="icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        <h1>Voltamos logo!</h1>
+        <p>
+            Estamos realizando algumas melhorias em nosso site para deixar sua experiência ainda melhor. 
+            Pedimos desculpas por qualquer inconveniente e agradecemos sua paciência.
+        </p>
+    </div>
+
+</body>
+</html>
