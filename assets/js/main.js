@@ -685,6 +685,86 @@ async function renderDetailedOrderView(orderId) {
         document.getElementById('order-details-modal')?.remove();
     }
 }
+async function renderAdminSettingsView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    // HTML da página de configurações
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Configurações Gerais</h1>
+            <p>Controle configurações importantes do seu site.</p>
+        </header>
+
+        <div class="admin-card p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Modo Manutenção</h2>
+            <p class="text-gray-600 mb-6">
+                Ao ativar, apenas administradores logados poderão acessar o site. 
+                Visitantes e clientes comuns verão uma página de manutenção.
+            </p>
+            
+            <div class="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+                <span id="maintenance-status-text" class="font-semibold text-gray-700">Verificando status...</span>
+                <button id="toggle-maintenance-btn" class="admin-btn" disabled>
+                    Aguarde
+                </button>
+            </div>
+        </div>
+    `;
+
+    const toggleBtn = document.getElementById('toggle-maintenance-btn');
+    const statusText = document.getElementById('maintenance-status-text');
+    
+    // Caminho para o documento de configurações no Firestore
+    const settingsRef = doc(db, 'settings', 'siteStatus');
+
+    // Função para atualizar a aparência do botão
+    const updateUI = (isMaintenanceMode) => {
+        if (isMaintenanceMode) {
+            statusText.textContent = "O modo manutenção está ATIVADO.";
+            toggleBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i> Desativar Modo Manutenção';
+            toggleBtn.classList.remove('btn-primary');
+            toggleBtn.classList.add('btn-danger');
+        } else {
+            statusText.textContent = "O modo manutenção está DESATIVADO.";
+            toggleBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i> Ativar Modo Manutenção';
+            toggleBtn.classList.remove('btn-danger');
+            toggleBtn.classList.add('btn-primary');
+        }
+        toggleBtn.disabled = false;
+    };
+
+    // Ouve por mudanças em tempo real no documento
+    onSnapshot(settingsRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const isMaintenanceMode = docSnap.data().isMaintenance;
+            updateUI(isMaintenanceMode);
+        } else {
+            // Se o documento não existe, considera que a manutenção está desligada
+            updateUI(false);
+        }
+    });
+
+    // Evento de clique para ligar/desligar
+    toggleBtn.addEventListener('click', async () => {
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = 'Alterando...';
+        
+        try {
+            const docSnap = await getDoc(settingsRef);
+            const newStatus = !docSnap.exists() || !docSnap.data().isMaintenance;
+            // setDoc com { merge: true } cria o documento se não existir, ou atualiza se já existir.
+            await setDoc(settingsRef, { isMaintenance: newStatus }, { merge: true });
+            // A UI será atualizada automaticamente pelo onSnapshot
+        } catch (error) {
+            console.error("Erro ao alterar o modo de manutenção:", error);
+            alert('Falha ao alterar o status. Tente novamente.');
+            // Reabilita o botão em caso de erro
+            const docSnap = await getDoc(settingsRef);
+            updateUI(docSnap.exists() && docSnap.data().isMaintenance);
+        }
+    });
+}
 async function renderAdminCouponsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -2330,6 +2410,8 @@ async function loadPage(pageName, params = {}) {
                 renderAdminCouponsView();
             } else if (adminPage === 'importar-xml') { 
                 renderAdminImportXMLView();
+				} else if (adminPage === 'configuracoes') { 
+                renderAdminSettingsView();
             } else {
                 document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
             }
@@ -2541,6 +2623,20 @@ function initBanhoTosaEventListeners() {
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 async function startApplication() {
+	 const settingsRef = doc(db, 'settings', 'siteStatus');
+    try {
+        const docSnap = await getDoc(settingsRef);
+        
+        // Verifica se a manutenção está ativa E se o usuário NÃO é um admin
+        if (docSnap.exists() && docSnap.data().isMaintenance && (!state.loggedInUser || state.loggedInUser.role !== 'admin')) {
+            // Se as condições forem verdadeiras, carrega a página de manutenção e para a execução
+            document.body.innerHTML = await (await fetch('pages/maintenance.html')).text();
+            return; // Interrompe o carregamento normal do site
+        }
+    } catch (error) {
+        console.error("Erro ao verificar o modo de manutenção:", error);
+        // Opcional: decidir o que fazer em caso de erro. Continuar carregando é uma opção segura.
+    }
     await Promise.all([
         loadComponent('components/header.html', 'header-placeholder'),
         loadComponent('components/footer.html', 'footer-placeholder')
@@ -3277,6 +3373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
