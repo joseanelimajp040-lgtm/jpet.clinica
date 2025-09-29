@@ -4288,3 +4288,48 @@ input[type='number'] {
 #cart-discount-row {
     font-weight: 600;
 }
+
+/* ================================================================== */
+/* ========== NOVOS ESTILOS PARA GERENCIAMENTO DE CUPONS ========== */
+/* ================================================================== */
+
+.coupon-list-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+}
+
+.coupon-code {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #1e293b; /* slate-800 */
+    font-size: 1.1rem;
+    background-color: #f1f5f9;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px dashed #cbd5e1;
+    display: inline-block;
+}
+
+.coupon-details {
+    color: #64748b; /* slate-500 */
+}
+
+.coupon-status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.coupon-status-badge.status-active { background-color: #f0fdf4; color: #15803d; }
+.coupon-status-badge.status-inactive { background-color: #f1f5f9; color: #475569; }
+
+.coupon-actions {
+    display: flex;
+    gap: 0.5rem;
+}
