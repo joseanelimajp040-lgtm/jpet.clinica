@@ -2627,15 +2627,13 @@ async function startApplication() {
     try {
         const docSnap = await getDoc(settingsRef);
         
-        // Verifica se a manutenção está ativa E se o usuário NÃO é um admin
+        // A lógica agora funciona, pois esta função só será chamada DEPOIS do login ser verificado.
         if (docSnap.exists() && docSnap.data().isMaintenance && (!state.loggedInUser || state.loggedInUser.role !== 'admin')) {
-            // Se as condições forem verdadeiras, carrega a página de manutenção e para a execução
             document.body.innerHTML = await (await fetch('pages/maintenance.html')).text();
-            return; // Interrompe o carregamento normal do site
+            return;
         }
     } catch (error) {
         console.error("Erro ao verificar o modo de manutenção:", error);
-        // Opcional: decidir o que fazer em caso de erro. Continuar carregando é uma opção segura.
     }
     await Promise.all([
         loadComponent('components/header.html', 'header-placeholder'),
@@ -3345,15 +3343,17 @@ document.addEventListener('DOMContentLoaded', () => {
             city: '',
             state: ''
         },
-        coupon: { // A propriedade 'coupon' agora está dentro do objeto state
+        coupon: {
             code: null,
             type: null,
             value: 0
         }
-    }; // Apenas uma chave de fechamento e ponto e vírgula no final
+    };
 
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
+
+    let appHasStarted = false; // ✅ Variável de controle
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -3362,17 +3362,28 @@ document.addEventListener('DOMContentLoaded', () => {
             state.loggedInUser = {
                 email: user.email,
                 uid: user.uid,
-                displayName: user.displayName,
+                displayName: user.displayName || userData.name,
                 role: userData.role || 'user'
             };
         } else {
             state.loggedInUser = null;
         }
-        updateLoginStatus();
+        
+        // ✅ CORREÇÃO: Inicia a aplicação AQUI, depois de saber quem é o usuário.
+        // A variável de controle garante que a aplicação só inicie uma vez.
+        if (!appHasStarted) {
+            appHasStarted = true;
+            await startApplication();
+        }
+
+        // A atualização do status do login pode continuar sendo chamada sempre que o auth mudar.
+        updateLoginStatus(); 
     });
+});
 
     startApplication();
 });
+
 
 
 
