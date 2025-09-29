@@ -18,6 +18,26 @@
                     <h2 class="text-xl font-bold text-gray-800 border-b pb-4 mb-4">Resumo do Pedido</h2>
                     <div class="space-y-3 mb-6 text-gray-600">
                         <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal">R$ 0,00</span></div>
+                        <div id="cart-discount-row" class="hidden flex justify-between text-green-600">
+    <span>Desconto</span>
+    <span id="cart-discount">- R$ 0,00</span>
+</div>
+
+<div class="pt-2 text-center">
+    <a href="#" id="coupon-toggle" class="text-sm font-medium text-secondary hover:underline">
+        Tem um cupom de desconto?
+    </a>
+</div>
+
+<div id="coupon-form-container" class="coupon-form-container">
+    <div class="flex items-center gap-2 mt-2">
+        <input type="text" id="coupon-input" placeholder="Digite seu cupom" class="form-input flex-grow uppercase text-sm" autocomplete="off">
+        <button id="apply-coupon-btn" class="bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md h-full">
+            Aplicar
+        </button>
+    </div>
+    <div id="coupon-feedback" class="text-sm h-5 mt-1 text-center"></div>
+</div>
                         <div class="flex justify-between items-center">
                             <span>Frete</span>
                             <div class="flex items-center relative">
@@ -86,3 +106,4 @@
         </div>
     </div>
 </div>
+
