@@ -279,20 +279,131 @@ function updateLoginStatus() {
 }
 
 function updateTotals() {
-    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = state.shipping.fee || 0;
-    // MODIFICADO: A lógica de exibição do frete agora checa pelo CEP
-    let shippingDisplayText = state.cart.length > 0 ? (state.shipping.cep ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
-    const total = subtotal + shippingFee;
-    const updateElementText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-    updateElementText('cart-subtotal', formatCurrency(subtotal));
-    updateElementText('cart-shipping', shippingDisplayText);
-    updateElementText('cart-total', formatCurrency(total));
-    updateElementText('checkout-subtotal', formatCurrency(subtotal));
-    updateElementText('checkout-shipping', formatCurrency(shippingFee));
-    updateElementText('checkout-total', formatCurrency(total));
+    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingFee = state.shipping.fee || 0;
+    
+    // --- LÓGICA DO CUPOM ---
+    let discountValue = 0;
+    if (state.coupon && state.coupon.code) {
+        if (state.coupon.type === 'percentage') {
+            discountValue = (subtotal * state.coupon.value) / 100;
+        } else if (state.coupon.type === 'fixed') {
+            discountValue = state.coupon.value;
+        }
+    }
+    // Garante que o desconto não seja maior que o subtotal
+    if (discountValue > subtotal) {
+        discountValue = subtotal;
+    }
+    // -------------------------
+
+    const total = (subtotal - discountValue) + shippingFee;
+
+    const updateElementText = (id, text) => { 
+        const el = document.getElementById(id); 
+        if (el) el.textContent = text; 
+    };
+
+    updateElementText('cart-subtotal', formatCurrency(subtotal));
+    
+    // Atualiza a linha de desconto
+    const discountRow = document.getElementById('cart-discount-row');
+    if (discountRow) {
+        if (discountValue > 0) {
+            updateElementText('cart-discount', `- ${formatCurrency(discountValue)}`);
+            discountRow.classList.remove('hidden');
+        } else {
+            discountRow.classList.add('hidden');
+        }
+    }
+
+    let shippingDisplayText = state.cart.length > 0 ? (state.shipping.cep ? formatCurrency(shippingFee) : 'Selecione') : formatCurrency(0);
+    updateElementText('cart-shipping', shippingDisplayText);
+    updateElementText('cart-total', formatCurrency(total));
+    
+    // Atualiza totais do checkout também
+    updateElementText('checkout-subtotal', formatCurrency(subtotal));
+    updateElementText('checkout-shipping', formatCurrency(shippingFee));
+    updateElementText('checkout-total', formatCurrency(total));
+    
+    // Atualiza a UI do cupom no checkout (se existir)
+    const checkoutDiscountRow = document.getElementById('checkout-discount-row');
+    if(checkoutDiscountRow) {
+        if(discountValue > 0) {
+            updateElementText('checkout-discount-value', `- ${formatCurrency(discountValue)}`);
+            checkoutDiscountRow.classList.remove('hidden');
+        } else {
+            checkoutDiscountRow.classList.add('hidden');
+        }
+    }
+}
+// Objeto para simular um banco de dados de cupons.
+const validCoupons = {
+    '10OFF': { type: 'percentage', value: 10 }, // 10% de desconto
+    'JA5': { type: 'fixed', value: 5 },       // R$ 5,00 de desconto
+    'FRETEGRATIS': { type: 'free_shipping', value: 0 } // (Funcionalidade futura)
+};
+
+/**
+ * Aplica um cupom de desconto.
+ */
+function applyCoupon() {
+    const input = document.getElementById('coupon-input');
+    const feedbackEl = document.getElementById('coupon-feedback');
+    if (!input || !feedbackEl) return;
+
+    const code = input.value.trim().toUpperCase();
+    const coupon = validCoupons[code];
+
+    if (coupon) {
+        state.coupon.code = code;
+        state.coupon.type = coupon.type;
+        state.coupon.value = coupon.value;
+        
+        feedbackEl.textContent = 'Cupom aplicado com sucesso!';
+        feedbackEl.className = 'text-sm h-5 mt-1 text-center success';
+
+        updateCouponUI();
+        updateTotals();
+    } else {
+        feedbackEl.textContent = 'Cupom inválido ou expirado.';
+        feedbackEl.className = 'text-sm h-5 mt-1 text-center error';
+        input.value = '';
+    }
+
+    setTimeout(() => { feedbackEl.textContent = ''; }, 3000);
 }
 
+/**
+ * Remove o cupom de desconto aplicado.
+ */
+function removeCoupon() {
+    state.coupon = { code: null, type: null, value: 0 };
+    updateCouponUI();
+    updateTotals();
+}
+/**
+ * Atualiza a interface do cupom (mostra/esconde campos, etc).
+ */
+function updateCouponUI() {
+    const toggleLink = document.getElementById('coupon-toggle');
+    const formContainer = document.getElementById('coupon-form-container');
+    const input = document.getElementById('coupon-input');
+    const feedbackEl = document.getElementById('coupon-feedback');
+
+    if (!toggleLink || !formContainer || !input || !feedbackEl) return;
+
+    if (state.coupon.code) {
+        // Se tem cupom, esconde o formulário e mostra o cupom aplicado
+        toggleLink.innerHTML = `Cupom aplicado: <strong class="text-green-600">${state.coupon.code}</strong> <button id="remove-coupon-btn" class="ml-2 text-red-500 hover:underline">(Remover)</button>`;
+        formContainer.classList.remove('active');
+    } else {
+        // Se não tem cupom, mostra o link padrão
+        toggleLink.innerHTML = 'Tem um cupom de desconto?';
+        input.value = '';
+        feedbackEl.textContent = '';
+    }
+}
 function updateAllHeartIcons() {
     document.querySelectorAll('.favorite-btn').forEach(btn => {
         const icon = btn.querySelector('i');
@@ -2982,6 +3093,12 @@ document.addEventListener('DOMContentLoaded', () => {
             state: ''
         }
     };
+	coupon: {
+            code: null,         // Ex: '10OFF'
+            type: null,         // 'percentage' ou 'fixed'
+            value: 0            // O valor do desconto (ex: 10 para 10% ou 10 para R$10)
+        }
+    };
     appRoot = document.getElementById('app-root');
     loadingOverlay = document.getElementById('loading-overlay');
 
@@ -3003,6 +3120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startApplication();
 });
+
 
 
 
