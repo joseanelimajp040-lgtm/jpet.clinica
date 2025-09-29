@@ -4245,3 +4245,46 @@ input[type='number'] {
     background-color: #94a3b8;
 }
 
+/* ================================================================== */
+/* ========== INÍCIO: ESTILOS PARA CUPOM DE DESCONTO ========== */
+/* ================================================================== */
+
+/* O container do formulário que será animado */
+.coupon-form-container {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, padding 0.4s ease-in-out;
+}
+
+/* Classe 'active' que o JavaScript vai adicionar para mostrar o formulário */
+.coupon-form-container.active {
+    max-height: 100px; /* Altura suficiente para o campo e botão */
+    opacity: 1;
+    padding-top: 0.5rem;  /* 8px */
+    padding-bottom: 0.5rem; /* 8px */
+}
+
+/* Deixa o input do cupom em maiúsculas para padronizar */
+#coupon-input {
+    text-transform: uppercase;
+}
+#coupon-input::placeholder {
+    text-transform: none;
+}
+
+/* Estilos para as mensagens de feedback (sucesso ou erro) */
+#coupon-feedback.success {
+    color: #16a34a; /* green-600 */
+}
+
+#coupon-feedback.error {
+    color: #dc2626; /* red-600 */
+}
+
+/* Estilo para a linha de desconto no resumo */
+#cart-discount-row {
+    font-weight: 600;
+}
