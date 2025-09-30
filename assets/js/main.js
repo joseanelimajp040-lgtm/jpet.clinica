@@ -3379,6 +3379,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // A atualização do status do login pode continuar sendo chamada sempre que o auth mudar.
         updateLoginStatus(); 
     });
+}); 
 
 
 
