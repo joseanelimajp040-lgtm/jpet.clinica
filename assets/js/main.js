@@ -3380,8 +3380,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 
-    startApplication();
-});
 
 
 
