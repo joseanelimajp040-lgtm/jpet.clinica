@@ -955,19 +955,9 @@ async function renderAdminOrdersView() {
                 .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
                 .join('');
 
-            return `
+             return `
             <div class="admin-card order-card" data-order-id="${orderId}">
-               <div class="card-header order-details-trigger cursor-pointer">
-                    <div>
-                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
-                        <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
-                        <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
-                    </div>
-               </div>
-               <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
                         <select id="status-${orderId}" class="admin-form-select">
@@ -978,11 +968,16 @@ async function renderAdminOrdersView() {
                         <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status</label>
                         <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
                     </div>
-               </div>
-               <div class="card-footer">
+                </div>
+                <div class="card-footer">
                    <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
-                    <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
-               </div>
+                   
+                   <button class="admin-btn btn-whatsapp send-whatsapp-btn" data-order-id="${orderId}">
+                       <i class="fab fa-whatsapp"></i> Enviar Status
+                   </button>
+                   
+                   <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
+                </div>
             </div>
             `;
         }).join('');
@@ -2870,13 +2865,18 @@ async function startApplication() {
 
             // Captura os dados usando os IDs corretos do seu checkout.html
             const fullName = document.getElementById('fullname')?.value || state.loggedInUser.displayName;
-            const cep = document.getElementById('cep')?.value;
+            const phone = document.getElementById('phone')?.value;
+			const cep = document.getElementById('cep')?.value;
             const street = document.getElementById('address')?.value; // Seu campo de endereço/rua
             const number = document.getElementById('number')?.value;
             const neighborhood = document.getElementById('neighborhood')?.value;
             const city = document.getElementById('city')?.value;
             const stateValue = document.getElementById('state')?.value;
 
+			 if (!phone) {
+        alert('Por favor, preencha o número de telefone para contato.');
+        return;
+    }
             // Lógica para pegar a forma de pagamento dos DIVs clicáveis
             const selectedPaymentEl = document.querySelector('.payment-option.selected');
             let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
@@ -2887,6 +2887,7 @@ async function startApplication() {
                 userId: state.loggedInUser.uid,
                 userEmail: state.loggedInUser.email,
                 userName: fullName,
+				userPhone: phone.replace(/\D/g, ''),
                 orderDate: serverTimestamp(),
                 items: [...state.cart],
                 shipping: {
@@ -3380,6 +3381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
