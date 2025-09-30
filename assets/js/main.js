@@ -503,98 +503,47 @@ function renderInstallmentsText(element, price) {
         element.style.display = 'none';
     }
 }
-
-// =========================================================================
-// INÍCIO: FUNÇÕES DE RENDERIZAÇÃO DAS PÁGINAS DO ADMIN (MODIFICADAS)
-// =========================================================================
-
 async function renderAdminDashboard() {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
+    console.log("Iniciando renderização do Dashboard Admin...");
 
-    // 1. Renderiza o HTML base do dashboard
-    adminContent.innerHTML = `
-        <header class="admin-header">
-            <h1>Dashboard</h1>
-            <p>Bem-vindo(a) de volta! Aqui está um resumo do seu site.</p>
-        </header>
+    // Seleciona os elementos no HTML que vamos atualizar
+    const totalClientsEl = document.getElementById('total-clients-value');
+    const pendingOrdersEl = document.getElementById('pending-orders-value');
+    const monthlySalesEl = document.getElementById('monthly-sales-value');
+    const activeProductsEl = document.getElementById('active-products-value');
+    const recentOrdersBodyEl = document.getElementById('recent-orders-body');
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card">
-                <div class="stat-card-icon bg-orange-500">
-                    <i class="fas fa-users text-2xl text-white"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Total de Clientes</p>
-                    <p id="total-clients-value" class="text-2xl font-bold text-gray-800">...</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon bg-cyan-500">
-                    <i class="fas fa-truck-loading text-2xl text-white"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Pedidos Pendentes</p>
-                    <p id="pending-orders-value" class="text-2xl font-bold text-gray-800">...</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon bg-green-500">
-                    <i class="fas fa-dollar-sign text-2xl text-white"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Vendas do Mês</p>
-                    <p id="monthly-sales-value" class="text-2xl font-bold text-gray-800">...</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon bg-yellow-500">
-                    <i class="fas fa-archive text-2xl text-white"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Produtos Ativos</p>
-                    <p id="active-products-value" class="text-2xl font-bold text-gray-800">...</p>
-                </div>
-            </div>
-        </div>
+    // Verifica se todos os elementos necessários existem na página
+    if (!totalClientsEl || !pendingOrdersEl || !monthlySalesEl || !activeProductsEl || !recentOrdersBodyEl) {
+        console.error("Um ou mais elementos do dashboard não foram encontrados no HTML.");
+        return;
+    }
 
-        <div class="admin-card">
-            <div class="p-6 border-b">
-                <h2 class="text-xl font-bold text-gray-800">Pedidos Recentes</h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-gray-50 border-b">
-                            <th class="p-4 font-semibold text-gray-600 text-sm">ID do Pedido</th>
-                            <th class="p-4 font-semibold text-gray-600 text-sm">Cliente</th>
-                            <th class="p-4 font-semibold text-gray-600 text-sm">Total</th>
-                            <th class="p-4 font-semibold text-gray-600 text-sm">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-orders-body">
-                        <tr>
-                            <td colspan="4" class="p-4 text-center text-gray-500">
-                                <i class="fas fa-spinner fa-spin mr-2"></i>Carregando pedidos...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
+    // Define um estado inicial de carregamento
+    const loadingHTML = `<i class="fas fa-spinner fa-spin text-gray-400"></i>`;
+    totalClientsEl.innerHTML = loadingHTML;
+    pendingOrdersEl.innerHTML = loadingHTML;
+    monthlySalesEl.innerHTML = loadingHTML;
+    activeProductsEl.innerHTML = loadingHTML;
+    recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">${loadingHTML} Carregando...</td></tr>`;
 
-    // 2. Busca e popula os dados (lógica original, mas agora separada da renderização do HTML)
     try {
+        // Busca todos os dados necessários do Firebase em paralelo para maior eficiência
         const [usersSnapshot, productsSnapshot, ordersSnapshot] = await Promise.all([
             getDocs(collection(db, 'users')),
             getDocs(collection(db, 'produtos')),
             getDocs(query(collection(db, 'orders'), orderBy('orderDate', 'desc')))
         ]);
 
-        document.getElementById('total-clients-value').textContent = usersSnapshot.size;
-        document.getElementById('active-products-value').textContent = productsSnapshot.size;
+        // --- 1. Calcular Total de Clientes ---
+        const totalClients = usersSnapshot.size;
+        totalClientsEl.textContent = totalClients;
 
+        // --- 2. Calcular Produtos Ativos ---
+        const activeProducts = productsSnapshot.size;
+        activeProductsEl.textContent = activeProducts;
+
+        // --- 3. Calcular Pedidos Pendentes e Vendas do Mês ---
         let pendingOrdersCount = 0;
         let monthlySales = 0;
         const now = new Date();
@@ -603,9 +552,13 @@ async function renderAdminDashboard() {
 
         ordersSnapshot.forEach(doc => {
             const order = doc.data();
-            if (['Processando', 'Enviado'].includes(order.status)) {
+
+            // Contagem de pedidos pendentes (Processando ou Enviado)
+            if (order.status === 'Processando' || order.status === 'Enviado') {
                 pendingOrdersCount++;
             }
+
+            // Soma das vendas do mês atual
             if (order.orderDate && order.status !== 'Cancelado') {
                 const orderDate = order.orderDate.toDate();
                 if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
@@ -614,309 +567,61 @@ async function renderAdminDashboard() {
             }
         });
 
-        document.getElementById('pending-orders-value').textContent = pendingOrdersCount;
-        document.getElementById('monthly-sales-value').textContent = formatCurrency(monthlySales);
+        pendingOrdersEl.textContent = pendingOrdersCount;
+        monthlySalesEl.textContent = formatCurrency(monthlySales);
 
+        // --- 4. Renderizar Pedidos Recentes (os 5 primeiros) ---
         const recentOrders = ordersSnapshot.docs.slice(0, 5);
-        const recentOrdersBodyEl = document.getElementById('recent-orders-body');
         
+        const getStatusBadgeHTML = (status) => {
+             switch (status.toLowerCase()) {
+                case 'processando':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Processando</span>`;
+                case 'enviado':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Enviado</span>`;
+                case 'entregue':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Entregue</span>`;
+                case 'cancelado':
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Cancelado</span>`;
+                default:
+                    return `<span class="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">${status}</span>`;
+            }
+        };
+
         if (recentOrders.length === 0) {
             recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum pedido encontrado.</td></tr>`;
         } else {
-            recentOrdersBodyEl.innerHTML = recentOrders.map(doc => {
+            const recentOrdersHTML = recentOrders.map(doc => {
                 const order = doc.data();
+                const orderId = `#JPET-${doc.id.substring(0, 6).toUpperCase()}`;
+                const clientName = order.userName || 'Cliente Anônimo';
+                const total = formatCurrency(order.total || 0);
+                const statusBadge = getStatusBadgeHTML(order.status);
+                
                 return `
-                    <tr class="border-b last:border-b-0 hover:bg-gray-50/50">
-                        <td class="p-4 text-gray-700 font-mono text-sm">#${doc.id.substring(0, 6).toUpperCase()}</td>
-                        <td class="p-4 text-gray-700 font-medium">${order.userName || 'Anônimo'}</td>
-                        <td class="p-4 text-gray-800 font-bold">${formatCurrency(order.total || 0)}</td>
-                        <td class="p-4"><span class="status-badge ${'status-' + (order.status || 'cancelado').toLowerCase()}">${order.status}</span></td>
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 text-gray-700 font-mono">${orderId}</td>
+                        <td class="p-3 text-gray-700">${clientName}</td>
+                        <td class="p-3 text-gray-700 font-medium">${total}</td>
+                        <td class="p-3">${statusBadge}</td>
                     </tr>
                 `;
             }).join('');
+            recentOrdersBodyEl.innerHTML = recentOrdersHTML;
         }
+
     } catch (error) {
         console.error("Erro ao carregar dados do dashboard:", error);
-        adminContent.innerHTML = `<p class="text-red-500">Falha ao carregar o dashboard.</p>`;
+        // Exibe uma mensagem de erro em todos os campos
+        const errorMsg = `<span class="text-xs text-red-500">Erro!</span>`;
+        totalClientsEl.innerHTML = errorMsg;
+        pendingOrdersEl.innerHTML = errorMsg;
+        monthlySalesEl.innerHTML = errorMsg;
+        activeProductsEl.innerHTML = errorMsg;
+        recentOrdersBodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Falha ao carregar os pedidos.</td></tr>`;
     }
 }
 
-async function renderAdminClientsView() {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
-
-    adminContent.innerHTML = `
-        <header class="admin-header">
-            <h1>Gerenciamento de Clientes</h1>
-            <p>Visualize e pesquise todos os clientes cadastrados na plataforma.</p>
-        </header>
-        <div class="mb-6 relative">
-             <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
-            <input type="search" id="client-search-input" placeholder="Pesquisar por nome ou e-mail..." class="admin-form-input pl-10">
-        </div>
-        <div id="admin-clients-list" class="space-y-3">
-            <p class="text-center p-6"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando clientes...</p>
-        </div>
-    `;
-
-    const clientsListEl = document.getElementById('admin-clients-list');
-    const searchInput = document.getElementById('client-search-input');
-    if (!clientsListEl || !searchInput) return;
-
-    let allClients = [];
-
-    const displayClients = (clients) => {
-        if (clients.length === 0) {
-            clientsListEl.innerHTML = '<p class="text-center p-6 text-gray-500">Nenhum cliente encontrado.</p>';
-            return;
-        }
-        clientsListEl.innerHTML = clients.map(client => {
-            const joinDate = client.createdAt ? client.createdAt.toDate().toLocaleDateString('pt-BR') : 'Data Indisponível';
-            const clientInitial = client.name ? client.name[0].toUpperCase() : '?';
-            return `
-                <div class="admin-card client-card">
-                    <div class="client-avatar">${clientInitial}</div>
-                    <div class="client-info">
-                        <div class="name">${client.name || 'Nome não cadastrado'}</div>
-                        <div class="email">${client.email || 'E-mail não cadastrado'}</div>
-                    </div>
-                    <div class="join-date">Membro desde: ${joinDate}</div>
-                </div>
-            `;
-        }).join('');
-    };
-
-    try {
-        const querySnapshot = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
-        allClients = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        displayClients(allClients);
-
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.trim().toLowerCase();
-            const filteredClients = allClients.filter(client =>
-                (client.name && client.name.toLowerCase().includes(searchTerm)) ||
-                (client.email && client.email.toLowerCase().includes(searchTerm))
-            );
-            displayClients(filteredClients);
-        });
-    } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-        clientsListEl.innerHTML = '<p class="text-red-500 text-center p-6">Ocorreu um erro ao carregar os clientes.</p>';
-    }
-}
-
-async function renderAdminOrdersView() {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
-
-    adminContent.innerHTML = `
-        <header class="admin-header">
-            <h1>Gerenciamento de Pedidos e Entregas</h1>
-            <p>Visualize e atualize o status de todos os pedidos do site.</p>
-        </header>
-        <div id="admin-orders-list" class="space-y-4">
-             <p class="text-center p-6"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando pedidos...</p>
-        </div>
-    `;
-
-    const ordersListEl = document.getElementById('admin-orders-list');
-    if (!ordersListEl) return;
-    
-    const renderList = (docs) => {
-        if (docs.length === 0) {
-            ordersListEl.innerHTML = '<p class="text-center p-6 text-gray-500">Nenhum pedido encontrado.</p>';
-            return;
-        }
-        ordersListEl.innerHTML = docs.map(doc => {
-            const order = doc.data();
-            const orderId = doc.id;
-            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
-            const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
-                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
-                .join('');
-
-            return `
-            <div class="admin-card order-card" data-order-id="${orderId}">
-                <div class="card-header order-details-trigger cursor-pointer bg-gray-50/50">
-                    <div>
-                        <p class="font-bold text-secondary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
-                        <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="status-badge ${'status-' + (order.status || 'cancelado').toLowerCase()}">${order.status}</span>
-                        <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
-                    </div>
-               </div>
-               <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
-                        <select id="status-${orderId}" class="admin-form-select">
-                            ${statusOptions}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status (p/ WhatsApp)</label>
-                        <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
-                    </div>
-               </div>
-               <div class="card-footer">
-                   <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
-                   <button class="admin-btn btn-whatsapp send-whatsapp-btn" data-order-id="${orderId}">
-                       <i class="fab fa-whatsapp"></i> Enviar Status
-                   </button>
-                   <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
-               </div>
-            </div>
-            `;
-        }).join('');
-    };
-
-    try {
-        onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (snapshot) => {
-            renderList(snapshot.docs);
-        });
-    } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-        ordersListEl.innerHTML = '<p class="text-red-500 text-center p-6">Ocorreu um erro ao carregar os pedidos.</p>';
-    }
-
-    // A lógica de eventos permanece a mesma
-    ordersListEl.addEventListener('click', async (e) => {
-        const clickedCard = e.target.closest('.order-card');
-        if (!clickedCard) return;
-        const orderId = clickedCard.dataset.orderId;
-
-        if (e.target.closest('.update-order-btn')) {
-            const button = e.target.closest('.update-order-btn');
-            const newStatus = document.getElementById(`status-${orderId}`).value;
-            const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
-            button.innerHTML = 'Salvando...';
-            button.disabled = true;
-            try {
-                await updateDoc(doc(db, 'orders', orderId), { status: newStatus, estimatedDelivery: newDeliveryEstimate });
-                button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-save"></i> Salvar';
-                    button.disabled = false;
-                }, 2000);
-            } catch (error) {
-                alert('Erro ao salvar.');
-                button.innerHTML = '<i class="fas fa-save"></i> Salvar';
-                button.disabled = false;
-            }
-            return;
-        }
-
-        if (e.target.closest('.send-whatsapp-btn')) {
-            handleSendWhatsAppMessage(orderId);
-            return;
-        }
-
-        if (e.target.closest('.delete-order-btn')) {
-            if (confirm('Tem certeza que deseja excluir este pedido?')) {
-                try {
-                    await deleteDoc(doc(db, 'orders', orderId));
-                } catch (error) {
-                    alert('Erro ao excluir o pedido.');
-                }
-            }
-            return;
-        }
-
-        if (e.target.closest('.order-details-trigger')) {
-            renderDetailedOrderView(orderId);
-        }
-    });
-}
-
-async function renderAdminProductsView() {
-    const adminContent = document.getElementById('admin-content');
-    if (!adminContent) return;
-
-    adminContent.innerHTML = `
-        <header class="admin-header">
-            <h1>Gerenciamento de Produtos e Custos</h1>
-            <p>Pesquise por um produto ou clique nele para editar suas informações.</p>
-        </header>
-        <div class="mb-6 relative">
-            <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
-            <input type="search" id="admin-product-search-input" placeholder="Pesquisar por nome ou categoria..." class="admin-form-input pl-10">
-        </div>
-        <div id="admin-products-list" class="admin-card divide-y divide-slate-100">
-             <p class="text-center p-6"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando produtos...</p>
-        </div>
-    `;
-
-    const productsListEl = document.getElementById('admin-products-list');
-    const searchInput = document.getElementById('admin-product-search-input');
-    if (!productsListEl || !searchInput) return;
-
-    let allProducts = [];
-
-    const displayProducts = (productsToDisplay) => {
-        if (productsToDisplay.length === 0) {
-            productsListEl.innerHTML = '<p class="text-center p-6 text-gray-500">Nenhum produto encontrado.</p>';
-            return;
-        }
-
-        productsToDisplay.sort((a, b) => (a.data.nome || '').localeCompare(b.data.nome || ''));
-        
-        productsListEl.innerHTML = productsToDisplay.map(productData => {
-            const product = productData.data;
-            const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
-            let displayName = product.nome;
-            if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
-                displayName = product.variations[0].fullName;
-            }
-            displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
-            const imageUrl = defaultVariation.image || product.image || 'https://via.placeholder.com/60';
-
-            return `
-                <div class="product-list-item" data-product-id="${productData.id}">
-                    <div class="product-list-item-thumbnail">
-                        <img src="${imageUrl}" alt="${displayName}">
-                    </div>
-                    <div class="product-info">
-                        <div class="name">${displayName}</div>
-                        <div class="category">Categoria: ${product.category || 'Não definida'}</div>
-                    </div>
-                    <div class="price-info">
-                        <div class="label">Preço base</div>
-                        <div class="price">${formatCurrency(defaultVariation.price)}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    };
-
-    try {
-        const querySnapshot = await getDocs(query(collection(db, 'produtos')));
-        allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-        displayProducts(allProducts);
-
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.trim().toLowerCase();
-            const filteredProducts = allProducts.filter(p => 
-                (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
-                (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
-            );
-            displayProducts(filteredProducts);
-        });
-    } catch (error) {
-        console.error("Erro ao buscar produtos para o painel admin:", error);
-        productsListEl.innerHTML = `<p class="text-red-500 text-center p-6">Ocorreu um erro ao carregar os produtos.</p>`;
-    }
-}
-
-// As outras funções (renderAdminProductEditView, renderAdminCouponsView, etc.)
-// já usam as classes genéricas (.admin-card, .admin-form-input, .admin-btn)
-// então elas se adaptarão automaticamente ao novo visual!
-
-// =========================================================================
-// FIM: FUNÇÕES DE RENDERIZAÇÃO DO ADMIN (MODIFICADAS)
-// =========================================================================
-
-// ... (o resto do seu arquivo main.js continua aqui sem alterações) ...
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
 async function renderDetailedOrderView(orderId) {
     const adminContent = document.getElementById('admin-content');
@@ -971,7 +676,7 @@ async function renderDetailedOrderView(orderId) {
         const googleMapsLinkHTML = fullAddress 
             ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}" target="_blank" class="btn-google-maps mt-2 inline-flex items-center gap-2 text-sm font-medium">
                    <i class="fas fa-map-marker-alt"></i> Ver no Google Maps
-              </a>` 
+               </a>` 
             : '';
 
         // Monta o HTML completo do modal
@@ -1012,9 +717,9 @@ async function renderDetailedOrderView(orderId) {
                                 <p class="font-semibold text-secondary">${order.paymentMethod || 'Não especificada'}</p>
                             </div>
                         </div> </div> <div class="mt-6">
-                            <h4 class="font-bold text-gray-600 mb-2">ITENS DO PEDIDO</h4>
-                            <div class="space-y-2">${itemsHTML}</div>
-                        </div>
+                        <h4 class="font-bold text-gray-600 mb-2">ITENS DO PEDIDO</h4>
+                        <div class="space-y-2">${itemsHTML}</div>
+                    </div>
                 </div>
             </div>
         `;
@@ -1268,6 +973,285 @@ async function renderAdminCouponsView() {
         }
     });
 }
+async function renderAdminOrdersView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Gerenciamento de Pedidos e Entregas</h1>
+            <p>Visualize e atualize o status de todos os pedidos do site.</p>
+        </header>
+        <div id="admin-orders-list" class="space-y-4">
+             <p>Carregando pedidos...</p>
+        </div>
+    `;
+
+    const ordersListEl = document.getElementById('admin-orders-list');
+    if (!ordersListEl) return;
+    
+    const getStatusClass = (status) => {
+        switch (status.toLowerCase()) {
+            case 'processando': return 'status-processando';
+            case 'enviado': return 'status-enviado';
+            case 'entregue': return 'status-entregue';
+            case 'cancelado': return 'status-cancelado';
+            default: return 'status-cancelado';
+        }
+    };
+
+    const renderList = (docs) => {
+        if (docs.length === 0) {
+            ordersListEl.innerHTML = '<p>Nenhum pedido encontrado.</p>';
+            return;
+        }
+        ordersListEl.innerHTML = docs.map(doc => {
+            const order = doc.data();
+            const orderId = doc.id;
+            const orderDate = order.orderDate ? order.orderDate.toDate().toLocaleDateString('pt-BR') : 'Data inválida';
+            const statusOptions = ['Processando', 'Enviado', 'Entregue', 'Cancelado']
+                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+                .join('');
+
+            return `
+            <div class="admin-card order-card" data-order-id="${orderId}">
+               <div class="card-header order-details-trigger cursor-pointer">
+                    <div>
+                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
+                        <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
+                    </div>
+               </div>
+               <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
+                        <select id="status-${orderId}" class="admin-form-select">
+                            ${statusOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status</label>
+                        <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
+                    </div>
+               </div>
+               <div class="card-footer">
+                   <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
+                   
+                   <button class="admin-btn btn-whatsapp send-whatsapp-btn" data-order-id="${orderId}">
+                       <i class="fab fa-whatsapp"></i> Enviar Status
+                   </button>
+
+                   <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
+               </div>
+            </div>
+            `;
+        }).join('');
+    };
+
+    try {
+        onSnapshot(query(collection(db, 'orders'), orderBy('orderDate', 'desc')), (snapshot) => {
+            console.log("Recebida atualização em tempo real dos pedidos.");
+            renderList(snapshot.docs);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar pedidos:", error);
+        ordersListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os pedidos.</p>';
+    }
+
+   ordersListEl.addEventListener('click', async (e) => {
+    const clickedCard = e.target.closest('.order-card');
+    if (!clickedCard) return;
+    const orderId = clickedCard.dataset.orderId;
+
+    if (e.target.closest('.update-order-btn')) {
+        const button = e.target.closest('.update-order-btn');
+        const newStatus = document.getElementById(`status-${orderId}`).value;
+        const newDeliveryEstimate = document.getElementById(`delivery-${orderId}`).value;
+        button.innerHTML = 'Salvando...';
+        button.disabled = true;
+        try {
+            await updateDoc(doc(db, 'orders', orderId), { status: newStatus, estimatedDelivery: newDeliveryEstimate });
+            button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-save"></i> Salvar';
+                button.disabled = false;
+            }, 2000);
+        } catch (error) {
+            alert('Erro ao salvar.');
+            button.innerHTML = '<i class="fas fa-save"></i> Salvar';
+            button.disabled = false;
+        }
+        return;
+    }
+
+    // ✅ NOVO EVENTO PARA O BOTÃO DO WHATSAPP
+    if (e.target.closest('.send-whatsapp-btn')) {
+        handleSendWhatsAppMessage(orderId);
+        return;
+    }
+
+    if (e.target.closest('.delete-order-btn')) {
+        if (confirm('Tem certeza que deseja excluir este pedido?')) {
+            try {
+                await deleteDoc(doc(db, 'orders', orderId));
+            } catch (error) {
+                alert('Erro ao excluir o pedido.');
+            }
+        }
+        return;
+    }
+
+    if (e.target.closest('.order-details-trigger')) {
+        renderDetailedOrderView(orderId);
+    }
+  });
+}
+async function renderAdminClientsView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Gerenciamento de Clientes</h1>
+            <p>Visualize e pesquise todos os clientes cadastrados na plataforma.</p>
+        </header>
+        <div class="mb-6 relative">
+             <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="search" id="client-search-input" placeholder="Pesquisar por nome ou e-mail..." class="admin-form-input pl-10">
+        </div>
+        <div id="admin-clients-list" class="space-y-3">
+            <p>Carregando clientes...</p>
+        </div>
+    `;
+
+    const clientsListEl = document.getElementById('admin-clients-list');
+    const searchInput = document.getElementById('client-search-input');
+    if (!clientsListEl || !searchInput) return;
+
+    let allClients = [];
+
+    const displayClients = (clients) => {
+        if (clients.length === 0) {
+            clientsListEl.innerHTML = '<p>Nenhum cliente encontrado.</p>';
+            return;
+        }
+        clientsListEl.innerHTML = clients.map(client => {
+            const joinDate = client.createdAt ? client.createdAt.toDate().toLocaleDateString('pt-BR') : 'Data Indisponível';
+            const clientInitial = client.name ? client.name[0].toUpperCase() : '?';
+            return `
+                <div class="admin-card client-card">
+                    <div class="client-avatar">${clientInitial}</div>
+                    <div class="client-info">
+                        <div class="name">${client.name || 'Nome não cadastrado'}</div>
+                        <div class="email">${client.email || 'E-mail não cadastrado'}</div>
+                    </div>
+                    <div class="join-date">Membro desde: ${joinDate}</div>
+                </div>
+            `;
+        }).join('');
+    };
+
+    try {
+        const querySnapshot = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
+        allClients = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        displayClients(allClients);
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            const filteredClients = allClients.filter(client =>
+                (client.name && client.name.toLowerCase().includes(searchTerm)) ||
+                (client.email && client.email.toLowerCase().includes(searchTerm))
+            );
+            displayClients(filteredClients);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+        clientsListEl.innerHTML = '<p class="text-red-500">Ocorreu um erro ao carregar os clientes.</p>';
+    }
+}
+
+async function renderAdminProductsView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Gerenciamento de Produtos e Custos</h1>
+            <p>Pesquise por um produto ou clique nele para editar suas informações.</p>
+        </header>
+        <div class="mb-6 relative">
+            <i class="fas fa-search text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="search" id="admin-product-search-input" placeholder="Pesquisar por nome ou categoria..." class="admin-form-input pl-10">
+        </div>
+        <div id="admin-products-list" class="space-y-2">
+            <p>Carregando produtos...</p>
+        </div>
+    `;
+
+    const productsListEl = document.getElementById('admin-products-list');
+    const searchInput = document.getElementById('admin-product-search-input');
+    if (!productsListEl || !searchInput) return;
+
+    let allProducts = [];
+
+    const displayProducts = (productsToDisplay) => {
+        if (productsToDisplay.length === 0) {
+            productsListEl.innerHTML = '<p>Nenhum produto encontrado.</p>';
+            return;
+        }
+
+        productsToDisplay.sort((a, b) => (a.data.nome || '').localeCompare(b.data.nome || ''));
+        
+        productsListEl.innerHTML = productsToDisplay.map(productData => {
+            const product = productData.data;
+            const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : { price: 0 };
+           let displayName = product.nome;
+			if (!displayName && product.variations && product.variations.length > 0 && product.variations[0].fullName) {
+			    displayName = product.variations[0].fullName;
+			}
+			displayName = displayName || `[Produto sem nome - ID: ${productData.id}]`;
+            const imageUrl = defaultVariation.image || product.image || 'https://via.placeholder.com/60';
+
+            return `
+                <div class="admin-card product-list-item" data-product-id="${productData.id}">
+                    <div class="product-list-item-thumbnail">
+                        <img src="${imageUrl}" alt="${displayName}">
+                    </div>
+                    <div class="product-info">
+                        <div class="name">${displayName}</div>
+                        <div class="category">Categoria: ${product.category || 'Não definida'}</div>
+                    </div>
+                    <div class="price-info">
+                        <div class="label">Preço base</div>
+                        <div class="price">${formatCurrency(defaultVariation.price)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    };
+
+    try {
+        const querySnapshot = await getDocs(query(collection(db, 'produtos')));
+        allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+        displayProducts(allProducts);
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            const filteredProducts = allProducts.filter(p => 
+                (p.data.nome && p.data.nome.toLowerCase().includes(searchTerm)) ||
+                (p.data.category && p.data.category.toLowerCase().includes(searchTerm))
+            );
+            displayProducts(filteredProducts);
+        });
+    } catch (error) {
+        console.error("Erro ao buscar produtos para o painel admin:", error);
+        productsListEl.innerHTML = `<p class="text-red-500">Ocorreu um erro ao carregar os produtos.</p>`;
+    }
+}
+
 async function renderAdminProductEditView(productId) {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -1669,40 +1653,40 @@ async function renderPromocoesPage() {
 }
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
-    try {
-        const docRef = doc(db, 'produtos', productId);
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
-            return;
-        }
+    try {
+        const docRef = doc(db, 'produtos', productId);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
+            return;
+        }
 
-        const productData = docSnap.data();
-        if (!productData.variations || productData.variations.length === 0) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
-            return;
-        }
+        const productData = docSnap.data();
+        if (!productData.variations || productData.variations.length === 0) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
+            return;
+        }
 
-        const defaultIndex = productData.defaultVariationIndex || 0;
-        const defaultVariation = productData.variations[defaultIndex];
-        const categoryForReviews = productData.category || 'geral';
-        const reviews = generateRealisticReviews(productId, categoryForReviews);
+        const defaultIndex = productData.defaultVariationIndex || 0;
+        const defaultVariation = productData.variations[defaultIndex];
+        const categoryForReviews = productData.category || 'geral';
+        const reviews = generateRealisticReviews(productId, categoryForReviews);
 
-        const el = (id) => document.getElementById(id);
-        if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
-        if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
-        if (el('product-brand')) el('product-brand').querySelector('span').textContent = productData.brand || "N/A";
-        if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
-        if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
+        const el = (id) => document.getElementById(id);
+        if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
+        if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
+        if (el('product-brand')) el('product-brand').querySelector('span').textContent = productData.brand || "N/A";
+        if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
+        if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
 
-        // Atualiza o texto de parcelamento usando a nova lógica
+        // Atualiza o texto de parcelamento usando a nova lógica
 renderInstallmentsText(el('product-installments'), defaultVariation.price);
-        // --- FIM DA MODIFICAÇÃO ---
+        // --- FIM DA MODIFICAÇÃO ---
 
-        const descriptionContainer = el('product-description');
-        if (descriptionContainer) {
-            descriptionContainer.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
-        }
+        const descriptionContainer = el('product-description');
+        if (descriptionContainer) {
+            descriptionContainer.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
+        }
         
         // --- INÍCIO DA MODIFICAÇÃO: Botão Favoritar ---
         const favBtnPage = el('favorite-btn-page');
@@ -1720,49 +1704,49 @@ renderInstallmentsText(el('product-installments'), defaultVariation.price);
         }
         // --- FIM DA MODIFICAÇÃO ---
 
-        renderStockStatus(defaultVariation.stock);
-        renderReviews(reviews);
-        renderStarRating(reviews);
-        renderProductSpecs(productData.specifications);
-        renderRelatedProducts(productData.category, productId);
+        renderStockStatus(defaultVariation.stock);
+        renderReviews(reviews);
+        renderStarRating(reviews);
+        renderProductSpecs(productData.specifications);
+        renderRelatedProducts(productData.category, productId);
 
-        const originalPriceEl = el('product-original-price');
-        const discountBadgeEl = el('product-discount-badge');
-        if (originalPriceEl && discountBadgeEl) {
-            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
-                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
-                originalPriceEl.classList.remove('hidden');
-                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
-                discountBadgeEl.textContent = `-${discount}%`;
-                discountBadgeEl.classList.remove('hidden');
-            } else {
-                originalPriceEl.classList.add('hidden');
-                discountBadgeEl.classList.add('hidden');
-            }
-        }
+        const originalPriceEl = el('product-original-price');
+        const discountBadgeEl = el('product-discount-badge');
+        if (originalPriceEl && discountBadgeEl) {
+            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
+                originalPriceEl.classList.remove('hidden');
+                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
+                discountBadgeEl.textContent = `-${discount}%`;
+                discountBadgeEl.classList.remove('hidden');
+            } else {
+                originalPriceEl.classList.add('hidden');
+                discountBadgeEl.classList.add('hidden');
+            }
+        }
 
-        const variationsContainer = document.querySelector('#product-variations .variations-container');
-        if (variationsContainer) {
-            variationsContainer.innerHTML = productData.variations.map((v, index) => `
-                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}" data-full-name="${v.fullName || productData.nome}">
-                    ${v.weight}
-                </button>`).join('');
-        }
+        const variationsContainer = document.querySelector('#product-variations .variations-container');
+        if (variationsContainer) {
+            variationsContainer.innerHTML = productData.variations.map((v, index) => `
+                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}" data-full-name="${v.fullName || productData.nome}">
+                    ${v.weight}
+                </button>`).join('');
+        }
 
-        const addToCartBtn = el('add-to-cart-product-page');
-        if (addToCartBtn) {
-            addToCartBtn.dataset.id = productId;
-            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
-            addToCartBtn.dataset.price = defaultVariation.price;
-            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
-            addToCartBtn.dataset.weight = defaultVariation.weight;
-            addToCartBtn.classList.add('add-to-cart-btn');
-        }
+        const addToCartBtn = el('add-to-cart-product-page');
+        if (addToCartBtn) {
+            addToCartBtn.dataset.id = productId;
+            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
+            addToCartBtn.dataset.price = defaultVariation.price;
+            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
+            addToCartBtn.dataset.weight = defaultVariation.weight;
+            addToCartBtn.classList.add('add-to-cart-btn');
+        }
 
-    } catch (error) {
-        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
-    }
+    } catch (error) {
+        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
+    }
 }
 
 function renderStockStatus(stock = 0) {
@@ -2413,8 +2397,8 @@ async function loadPage(pageName, params = {}) {
         // Funções de cupom que estavam faltando:
         applyCoupon,
         removeCoupon
-        });
-              break;
+         });
+             break;
             case 'produtos':
                 await renderProdutosPage();
                 break;
@@ -2432,7 +2416,7 @@ async function loadPage(pageName, params = {}) {
             case 'busca':
                 await renderBuscaPage(params);
                 break;
-              case 'checkout':
+             case 'checkout':
                     renderCheckoutSummary();
                     initCheckoutPageListeners(state);
                     // NOVO: Chama a função para preencher o endereço no checkout
@@ -2456,43 +2440,44 @@ async function loadPage(pageName, params = {}) {
                 }
                 break;
             case 'admin':
-                const adminUserNameEl = document.getElementById('admin-user-name');
-                if (adminUserNameEl) {
-                    adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-                }
-                document.querySelector('#admin-user-profile .logout-btn')?.addEventListener('click', handleLogout);
+    // Configurações básicas do painel
+    const adminUserNameEl = document.getElementById('admin-user-name');
+    if (adminUserNameEl) {
+        adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
+    }
+    document.querySelector('#admin-user-profile .logout-btn')?.addEventListener('click', handleLogout);
 
-                const adminContent = document.getElementById('admin-content');
-                
-                // Função para carregar a view da aba
-                const loadAdminView = (viewName) => {
-                    document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
-                    document.querySelector(`.admin-nav-link[data-admin-page="${viewName}"]`).classList.add('active');
+    // CHAMA A NOVA FUNÇÃO PARA PREENCHER OS DADOS DA DASHBOARD
+    renderAdminDashboard();
+    
+    // Lógica de navegação da barra lateral
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
 
-                    switch(viewName) {
-                        case 'dashboard': renderAdminDashboard(); break;
-                        case 'pedidos': renderAdminOrdersView(); break;
-                        case 'clientes': renderAdminClientsView(); break;
-                        case 'produtos': renderAdminProductsView(); break;
-                        case 'cupons': renderAdminCouponsView(); break;
-                        case 'importar-xml': renderAdminImportXMLView(); break;
-                        case 'configuracoes': renderAdminSettingsView(); break;
-                        default: adminContent.innerHTML = `<h1 class="text-3xl font-bold">Página de ${viewName} em construção...</h1>`;
-                    }
-                };
-
-                // Carrega a view do dashboard por padrão
-                loadAdminView('dashboard');
-
-                // Lógica de navegação da barra lateral
-                document.querySelectorAll('.admin-nav-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const adminPage = link.dataset.adminPage;
-                        loadAdminView(adminPage);
-                    });
-                });
-                break;
+            const adminPage = link.dataset.adminPage;
+            if (adminPage === 'dashboard') {
+                loadPage('admin'); // Recarrega a página do admin para mostrar o dashboard
+            } else if (adminPage === 'pedidos') {
+                renderAdminOrdersView();
+            } else if (adminPage === 'clientes') {
+                renderAdminClientsView();
+            } else if (adminPage === 'produtos') { 
+                renderAdminProductsView();
+			} else if (adminPage === 'cupons') { 
+                renderAdminCouponsView();
+            } else if (adminPage === 'importar-xml') { 
+                renderAdminImportXMLView();
+				} else if (adminPage === 'configuracoes') { 
+                renderAdminSettingsView();
+            } else {
+                document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
+            }
+        });
+    });
+    break;
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -2954,9 +2939,9 @@ async function startApplication() {
             const stateValue = document.getElementById('state')?.value;
 
 			 if (!phone) {
-    alert('Por favor, preencha o número de telefone para contato.');
-    return;
-  }
+        alert('Por favor, preencha o número de telefone para contato.');
+        return;
+    }
             // Lógica para pegar a forma de pagamento dos DIVs clicáveis
             const selectedPaymentEl = document.querySelector('.payment-option.selected');
             let paymentMethod = selectedPaymentEl ? selectedPaymentEl.dataset.method : 'Não especificado';
@@ -3252,7 +3237,7 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
     const modalHTML = `
         <div id="product-modal" class="admin-modal-overlay">
             <div class="admin-modal-content">
-                <button id="modal-close-btn" class="modal-close-button">×</button>
+                <button id="modal-close-btn" class="modal-close-button">&times;</button>
                 <h3 class="text-xl font-bold text-gray-800 mb-4">Cadastrar Novo Produto</h3>
                 <form id="new-product-form">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -3460,4 +3445,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // A atualização do status do login pode continuar sendo chamada sempre que o auth mudar.
         updateLoginStatus(); 
     });
-});
+}); 
+
+
+
+
+
+
+
+
+
