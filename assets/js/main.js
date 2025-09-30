@@ -1013,9 +1013,19 @@ async function renderAdminOrdersView() {
                 .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
                 .join('');
 
-             return `
+            return `
             <div class="admin-card order-card" data-order-id="${orderId}">
-                <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div class="card-header order-details-trigger cursor-pointer">
+                    <div>
+                        <p class="font-bold text-primary">Pedido #${orderId.substring(0, 6).toUpperCase()}</p>
+                        <p class="text-sm text-gray-500">Cliente: ${order.userName} (${order.userEmail})</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
+                        <p class="text-sm text-gray-500 mt-1">Data: ${orderDate}</p>
+                    </div>
+               </div>
+               <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="admin-form-label" for="status-${orderId}">Alterar Status</label>
                         <select id="status-${orderId}" class="admin-form-select">
@@ -1026,16 +1036,16 @@ async function renderAdminOrdersView() {
                         <label class="admin-form-label" for="delivery-${orderId}">Mensagem de Status</label>
                         <input type="text" id="delivery-${orderId}" value="${order.estimatedDelivery || ''}" placeholder="Ex: Saiu para entrega" class="admin-form-input">
                     </div>
-                </div>
-                <div class="card-footer">
+               </div>
+               <div class="card-footer">
                    <button class="admin-btn btn-danger delete-order-btn" data-order-id="${orderId}"><i class="fas fa-trash-alt"></i></button>
                    
                    <button class="admin-btn btn-whatsapp send-whatsapp-btn" data-order-id="${orderId}">
                        <i class="fab fa-whatsapp"></i> Enviar Status
                    </button>
-                   
+
                    <button class="admin-btn btn-primary update-order-btn" data-order-id="${orderId}"><i class="fas fa-save"></i> Salvar</button>
-                </div>
+               </div>
             </div>
             `;
         }).join('');
@@ -1052,17 +1062,10 @@ async function renderAdminOrdersView() {
     }
 
    ordersListEl.addEventListener('click', async (e) => {
-    // Primeiro, vamos ver se o clique foi dentro de um card de pedido
     const clickedCard = e.target.closest('.order-card');
-    if (!clickedCard) {
-        return; // Se não foi, não fazemos nada
-    }
-
+    if (!clickedCard) return;
     const orderId = clickedCard.dataset.orderId;
 
-    // Agora, verificamos qual parte do card foi clicada
-
-    // 1. Foi o botão de ATUALIZAR?
     if (e.target.closest('.update-order-btn')) {
         const button = e.target.closest('.update-order-btn');
         const newStatus = document.getElementById(`status-${orderId}`).value;
@@ -1081,9 +1084,15 @@ async function renderAdminOrdersView() {
             button.innerHTML = '<i class="fas fa-save"></i> Salvar';
             button.disabled = false;
         }
-        return; // Termina a execução aqui
+        return;
     }
-    // 2. Foi o botão de DELETAR?
+
+    // ✅ NOVO EVENTO PARA O BOTÃO DO WHATSAPP
+    if (e.target.closest('.send-whatsapp-btn')) {
+        handleSendWhatsAppMessage(orderId);
+        return;
+    }
+
     if (e.target.closest('.delete-order-btn')) {
         if (confirm('Tem certeza que deseja excluir este pedido?')) {
             try {
@@ -1092,19 +1101,14 @@ async function renderAdminOrdersView() {
                 alert('Erro ao excluir o pedido.');
             }
         }
-        return; // Termina a execução aqui
+        return;
     }
- // ✅ bloco para o botão do WhatsApp
-    if (e.target.closest('.send-whatsapp-btn')) {
-        handleSendWhatsAppMessage(orderId);
-        return; // Termina a execução aqui
-    }
-    // 3. Se não foi nenhum dos botões, foi na ÁREA DE DETALHES?
+
     if (e.target.closest('.order-details-trigger')) {
         renderDetailedOrderView(orderId);
     }
   });
-} 
+}
 async function renderAdminClientsView() {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -3442,6 +3446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
