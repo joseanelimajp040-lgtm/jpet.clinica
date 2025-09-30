@@ -337,6 +337,64 @@ function updateTotals() {
         }
     }
 }
+/**
+ * Busca os dados de um pedido e abre o WhatsApp com uma mensagem pré-formatada.
+ * @param {string} orderId - O ID do pedido no Firestore.
+ */
+async function handleSendWhatsAppMessage(orderId) {
+    const button = document.querySelector(`.send-whatsapp-btn[data-order-id="${orderId}"]`);
+    if (!button) return;
+
+    // Pega a mensagem da caixa de texto
+    const messageInput = document.getElementById(`delivery-${orderId}`);
+    const message = messageInput.value.trim();
+
+    if (!message) {
+        alert('Por favor, escreva uma mensagem de status antes de enviar.');
+        messageInput.focus();
+        return;
+    }
+
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+    button.disabled = true;
+
+    try {
+        const orderRef = doc(db, 'orders', orderId);
+        const orderSnap = await getDoc(orderRef);
+
+        if (!orderSnap.exists()) {
+            throw new Error('Pedido não encontrado no banco de dados.');
+        }
+
+        const orderData = orderSnap.data();
+        const clientPhone = orderData.userPhone;
+
+        if (!clientPhone) {
+            throw new Error('Este cliente não possui um número de telefone cadastrado no pedido.');
+        }
+
+        // Formata o telefone: Adiciona o código do Brasil (55) se não tiver.
+        // Isso assume que todos os telefones são do Brasil.
+        let formattedPhone = clientPhone.startsWith('55') ? clientPhone : `55${clientPhone}`;
+
+        // Codifica a mensagem para ser usada em uma URL
+        const encodedMessage = encodeURIComponent(message);
+
+        // Cria o link do WhatsApp
+        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+
+        // Abre o link em uma nova aba
+        window.open(whatsappUrl, '_blank');
+
+    } catch (error) {
+        console.error("Erro ao enviar mensagem para o WhatsApp:", error);
+        alert(`Não foi possível enviar a mensagem: ${error.message}`);
+    } finally {
+        // Restaura o botão ao estado original
+        button.innerHTML = '<i class="fab fa-whatsapp"></i> Enviar Status';
+        button.disabled = false;
+    }
+}
 // banco de dados de cupons
 async function applyCoupon() {
     const input = document.getElementById('coupon-input');
@@ -1025,7 +1083,6 @@ async function renderAdminOrdersView() {
         }
         return; // Termina a execução aqui
     }
-
     // 2. Foi o botão de DELETAR?
     if (e.target.closest('.delete-order-btn')) {
         if (confirm('Tem certeza que deseja excluir este pedido?')) {
@@ -1037,7 +1094,11 @@ async function renderAdminOrdersView() {
         }
         return; // Termina a execução aqui
     }
-
+ // ✅ bloco para o botão do WhatsApp
+    if (e.target.closest('.send-whatsapp-btn')) {
+        handleSendWhatsAppMessage(orderId);
+        return; // Termina a execução aqui
+    }
     // 3. Se não foi nenhum dos botões, foi na ÁREA DE DETALHES?
     if (e.target.closest('.order-details-trigger')) {
         renderDetailedOrderView(orderId);
@@ -3381,6 +3442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
