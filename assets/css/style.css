@@ -4345,3 +4345,118 @@ input[type='number'] {
 .btn-whatsapp:hover {
     background-color: #128C7E;
 }
+
+/* ================================================================== */
+/* ========== REDESIGN DO SLIDER ANTES E DEPOIS ========== */
+/* ================================================================== */
+
+.comparison-slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: ew-resize;
+}
+
+.comparison-figure {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.comparison-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.comparison-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* A imagem "Depois" fica na frente e é cortada */
+.comparison-after {
+    width: 50%; /* Posição inicial */
+    border-right: 3px solid white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Etiquetas "Antes" e "Depois" */
+.comparison-label {
+    position: absolute;
+    top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.comparison-before .comparison-label {
+    left: 1rem;
+}
+
+.comparison-after .comparison-label {
+    right: 1rem;
+}
+
+/* Oculta as labels ao arrastar para uma visão mais limpa */
+.comparison-slider.is-dragging .comparison-label {
+    opacity: 0;
+}
+
+/* O divisor/alça */
+.comparison-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* Apenas o slider principal captura o evento */
+    z-index: 40;
+}
+
+.comparison-handle-line {
+    width: 3px;
+    background: white;
+    flex-grow: 1;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.comparison-handle-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #FF6B00; /* Laranja da marca */
+    border: 3px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin: 10px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+
+.comparison-slider:hover .comparison-handle-circle {
+    transform: scale(1.1);
+}
