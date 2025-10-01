@@ -310,63 +310,27 @@
     </div>
 </section>
 
-<section id="antes-depois-section" class="bg-gradient-to-b from-gray-100 to-gray-200 py-16">
+<section id="antes-depois-section" class="bg-gray-100 py-16">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-4xl font-extrabold text-gray-800">Nossa Jornada de Transformação</h2>
-            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-                Testemunhe a evolução da nossa clínica e loja. Cada detalhe, uma nova história de cuidado e dedicação.
-            </p>
+            <h2 class="text-3xl font-bold text-gray-800">Nossa Loja - Antes e Depois</h2>
+            <p class="text-gray-600 mt-2">Arraste o divisor para ver a nossa transformação.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-            <div class="transformation-card group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 ease-in-out cursor-pointer">
-                <img src="https://i.postimg.cc/rybsS598/76862149-1a43-4eb4-9aa7-a643e6217d5.jpg" alt="Fachada da J.A Pet Clínica Antes da Reforma" class="transformation-before w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ease-in-out group-hover:opacity-0">
-                <img src="https://i.postimg.cc/cLY6X6LV/a73beb16-8dec-44d2-922e-ecc3d56efd98.jpg" alt="Fachada da J.A Pet Clínica Depois da Reforma" class="transformation-after w-full h-full object-cover">
-                
-                <div class="overlay absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-0 transition-opacity duration-700"></div>
-                
-                <div class="labels absolute bottom-4 left-4 right-4 text-white p-2 flex justify-between items-end z-10">
-                    <span class="before-label text-sm font-semibold bg-red-600 px-3 py-1 rounded-full opacity-100 group-hover:opacity-0 transition-opacity duration-700">ANTES</span>
-                    <span class="after-label text-sm font-semibold bg-green-500 px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700">DEPOIS</span>
+        <div id="comparison-container" class="relative max-w-4xl mx-auto aspect-video rounded-lg overflow-hidden shadow-2xl select-none cursor-ew-resize">
+            <img src="https://i.postimg.cc/rybsS598/76862149-1a43-4eb4-9aa7-a643e621d7d5.jpg" alt="Loja j.A Pet Clínica Antes da Reforma" class="absolute top-0 left-0 w-full h-full object-cover pointer-events-none">
+            <div id="after-image-wrapper" class="absolute top-0 left-0 w-1/2 h-full overflow-hidden">
+                <img src="https://i.postimg.cc/cLY6X6LV/a73beb16-8dec-44d2-922e-ecc3d56efd98.jpg" alt="Loja j.A Pet Clínica Depois da Reforma" class="absolute top-0 left-0 w-full h-full object-cover pointer-events-none">
+            </div>
+            <div id="slider-handle" class="absolute top-0 bottom-0 w-1.5 bg-white cursor-ew-resize" style="left: 50%; transform: translateX(-50%);">
+                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center text-primary text-2xl pointer-events-none">
+                    <i class="fas fa-arrows-alt-h"></i>
                 </div>
-
-                <div class="title absolute top-4 left-4 right-4 text-white text-xl font-bold z-10">Fachada Principal</div>
             </div>
-
-            <div class="transformation-card group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 ease-in-out cursor-pointer">
-                <img src="https://via.placeholder.com/600x400/FFDDDD/000000?text=Recepcao+ANTES" alt="Recepção da J.A Pet Clínica Antes" class="transformation-before w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ease-in-out group-hover:opacity-0">
-                <img src="https://via.placeholder.com/600x400/DDEEFF/000000?text=Recepcao+DEPOIS" alt="Recepção da J.A Pet Clínica Depois" class="transformation-after w-full h-full object-cover">
-                
-                <div class="overlay absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-0 transition-opacity duration-700"></div>
-                
-                <div class="labels absolute bottom-4 left-4 right-4 text-white p-2 flex justify-between items-end z-10">
-                    <span class="before-label text-sm font-semibold bg-red-600 px-3 py-1 rounded-full opacity-100 group-hover:opacity-0 transition-opacity duration-700">ANTES</span>
-                    <span class="after-label text-sm font-semibold bg-green-500 px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700">DEPOIS</span>
-                </div>
-
-                <div class="title absolute top-4 left-4 right-4 text-white text-xl font-bold z-10">Recepção</div>
-            </div>
-
-            <div class="transformation-card group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 ease-in-out cursor-pointer">
-                <img src="https://via.placeholder.com/600x400/FFFFAA/000000?text=Loja+ANTES" alt="Loja da J.A Pet Clínica Antes" class="transformation-before w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ease-in-out group-hover:opacity-0">
-                <img src="https://via.placeholder.com/600x400/AAFFBB/000000?text=Loja+DEPOIS" alt="Loja da J.A Pet Clínica Depois" class="transformation-after w-full h-full object-cover">
-                
-                <div class="overlay absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-0 transition-opacity duration-700"></div>
-                
-                <div class="labels absolute bottom-4 left-4 right-4 text-white p-2 flex justify-between items-end z-10">
-                    <span class="before-label text-sm font-semibold bg-red-600 px-3 py-1 rounded-full opacity-100 group-hover:opacity-0 transition-opacity duration-700">ANTES</span>
-                    <span class="after-label text-sm font-semibold bg-green-500 px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700">DEPOIS</span>
-                </div>
-
-                <div class="title absolute top-4 left-4 right-4 text-white text-xl font-bold z-10">Loja e Produtos</div>
-            </div>
-
-            </div>
+        </div>
     </div>
 </section>
-    
+
 <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
 
@@ -429,9 +393,6 @@
         </div>
     </div>
 </section>
-
-
-
 
 
 
