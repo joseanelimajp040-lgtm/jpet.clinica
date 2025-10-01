@@ -4,7 +4,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, orderBy, where, doc, getDoc, updateDoc, FieldPath, query, onSnapshot, addDoc, setDoc, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-import { initSlider } from './slider.js';
+import { initSlider, initComparisonSlider } from './slider.js';
 import { initPageModals } from './modals.js';
 import { initCartPageListeners, initCheckoutPageListeners } from './cart.js';
 
@@ -70,59 +70,7 @@ function managePageStyles(pageName) {
     document.body.classList.toggle('is-fullpage', pageName === 'farmacia');
     document.body.classList.toggle('body-has-decorations', ['instalar-ios', 'login'].includes(pageName));
 }
-function initComparisonSlider() {
-    const slider = document.querySelector(".comparison-slider");
-    if (!slider) return;
 
-    const afterImage = slider.querySelector(".comparison-after");
-    const handle = slider.querySelector(".comparison-handle");
-    let isDragging = false;
-
-    const moveSlider = (x) => {
-        const rect = slider.getBoundingClientRect();
-        let position = ((x - rect.left) / rect.width) * 100;
-
-        position = Math.max(0, Math.min(100, position));
-
-        afterImage.style.width = `${position}%`;
-        handle.style.left = `${position}%`;
-    };
-
-    // Eventos de Mouse (Desktop)
-    slider.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        isDragging = true;
-        slider.classList.add("is-dragging");
-    });
-
-    window.addEventListener("mouseup", () => {
-        isDragging = false;
-        slider.classList.remove("is-dragging");
-    });
-
-    window.addEventListener("mousemove", (e) => {
-        if (isDragging) {
-            moveSlider(e.clientX);
-        }
-    });
-
-    // Eventos de Toque (Mobile)
-    slider.addEventListener("touchstart", (e) => {
-        isDragging = true;
-        slider.classList.add("is-dragging");
-    }, { passive: true });
-
-    window.addEventListener("touchend", () => {
-        isDragging = false;
-        slider.classList.remove("is-dragging");
-    });
-
-    window.addEventListener("touchmove", (e) => {
-        if (isDragging && e.touches.length > 0) {
-            moveSlider(e.touches[0].clientX);
-        }
-    });
-}
 /**
  * Calcula a taxa de entrega com base no nome do bairro.
  * @param {string} neighborhood - O nome do bairro.
@@ -3498,8 +3446,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
-
-
 
 
 
