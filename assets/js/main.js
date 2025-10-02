@@ -1530,63 +1530,82 @@ function renderModernCalendar() {
         const dayName = daysOfWeek[day.getDay()];
         const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
         
-        // Separa os horários em Manhã e Tarde
-        let morningSlotsHTML = '';
-        let afternoonSlotsHTML = '';
+        let columnHTML;
+        
+        // Verifica se o dia é Domingo (getDay() === 0)
+        if (day.getDay() === 0) {
+            columnHTML = `
+                <div class="day-column-closed">
+                     <div class="column-header">
+                        <h3 class="day-name">${dayName}</h3>
+                        <p class="date-display">${dayDate}</p>
+                    </div>
+                    <div class="closed-message-container">
+                        <i class="fas fa-store-slash"></i>
+                        <h4>Fechado aos Domingos</h4>
+                        <p>Nosso setor de banho e tosa não funciona neste dia.</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Lógica original para os outros dias da semana
+            let morningSlotsHTML = '';
+            let afternoonSlotsHTML = '';
 
-        hours.forEach(hour => {
-            const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
-            let slotHTML;
+            hours.forEach(hour => {
+                const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
+                let slotHTML;
 
-            if (appointment) {
-                // Cartão de horário RESERVADO
-                const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
-                slotHTML = `
-                    <div class="slot-card booked" data-appointment='${appointmentData}'>
-                        <span class="slot-time">${hour}</span>
-                        <div class="slot-details">
-                            <span class="pet-name">${censorString(appointment.petName)}</span>
-                            <p class="status-text">Reservado</p>
+                if (appointment) {
+                    // Cartão de horário RESERVADO
+                    const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                    slotHTML = `
+                        <div class="slot-card booked" data-appointment='${appointmentData}'>
+                            <span class="slot-time">${hour}</span>
+                            <div class="slot-details">
+                                <span class="pet-name">${censorString(appointment.petName)}</span>
+                                <p class="status-text">Reservado</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            } else {
-                // Cartão de horário DISPONÍVEL
-                slotHTML = `
-                    <div class="slot-card available" data-day="${dayDate}" data-time="${hour}">
-                        <span class="slot-time">${hour}</span>
-                        <span class="slot-action">
-                            Agendar <i class="fas fa-paw ml-2"></i>
-                        </span>
-                    </div>
-                `;
-            }
+                    `;
+                } else {
+                    // Cartão de horário DISPONÍVEL
+                    slotHTML = `
+                        <div class="slot-card available" data-day="${dayDate}" data-time="${hour}">
+                            <span class="slot-time">${hour}</span>
+                            <span class="slot-action">
+                                Agendar <i class="fas fa-paw ml-2"></i>
+                            </span>
+                        </div>
+                    `;
+                }
 
-            // Adiciona o HTML ao grupo correto (Manhã/Tarde)
-            if (parseInt(hour.split(':')[0]) < 12) {
-                morningSlotsHTML += slotHTML;
-            } else {
-                afternoonSlotsHTML += slotHTML;
-            }
-        });
+                // Adiciona o HTML ao grupo correto (Manhã/Tarde)
+                if (parseInt(hour.split(':')[0]) < 12) {
+                    morningSlotsHTML += slotHTML;
+                } else {
+                    afternoonSlotsHTML += slotHTML;
+                }
+            });
 
-        // Monta a coluna completa do dia
-        const columnHTML = `
-            <div class="day-column">
-                <div class="column-header">
-                    <h3 class="day-name">${dayName}</h3>
-                    <p class="date-display">${dayDate}</p>
+            // Monta a coluna completa do dia
+            columnHTML = `
+                <div class="day-column">
+                    <div class="column-header">
+                        <h3 class="day-name">${dayName}</h3>
+                        <p class="date-display">${dayDate}</p>
+                    </div>
+                    <div class="time-group">
+                        <h4 class="time-group-title"><i class="fas fa-sun text-yellow-500"></i> Manhã</h4>
+                        ${morningSlotsHTML}
+                    </div>
+                    <div class="time-group">
+                        <h4 class="time-group-title"><i class="fas fa-moon text-indigo-500"></i> Tarde</h4>
+                        ${afternoonSlotsHTML}
+                    </div>
                 </div>
-                <div class="time-group">
-                    <h4 class="time-group-title"><i class="fas fa-sun text-yellow-500"></i> Manhã</h4>
-                    ${morningSlotsHTML}
-                </div>
-                <div class="time-group">
-                    <h4 class="time-group-title"><i class="fas fa-moon text-indigo-500"></i> Tarde</h4>
-                    ${afternoonSlotsHTML}
-                </div>
-            </div>
-        `;
+            `;
+        }
         container.innerHTML += columnHTML;
     }
 }
@@ -2735,7 +2754,7 @@ function initBanhoTosaEventListeners() {
                 phoneNumber: document.getElementById('booking-phone-number').value
             };
             state.appointments.push(newAppointment);
-            save.appointments();
+            save.appointments(); // Assumindo que você tem essa função global
             document.getElementById('booking-modal').style.display = 'none';
             showAnimation('success-animation-overlay', 1500, () => {
                 // Recarrega o calendário para mostrar o novo agendamento
@@ -3511,6 +3530,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
