@@ -4345,3 +4345,122 @@ input[type='number'] {
 .btn-whatsapp:hover {
     background-color: #128C7E;
 }
+
+/* ================================================================== */
+/* MELHORIAS DE ESTILO PARA OS MODAIS DE CATEGORIA           */
+/* ================================================================== */
+
+/* --- 1. Botão de Ação Principal dentro do Modal --- */
+/* Usado nos modais de Vacinas e Adoção */
+.modal-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 9999px; /* Formato de pílula */
+    background-color: var(--secondary-color); /* #00A8A8 */
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.modal-action-btn:hover {
+    background-color: #007f7f; /* Cor secundária mais escura */
+    transform: scale(1.03);
+    box-shadow: 0 8px 15px rgba(0, 168, 168, 0.25);
+}
+
+
+/* --- 2. Título do Modal Mais Destacado --- */
+.modal-content h2 {
+    /* O Tailwind já aplica estilos, aqui refinamos */
+    border-bottom: 2px solid var(--primary-color); /* Adiciona uma linha laranja */
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem !important; /* Força uma margem maior */
+}
+
+
+/* --- 3. Melhorias nas Opções (Animal Option) --- */
+.animal-option {
+    border: 1px solid var(--border-color); /* Adiciona uma borda sutil */
+    background-color: #f8fafc; /* Um cinza bem claro (slate-50) */
+}
+
+.animal-option:hover {
+    border-color: var(--secondary-color);
+    background-color: #f0fdfa; /* Um verde-azulado bem claro (teal-50) */
+    transform: translateX(8px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.animal-option h3 {
+    transition: color 0.3s ease;
+}
+
+.animal-option:hover h3 {
+    color: var(--secondary-color); /* A cor secundária (verde-azulado) no hover */
+}
+
+/* Centraliza o ícone verticalmente caso o texto quebre em duas linhas */
+.animal-option i {
+    align-self: center; 
+}
+
+
+/* --- 4. Animações Novas para Ícones dos Modais --- */
+/* Seus keyframes de animação já estão ótimos! 
+   Abaixo, apenas adicionamos as associações para os novos ícones 
+   que colocamos nos modais.
+*/
+
+@keyframes animate-band-aid {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg) scale(1.1); }
+}
+
+@keyframes animate-bacteria {
+    0% { transform: translate(0, 0) rotate(0); }
+    20% { transform: translate(2px, -2px) rotate(10deg); }
+    40% { transform: translate(-2px, 2px) rotate(-10deg); }
+    60% { transform: translate(2px, 2px) rotate(10deg); }
+    80% { transform: translate(-2px, -2px) rotate(-10deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+
+@keyframes animate-ring {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(10deg); }
+}
+
+@keyframes animate-bottle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Associações */
+.animal-option:hover .fa-band-aid {
+    animation: animate-band-aid 0.7s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-bacterium {
+    animation: animate-bacteria 0.8s linear infinite;
+}
+
+.animal-option:hover .fa-bug {
+    animation: animate-wobble 0.6s ease-in-out infinite; /* Reutilizando uma animação existente */
+}
+
+.animal-option:hover .fa-ring {
+    animation: animate-ring 1s ease-in-out infinite;
+}
+
+.animal-option:hover .fa-prescription-bottle {
+    animation: animate-bottle 0.5s ease-in-out infinite alternate;
+}
+
+.animal-option:hover .fa-tablets {
+    animation: animate-pills 0.7s ease-in-out infinite; /* Reutilizando */
+}
