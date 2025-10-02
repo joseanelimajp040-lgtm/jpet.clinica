@@ -124,40 +124,179 @@
 <div id="medicamentos-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Medicamentos</h2>
-        <p class="text-center text-gray-600">Conteúdo sobre medicamentos em breve...</p>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Medicamentos para qual Pet?</h2>
+        <div class="animal-option" data-animal="cao">
+            <i class="fas fa-dog text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Cães</h3>
+                <p class="text-gray-600 text-sm">Analgésicos, antibióticos, vermífugos e mais</p>
+            </div>
         </div>
+        <div class="animal-option" data-animal="gato">
+            <i class="fas fa-cat text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Gatos</h3>
+                <p class="text-gray-600 text-sm">Analgésicos, antibióticos, vermífugos e mais</p>
+            </div>
+        </div>
+        <div class="animal-option" data-animal="outros">
+            <i class="fas fa-paw text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Outros Pets</h3>
+                <p class="text-gray-600 text-sm">Medicamentos para aves, roedores e peixes</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div id="medicamentos-caes-tipo-modal" class="modal hidden" data-parent-modal="medicamentos-modal">
+    <div class="modal-content relative">
+        <span class="modal-close">×</span>
+        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Medicamentos para Cães</h2>
+        </div>
+        <div class="animal-option" data-category-search="Analgésico para Cães"><i class="fas fa-band-aid text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Analgésicos e Anti-inflamatórios</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Antibiótico para Cães"><i class="fas fa-bacterium text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Antibióticos</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Vermífugo para Cães"><i class="fas fa-bug text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Vermífugos</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="medicamentos-gatos-tipo-modal" class="modal hidden" data-parent-modal="medicamentos-modal">
+    <div class="modal-content relative">
+        <span class="modal-close">×</span>
+        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Medicamentos para Gatos</h2>
+        </div>
+        <div class="animal-option" data-category-search="Analgésico para Gatos"><i class="fas fa-band-aid text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Analgésicos e Anti-inflamatórios</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Antibiótico para Gatos"><i class="fas fa-bacterium text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Antibióticos</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Vermífugo para Gatos"><i class="fas fa-bug text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Vermífugos</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div id="antipulgas-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Antipulgas</h2>
-        <p class="text-center text-gray-600">Conteúdo sobre antipulgas em breve...</p>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Antipulgas para qual Pet?</h2>
+        <div class="animal-option" data-animal="cao">
+            <i class="fas fa-dog text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Cães</h3>
+                <p class="text-gray-600 text-sm">Coleiras, pipetas, comprimidos e sprays</p>
+            </div>
+        </div>
+        <div class="animal-option" data-animal="gato">
+            <i class="fas fa-cat text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Gatos</h3>
+                <p class="text-gray-600 text-sm">Coleiras, pipetas, comprimidos e sprays</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="antipulgas-caes-tipo-modal" class="modal hidden" data-parent-modal="antipulgas-modal">
+    <div class="modal-content relative">
+        <span class="modal-close">×</span>
+        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Antipulgas para Cães</h2>
+        </div>
+        <div class="animal-option" data-category-search="Coleira Antipulgas para Cães"><i class="fas fa-ring text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Coleiras</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Pipeta Antipulgas para Cães"><i class="fas fa-prescription-bottle text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Pipetas (Spot On)</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Comprimido Antipulgas para Cães"><i class="fas fa-tablets text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Comprimidos</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="antipulgas-gatos-tipo-modal" class="modal hidden" data-parent-modal="antipulgas-modal">
+    <div class="modal-content relative">
+        <span class="modal-close">×</span>
+        <div class="flex items-center mb-6"><i class="fas fa-arrow-left modal-back text-primary"></i>
+            <h2 class="text-2xl font-bold text-gray-800">Antipulgas para Gatos</h2>
+        </div>
+        <div class="animal-option" data-category-search="Coleira Antipulgas para Gatos"><i class="fas fa-ring text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Coleiras</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Pipeta Antipulgas para Gatos"><i class="fas fa-prescription-bottle text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Pipetas (Spot On)</h3>
+            </div>
+        </div>
+        <div class="animal-option" data-category-search="Comprimido Antipulgas para Gatos"><i class="fas fa-tablets text-primary"></i>
+            <div>
+                <h3 class="font-bold text-lg">Comprimidos</h3>
+            </div>
+        </div>
     </div>
 </div>
 
 <div id="vacinas-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Vacinas</h2>
-        <p class="text-center text-gray-600">Conteúdo sobre vacinas em breve...</p>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Vacinação é um ato de amor!</h2>
+        <p class="text-center text-gray-600 mb-6">Mantenha a carteirinha de vacinação do seu pet em dia. Trabalhamos com as melhores vacinas do mercado para cães e gatos.</p>
+        <a href="#" class="nav-link modal-action-btn" data-page="banho-e-tosa">
+            Agende um Horário
+        </a>
     </div>
 </div>
 
 <div id="adocao-caes-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Adoção de Cães</h2>
-        <p class="text-center text-gray-600">Conteúdo sobre adoção de cães em breve...</p>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Adote um Cãozinho!</h2>
+        <p class="text-center text-gray-600 mb-6">Temos cãezinhos incríveis esperando por um lar. Adotar é salvar uma vida. Entre em contato para saber mais sobre os pets disponíveis.</p>
+        <a href="https://wa.me/558300000000?text=Ol%C3%A1%21+Gostaria+de+saber+mais+sobre+a+ado%C3%A7%C3%A3o+de+c%C3%A3es." target="_blank" class="modal-action-btn">
+            <i class="fab fa-whatsapp mr-2"></i> Falar sobre Adoção
+        </a>
     </div>
 </div>
 
 <div id="adocao-gatos-modal" class="modal hidden">
     <div class="modal-content relative">
         <span class="modal-close">×</span>
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Adoção de Gatos</h2>
-        <p class="text-center text-gray-600">Conteúdo sobre adoção de gatos em breve...</p>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Adote um Gatinho!</h2>
+        <p class="text-center text-gray-600 mb-6">Gatinhos carinhosos e brincalhões estão à procura de uma família. Entre em contato para conhecer nossos pets para adoção.</p>
+        <a href="https://wa.me/558300000000?text=Ol%C3%A1%21+Gostaria+de+saber+mais+sobre+a+ado%C3%A7%C3%A3o+de+gatos." target="_blank" class="modal-action-btn">
+            <i class="fab fa-whatsapp mr-2"></i> Falar sobre Adoção
+        </a>
     </div>
 </div>
 
@@ -435,6 +574,7 @@
         </div>
     </div>
 </section>
+
 
 
 
