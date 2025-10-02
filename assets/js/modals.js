@@ -7,15 +7,6 @@ function closeModal(modal) {
     if (modal) modal.style.display = 'none';
 }
 
-// Funções auxiliares que não precisam ser exportadas
-function openModal(modal) {
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeModal(modal) {
-    if (modal) modal.style.display = 'none';
-}
-
 // Função principal que será exportada
 export function initPageModals() {
     document.querySelectorAll('.modal').forEach(modal => {
@@ -126,4 +117,5 @@ export function initPageModals() {
         }
     });
 }
+
 
