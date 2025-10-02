@@ -1513,36 +1513,82 @@ function renderCheckoutSummary() {
     updateTotals();
 }
 
-function renderCalendar() {
-    const agendaGrid = document.getElementById('agenda-grid');
-    if (!agendaGrid) return;
-    agendaGrid.innerHTML = '';
-    const today = new Date('2025-08-15T10:00:00'); // Data fixa para consistência
+function renderModernCalendar() {
+    const container = document.getElementById('agenda-container');
+    if (!container) return;
+    container.innerHTML = ''; // Limpa o conteúdo anterior
+
+    const today = new Date(); // Usa a data atual
     const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-    agendaGrid.insertAdjacentHTML('beforeend', '<div></div>');
+
+    // Gera 7 colunas, uma para cada dia da semana
     for (let i = 0; i < 7; i++) {
         const day = new Date(today);
         day.setDate(today.getDate() + i);
+        
         const dayName = daysOfWeek[day.getDay()];
         const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
-        agendaGrid.insertAdjacentHTML('beforeend', `<div class="day-header">${dayName}<br>${dayDate}</div>`);
-    }
-    hours.forEach(hour => {
-        agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-label">${hour}</div>`);
-        for (let i = 0; i < 7; i++) {
-            const day = new Date(today);
-            day.setDate(today.getDate() + i);
-            const dayDate = `${String(day.getDate()).padStart(2, '0')}/${String(day.getMonth() + 1).padStart(2, '0')}`;
+        
+        // Separa os horários em Manhã e Tarde
+        let morningSlotsHTML = '';
+        let afternoonSlotsHTML = '';
+
+        hours.forEach(hour => {
             const appointment = state.appointments.find(a => a.day === dayDate && a.time === hour);
+            let slotHTML;
+
             if (appointment) {
-                const appointmentData = JSON.stringify(appointment).replace(/'/g, "'");
-                agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot booked" data-appointment='${appointmentData}'><span class="booked-name">${censorString(appointment.petName)}</span><span class="booked-status">Reservado</span></div>`);
+                // Cartão de horário RESERVADO
+                const appointmentData = JSON.stringify(appointment).replace(/'/g, "&apos;");
+                slotHTML = `
+                    <div class="slot-card booked" data-appointment='${appointmentData}'>
+                        <span class="slot-time">${hour}</span>
+                        <div class="slot-details">
+                            <span class="pet-name">${censorString(appointment.petName)}</span>
+                            <p class="status-text">Reservado</p>
+                        </div>
+                    </div>
+                `;
             } else {
-                agendaGrid.insertAdjacentHTML('beforeend', `<div class="time-slot available" data-day="${dayDate}" data-time="${hour}"><i class="fas fa-plus"></i></div>`);
+                // Cartão de horário DISPONÍVEL
+                slotHTML = `
+                    <div class="slot-card available" data-day="${dayDate}" data-time="${hour}">
+                        <span class="slot-time">${hour}</span>
+                        <span class="slot-action">
+                            Agendar <i class="fas fa-paw ml-2"></i>
+                        </span>
+                    </div>
+                `;
             }
-        }
-    });
+
+            // Adiciona o HTML ao grupo correto (Manhã/Tarde)
+            if (parseInt(hour.split(':')[0]) < 12) {
+                morningSlotsHTML += slotHTML;
+            } else {
+                afternoonSlotsHTML += slotHTML;
+            }
+        });
+
+        // Monta a coluna completa do dia
+        const columnHTML = `
+            <div class="day-column">
+                <div class="column-header">
+                    <h3 class="day-name">${dayName}</h3>
+                    <p class="date-display">${dayDate}</p>
+                </div>
+                <div class="time-group">
+                    <h4 class="time-group-title"><i class="fas fa-sun text-yellow-500"></i> Manhã</h4>
+                    ${morningSlotsHTML}
+                </div>
+                <div class="time-group">
+                    <h4 class="time-group-title"><i class="fas fa-moon text-indigo-500"></i> Tarde</h4>
+                    ${afternoonSlotsHTML}
+                </div>
+            </div>
+        `;
+        container.innerHTML += columnHTML;
+    }
 }
 
 async function renderFeaturedProducts() {
@@ -2426,7 +2472,7 @@ async function loadPage(pageName, params = {}) {
                 await renderFavoritesPage();
                 break;
             case 'banho-e-tosa':
-                renderCalendar();
+                renderModernCalendar();
                 initBanhoTosaEventListeners();
                 break;
             case 'meus-pedidos':
@@ -2642,10 +2688,12 @@ function initProductPageListeners() {
 function initBanhoTosaEventListeners() {
     const pageContainer = document.getElementById('app-root');
     if (!pageContainer) return;
+
     pageContainer.addEventListener('click', e => {
         const openModal = (modal) => { if (modal) modal.style.display = 'flex'; };
 
-        const availableSlot = e.target.closest('.time-slot.available');
+        // Lógica para abrir modal de agendamento
+        const availableSlot = e.target.closest('.slot-card.available');
         if (availableSlot) {
             if (state.loggedInUser) {
                 const bookingModal = document.getElementById('booking-modal');
@@ -2658,9 +2706,23 @@ function initBanhoTosaEventListeners() {
             } else {
                 openModal(document.getElementById('login-required-modal'));
             }
+            return; // Impede que o evento continue
+        }
+
+        // Lógica para ver detalhes de um agendamento
+        const bookedSlot = e.target.closest('.slot-card.booked');
+        if (bookedSlot) {
+            const appointmentData = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+            const detailsModal = document.getElementById('appointment-details-modal');
+            document.getElementById('details-tutor-name').textContent = censorString(appointmentData.tutorName);
+            document.getElementById('details-pet-name').textContent = censorString(appointmentData.petName);
+            document.getElementById('details-phone-number').textContent = censorString(appointmentData.phoneNumber);
+            openModal(detailsModal);
+            return; // Impede que o evento continue
         }
     });
 
+    // A lógica do formulário de agendamento continua a mesma
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
         bookingForm.addEventListener('submit', e => {
@@ -2675,8 +2737,11 @@ function initBanhoTosaEventListeners() {
             state.appointments.push(newAppointment);
             save.appointments();
             document.getElementById('booking-modal').style.display = 'none';
-            showAnimation('success-animation-overlay', 1500);
-            renderCalendar();
+            showAnimation('success-animation-overlay', 1500, () => {
+                // Recarrega o calendário para mostrar o novo agendamento
+                renderModernCalendar(); 
+            });
+            bookingForm.reset();
         });
     }
 }
@@ -3446,6 +3511,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
