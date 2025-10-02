@@ -754,76 +754,152 @@ input[type='number'] {
 
 /* --- Fim: Estilos da Seção "Nossos Serviços" --- */
 
-/* --- Início: Estilos da Agenda --- */
-#agenda-grid {
+/* --- Início: REDESIGN da Agenda de Banho e Tosa --- */
+
+/* Container principal com scroll horizontal */
+.agenda-scroller {
     display: grid;
-    grid-template-columns: 60px repeat(7, 1fr);
-    gap: 2px;
+    grid-auto-flow: column;
+    grid-auto-columns: 85%; /* No mobile, cada coluna ocupa 85% da tela */
+    gap: 1rem; /* Espaçamento entre as colunas dos dias */
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory; /* Efeito de "travar" a rolagem em cada dia */
+    -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
 }
 
-.day-header,
-.time-label,
-.time-slot {
-    padding: 0.75rem 0.5rem;
-    text-align: center;
-    font-weight: 600;
+/* Esconde a barra de rolagem */
+.agenda-scroller::-webkit-scrollbar {
+    display: none;
+}
+.agenda-scroller {
+    -ms-overflow-style: none; /* IE e Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
-.day-header {
-    background-color: #FF6B00;
-    color: white;
-}
-
-.time-label {
-    background-color: #f3f4f6;
-    border-right: 2px solid #e5e7eb;
-}
-
-.time-slot {
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-    min-height: 70px;
-    transition: all 0.2s ease-in-out;
-    font-size: 0.75rem;
+/* Coluna de cada dia */
+.day-column {
+    background-color: #f8fafc; /* cinza bem claro (slate-50) */
+    border-radius: 1rem; /* 16px */
+    border: 1px solid #e2e8f0; /* slate-200 */
+    padding: 1rem;
+    scroll-snap-align: start; /* Alinha a coluna no início da tela */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+    gap: 1.5rem; /* Espaço entre os grupos "Manhã" e "Tarde" */
 }
 
-.time-slot.available {
-    background-color: #fff5ed;
-    cursor: pointer;
+/* Cabeçalho da coluna (Dia da semana e data) */
+.column-header {
+    text-align: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.time-slot.available:hover {
-    background-color: #fed7aa;
-    transform: scale(1.05);
-    z-index: 10;
-}
-
-.time-slot.booked {
-    background-color: #00A8A8;
-    color: white;
-    cursor: pointer;
-}
-
-.time-slot.booked:hover {
-    background-color: #007f7f;
-}
-
-.time-slot.booked .booked-name {
+.column-header .day-name {
+    font-size: 1.125rem; /* 18px */
     font-weight: 700;
+    color: #1f2937; /* gray-800 */
 }
 
-.time-slot.booked .booked-status {
-    font-size: 0.65rem;
-    opacity: 0.8;
+.column-header .date-display {
+    font-size: 0.875rem; /* 14px */
+    color: #64748b; /* slate-500 */
 }
 
-/* --- Fim: Estilos da Agenda --- */
+/* Grupo de horários (Manhã / Tarde) */
+.time-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Espaço entre os cartões de horário */
+}
+
+.time-group-title {
+    font-weight: 600;
+    color: #4b5563; /* gray-600 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Cartão individual de cada horário */
+.slot-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: 0.75rem; /* 12px */
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+/* Estilo para horários DISPONÍVEIS */
+.slot-card.available {
+    background-color: #fff;
+    border-color: #e2e8f0;
+    cursor: pointer;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.slot-card.available .slot-time {
+    font-weight: 600;
+    color: #334155; /* slate-700 */
+}
+
+.slot-card.available .slot-action {
+    color: var(--primary-color); /* #FF6B00 */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.slot-card.available:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: var(--primary-color);
+    box-shadow: 0 7px 15px rgba(255, 107, 0, 0.1);
+}
+
+/* Estilo para horários RESERVADOS */
+.slot-card.booked {
+    background-color: #f1f5f9; /* slate-100 */
+    cursor: pointer; /* Permite clicar para ver detalhes */
+}
+
+.slot-card.booked .slot-time {
+    font-weight: 600;
+    color: #64748b; /* slate-500 */
+    text-decoration: line-through;
+}
+
+.slot-card.booked .slot-details {
+    text-align: right;
+}
+
+.slot-card.booked .pet-name {
+    font-weight: 600;
+    color: var(--secondary-color); /* #00A8A8 */
+}
+
+.slot-card.booked .status-text {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.slot-card.booked:hover {
+    background-color: #e2e8f0; /* slate-200 */
+}
+
+/* Ajustes para telas maiores (Desktop) */
+@media (min-width: 768px) {
+    .agenda-scroller {
+        /* Em telas maiores, cada coluna ocupa 1/4 da largura */
+        grid-auto-columns: minmax(280px, 1fr);
+    }
+}
+
+/* --- Fim: REDESIGN da Agenda de Banho e Tosa --- */
 
 /* --- Início: Animação de Sucesso e Erro --- */
 #success-animation-overlay {
@@ -4464,3 +4540,4 @@ input[type='number'] {
 .animal-option:hover .fa-tablets {
     animation: animate-pills 0.7s ease-in-out infinite; /* Reutilizando */
 }
+
