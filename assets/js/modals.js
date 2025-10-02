@@ -21,23 +21,43 @@ export function initPageModals() {
 
     // Gatilhos que abrem os modals
     document.body.addEventListener('click', e => {
+        // Modal de Medicamentos
+        if (e.target.closest('#medicamentos-cat-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('medicamentos-modal'));
+        }
+        
+        // Modal de Rações
+        if (e.target.closest('#racao-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('racao-modal'));
+        }
+        
+        // <<< ADICIONADO: Modal de Antipulgas >>>
+        if (e.target.closest('#antipulgas-cat-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('antipulgas-modal'));
+        }
+        
+        // <<< ADICIONADO: Modal de Vacinas >>>
+        if (e.target.closest('#vacinas-cat-btn')) {
+            e.preventDefault();
+            openModal(document.getElementById('vacinas-modal'));
+        }
+
         // Modal de Adoção de Cães
         if (e.target.closest('#caes-adocao-btn')) {
             e.preventDefault();
             openModal(document.getElementById('adocao-caes-modal'));
         }
+        
         // Modal de Adoção de Gatos
         if (e.target.closest('#gatos-adocao-btn')) {
             e.preventDefault();
             openModal(document.getElementById('adocao-gatos-modal'));
         }
 
-        // Modal de Rações
-        if (e.target.closest('#racao-btn') || e.target.closest('#racao-btn-nav') || e.target.closest('#racao-btn-dropdown')) {
-            e.preventDefault();
-            openModal(document.getElementById('racao-modal'));
-        }
-   const categorySearchBtn = e.target.closest('[data-category-search]');
+        const categorySearchBtn = e.target.closest('[data-category-search]');
         if (categorySearchBtn) {
             e.preventDefault();
             const category = categorySearchBtn.dataset.categorySearch;
@@ -51,18 +71,12 @@ export function initPageModals() {
             });
             document.dispatchEvent(searchEvent);
         }
-        // <<< INÍCIO DA CORREÇÃO >>>
-        // Modal de Medicamentos (agora verifica os 3 botões possíveis)
-        if (e.target.closest('#medicamentos-btn-nav') || e.target.closest('#medicamentos-btn-dropdown') || e.target.closest('#medicamentos-cat-btn')) {
-            e.preventDefault();
-            openModal(document.getElementById('medicamentos-modal'));
-        }
-        // <<< FIM DA CORREÇÃO >>>
 
         // Modal de Frete no Carrinho
         if (e.target.closest('#shipping-info-btn')) {
              openModal(document.getElementById('shipping-modal'));
         }
+        
         // Navegação entre modals de ração
         const animalOption = e.target.closest('.animal-option');
         if (animalOption && animalOption.closest('#racao-modal')) {
@@ -72,11 +86,13 @@ export function initPageModals() {
              if (animal === 'gato') openModal(document.getElementById('racao-gatos-tipo-modal'));
              if (animal === 'outros') openModal(document.getElementById('racao-outros-tipo-modal'));
         }
+        
         // Botão de voltar nos sub-modals
         if (e.target.closest('.modal-back')) {
             closeModal(e.target.closest('.modal'));
             openModal(document.getElementById('racao-modal'));
         }
+        
         // Seleção de frete
         const shippingOption = e.target.closest('.shipping-option');
         if(shippingOption) {
