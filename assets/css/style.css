@@ -755,8 +755,6 @@ input[type='number'] {
 /* --- Fim: Estilos da Seção "Nossos Serviços" --- */
 
 /* --- Início: REDESIGN da Agenda de Banho e Tosa --- */
-
-/* Container principal com scroll horizontal */
 .agenda-scroller {
     display: grid;
     grid-auto-flow: column;
@@ -769,13 +767,8 @@ input[type='number'] {
 }
 
 /* Esconde a barra de rolagem */
-.agenda-scroller::-webkit-scrollbar {
-    display: none;
-}
-.agenda-scroller {
-    -ms-overflow-style: none; /* IE e Edge */
-    scrollbar-width: none; /* Firefox */
-}
+.agenda-scroller::-webkit-scrollbar { display: none; }
+.agenda-scroller { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Coluna de cada dia */
 .day-column {
@@ -795,110 +788,75 @@ input[type='number'] {
     padding-bottom: 0.75rem;
     border-bottom: 1px solid #e5e7eb;
 }
-
-.column-header .day-name {
-    font-size: 1.125rem; /* 18px */
-    font-weight: 700;
-    color: #1f2937; /* gray-800 */
-}
-
-.column-header .date-display {
-    font-size: 0.875rem; /* 14px */
-    color: #64748b; /* slate-500 */
-}
+.column-header .day-name { font-size: 1.125rem; font-weight: 700; color: #1f2937; }
+.column-header .date-display { font-size: 0.875rem; color: #64748b; }
 
 /* Grupo de horários (Manhã / Tarde) */
-.time-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem; /* Espaço entre os cartões de horário */
-}
-
+.time-group { display: flex; flex-direction: column; gap: 0.75rem; }
 .time-group-title {
-    font-weight: 600;
-    color: #4b5563; /* gray-600 */
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    font-weight: 600; color: #4b5563; display: flex;
+    align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
 }
 
 /* Cartão individual de cada horário */
 .slot-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    border-radius: 0.75rem; /* 12px */
-    transition: all 0.2s ease-in-out;
-    border: 1px solid transparent;
+    display: flex; align-items: center; justify-content: space-between; padding: 1rem;
+    border-radius: 0.75rem; transition: all 0.2s ease-in-out; border: 1px solid transparent;
 }
 
 /* Estilo para horários DISPONÍVEIS */
 .slot-card.available {
-    background-color: #fff;
-    border-color: #e2e8f0;
-    cursor: pointer;
+    background-color: #fff; border-color: #e2e8f0; cursor: pointer;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
-
-.slot-card.available .slot-time {
-    font-weight: 600;
-    color: #334155; /* slate-700 */
-}
-
-.slot-card.available .slot-action {
-    color: var(--primary-color); /* #FF6B00 */
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
 .slot-card.available:hover {
-    transform: translateY(-3px) scale(1.02);
-    border-color: var(--primary-color);
+    transform: translateY(-3px) scale(1.02); border-color: var(--primary-color);
     box-shadow: 0 7px 15px rgba(255, 107, 0, 0.1);
+}
+.slot-card.available .slot-time { font-weight: 600; color: #334155; }
+.slot-card.available .slot-action {
+    color: var(--primary-color); font-weight: 600; display: flex;
+    align-items: center; gap: 0.5rem;
 }
 
 /* Estilo para horários RESERVADOS */
-.slot-card.booked {
-    background-color: #f1f5f9; /* slate-100 */
-    cursor: pointer; /* Permite clicar para ver detalhes */
-}
+.slot-card.booked { background-color: #f1f5f9; cursor: pointer; }
+.slot-card.booked:hover { background-color: #e2e8f0; }
+.slot-card.booked .slot-time { font-weight: 600; color: #64748b; text-decoration: line-through; }
+.slot-card.booked .slot-details { text-align: right; }
+.slot-card.booked .pet-name { font-weight: 600; color: var(--secondary-color); }
+.slot-card.booked .status-text { font-size: 0.8rem; color: #64748b; }
 
-.slot-card.booked .slot-time {
-    font-weight: 600;
-    color: #64748b; /* slate-500 */
-    text-decoration: line-through;
+/* Estilos para a coluna de Domingo (Fechado) */
+.day-column-closed {
+    position: relative; background-color: #f8fafc; border-radius: 1rem; border: 1px solid #e2e8f0;
+    padding: 1rem; scroll-snap-align: start; display: flex; flex-direction: column;
+    opacity: 0.85; overflow: hidden;
+    background-image: linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 50%, #f1f5f9 50%, #f1f5f9 75%, transparent 75%, transparent 100%);
+    background-size: 56.57px 56.57px;
+    animation: animate-bg-stripes 4s linear infinite;
 }
+@keyframes animate-bg-stripes { from { background-position: 0 0; } to { background-position: 56.57px 0; } }
 
-.slot-card.booked .slot-details {
-    text-align: right;
+.closed-message-container {
+    flex-grow: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center; color: #64748b;
 }
-
-.slot-card.booked .pet-name {
-    font-weight: 600;
-    color: var(--secondary-color); /* #00A8A8 */
+.closed-message-container i {
+    font-size: 3rem; margin-bottom: 1rem; color: #94a3b8;
+    animation: pulse-icon 2.5s ease-in-out infinite;
 }
-
-.slot-card.booked .status-text {
-    font-size: 0.8rem;
-    color: #64748b;
+@keyframes pulse-icon {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
 }
-
-.slot-card.booked:hover {
-    background-color: #e2e8f0; /* slate-200 */
-}
+.closed-message-container h4 { font-size: 1.25rem; font-weight: 700; color: #475569; }
+.closed-message-container p { font-size: 0.9rem; max-width: 200px; }
 
 /* Ajustes para telas maiores (Desktop) */
-@media (min-width: 768px) {
-    .agenda-scroller {
-        /* Em telas maiores, cada coluna ocupa 1/4 da largura */
-        grid-auto-columns: minmax(280px, 1fr);
-    }
+@media (min-width: 1024px) {
+    .agenda-scroller { grid-auto-columns: minmax(280px, 1fr); }
 }
-
 /* --- Fim: REDESIGN da Agenda de Banho e Tosa --- */
 
 /* --- Início: Animação de Sucesso e Erro --- */
@@ -4540,4 +4498,5 @@ input[type='number'] {
 .animal-option:hover .fa-tablets {
     animation: animate-pills 0.7s ease-in-out infinite; /* Reutilizando */
 }
+
 
