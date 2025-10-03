@@ -2858,57 +2858,59 @@ function initBanhoTosaEventListeners() {
             } else {
                 openModal(document.getElementById('login-required-modal'));
             }
-            return; // Impede que o evento continue
+            return;
         }
 
         // Lógica para ver detalhes de um agendamento
         const bookedSlot = e.target.closest('.slot-card.booked');
         if (bookedSlot) {
-            const appointmentData = JSON.parse(bookedSlot.dataset.appointment.replace(/&apos;/g, "'"));
+            const appointmentData = JSON.parse(bookedSlot.dataset.appointment.replace(/'/g, "'"));
             const detailsModal = document.getElementById('appointment-details-modal');
             document.getElementById('details-tutor-name').textContent = censorString(appointmentData.tutorName);
             document.getElementById('details-pet-name').textContent = censorString(appointmentData.petName);
             document.getElementById('details-phone-number').textContent = censorString(appointmentData.phoneNumber);
             openModal(detailsModal);
-            return; // Impede que o evento continue
+            return;
         }
     });
 
-    // A lógica do formulário de agendamento continua a mesma
-    bookingForm.addEventListener('submit', async (e) => { // Adicione 'async'
-    e.preventDefault();
-    const submitButton = bookingForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Agendando...';
+    // ✅ CORREÇÃO: Seleciona o formulário pelo ID antes de usar
+    const bookingForm = document.getElementById('booking-form');
 
-    const newAppointment = {
-        day: document.getElementById('booking-day').value,
-        time: document.getElementById('booking-time').value,
-        tutorName: document.getElementById('booking-tutor-name').value,
-        petName: document.getElementById('booking-pet-name').value,
-        phoneNumber: document.getElementById('booking-phone-number').value,
-        status: 'Agendado',
-        createdAt: serverTimestamp() // Adiciona data de criação
-    };
+    // ✅ BOA PRÁTICA: Verifica se o formulário existe antes de adicionar o listener
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = bookingForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Agendando...';
 
-    try {
-        // ✅ SALVANDO NO FIRESTORE
-        await addDoc(collection(db, 'groomingAppointments'), newAppointment);
-        
-        document.getElementById('booking-modal').style.display = 'none';
-        showAnimation('success-animation-overlay', 1500, () => {
-            // O calendário será atualizado automaticamente pelo onSnapshot que busca os dados
+            const newAppointment = {
+                day: document.getElementById('booking-day').value,
+                time: document.getElementById('booking-time').value,
+                tutorName: document.getElementById('booking-tutor-name').value,
+                petName: document.getElementById('booking-pet-name').value,
+                phoneNumber: document.getElementById('booking-phone-number').value,
+                status: 'Agendado',
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, 'groomingAppointments'), newAppointment);
+                
+                document.getElementById('booking-modal').style.display = 'none';
+                showAnimation('success-animation-overlay', 1500, () => {});
+                bookingForm.reset();
+
+            } catch (error) {
+                console.error("Erro ao salvar agendamento:", error);
+                alert('Não foi possível realizar o agendamento. Tente novamente.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Confirmar Agendamento';
+            }
         });
-        bookingForm.reset();
-
-    } catch (error) {
-        console.error("Erro ao salvar agendamento:", error);
-        alert('Não foi possível realizar o agendamento. Tente novamente.');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Confirmar Agendamento';
     }
-  });
 }
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
@@ -3676,6 +3678,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
