@@ -3626,13 +3626,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cart: JSON.parse(localStorage.getItem('cart')) || [],
         loggedInUser: null,
         favorites: JSON.parse(localStorage.getItem('favorites')) || [],
-        appointments: JSON.parse(localStorage.getItem('groomingAppointments')) || [],
+        appointments: [], // Será preenchido pelo Firestore
         orders: JSON.parse(localStorage.getItem('orders')) || [],
-        shipping: { 
-            fee: 0, 
-            cep: '', 
-            street: '', 
-            number: '', 
+        shipping: {
+            fee: 0,
+            cep: '',
+            street: '',
+            number: '',
             complement: '',
             neighborhood: '',
             city: '',
@@ -3663,7 +3663,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             state.loggedInUser = null;
         }
-        
+
         // ✅ CORREÇÃO: Inicia a aplicação AQUI, depois de saber quem é o usuário.
         // A variável de controle garante que a aplicação só inicie uma vez.
         if (!appHasStarted) {
@@ -3672,9 +3672,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // A atualização do status do login pode continuar sendo chamada sempre que o auth mudar.
-        updateLoginStatus(); 
+        updateLoginStatus();
     });
-}); 
+});
+
 
 
 
