@@ -2908,7 +2908,8 @@ function initBanhoTosaEventListeners() {
         submitButton.disabled = false;
         submitButton.textContent = 'Confirmar Agendamento';
     }
-});
+  });
+}
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 async function startApplication() {
@@ -3675,6 +3676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
