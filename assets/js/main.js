@@ -395,6 +395,53 @@ async function handleSendWhatsAppMessage(orderId) {
         button.disabled = false;
     }
 }
+/**
+ * Busca os dados de um agendamento e abre o WhatsApp com uma mensagem pré-formatada.
+ * @param {string} appointmentId - O ID do agendamento no Firestore.
+ */
+async function handleSendGroomingWhatsAppMessage(appointmentId) {
+    const button = document.querySelector(`.send-grooming-whatsapp-btn[data-appointment-id="${appointmentId}"]`);
+    if (!button) return;
+
+    // Mensagem padrão de confirmação
+    const message = `Olá! Gostaríamos de confirmar o seu agendamento de banho e tosa na J.A Pet Clínica. Por favor, responda a esta mensagem para confirmar. Obrigado!`;
+
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    button.disabled = true;
+
+    try {
+        const appointmentRef = doc(db, 'groomingAppointments', appointmentId);
+        const appointmentSnap = await getDoc(appointmentRef);
+
+        if (!appointmentSnap.exists()) {
+            throw new Error('Agendamento não encontrado no banco de dados.');
+        }
+
+        const appointmentData = appointmentSnap.data();
+        const clientPhone = appointmentData.phoneNumber;
+
+        if (!clientPhone) {
+            throw new Error('Este cliente não possui um número de telefone cadastrado no agendamento.');
+        }
+
+        // Formata o telefone para o padrão da API do WhatsApp
+        let formattedPhone = clientPhone.replace(/\D/g, '');
+        if (!formattedPhone.startsWith('55')) {
+            formattedPhone = `55${formattedPhone}`;
+        }
+
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+
+    } catch (error) {
+        console.error("Erro ao enviar WhatsApp para agendamento:", error);
+        alert(`Não foi possível enviar a mensagem: ${error.message}`);
+    } finally {
+        button.innerHTML = '<i class="fab fa-whatsapp"></i> Contato';
+        button.disabled = false;
+    }
+}
 // banco de dados de cupons
 async function applyCoupon() {
     const input = document.getElementById('coupon-input');
@@ -742,6 +789,87 @@ async function renderDetailedOrderView(orderId) {
         alert("Não foi possível carregar os detalhes do pedido.");
         document.getElementById('order-details-modal')?.remove();
     }
+}
+async function renderAdminGroomingView() {
+    const adminContent = document.getElementById('admin-content');
+    if (!adminContent) return;
+
+    // HTML base da nova página
+    adminContent.innerHTML = `
+        <header class="admin-header">
+            <h1>Gerenciamento de Banho e Tosa</h1>
+            <p>Visualize, contate o cliente ou exclua os agendamentos.</p>
+        </header>
+        <div id="admin-grooming-list" class="space-y-4">
+            <p class="p-6 text-center text-gray-500">Carregando agendamentos...</p>
+        </div>
+    `;
+
+    const groomingListEl = document.getElementById('admin-grooming-list');
+
+    // Função interna para montar a lista de agendamentos
+    const renderList = (docs) => {
+        if (docs.length === 0) {
+            groomingListEl.innerHTML = '<div class="admin-card text-center p-8 text-gray-500">Nenhum agendamento encontrado.</div>';
+            return;
+        }
+
+        groomingListEl.innerHTML = docs.map(doc => {
+            const appointment = doc.data();
+            const appointmentId = doc.id;
+            
+            // Determina se é manhã ou tarde para o ícone
+            const period = parseInt(appointment.time.split(':')[0]) < 12 ? 'Manhã' : 'Tarde';
+            const periodIcon = period === 'Manhã' ? 'fa-sun text-yellow-500' : 'fa-moon text-indigo-500';
+
+            return `
+            <div class="admin-card order-card" data-appointment-id="${appointmentId}">
+                <div class="card-header">
+                    <div>
+                        <p class="font-bold text-gray-800 text-lg">${appointment.petName} <span class="font-normal text-base">(Tutor: ${appointment.tutorName})</span></p>
+                        <p class="text-sm text-gray-500">Contato: ${appointment.phoneNumber || 'Não informado'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-secondary text-lg">${appointment.day} às ${appointment.time}</p>
+                        <p class="text-sm text-gray-500 mt-1"><i class="fas ${periodIcon} mr-1"></i>Período da ${period}</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="admin-btn btn-danger delete-grooming-btn" data-appointment-id="${appointmentId}"><i class="fas fa-trash-alt"></i> Excluir</button>
+                    <button class="admin-btn btn-whatsapp send-grooming-whatsapp-btn" data-appointment-id="${appointmentId}"><i class="fab fa-whatsapp"></i> Contato</button>
+                </div>
+            </div>
+            `;
+        }).join('');
+    };
+
+    // Ouve por atualizações em tempo real na coleção de agendamentos
+    onSnapshot(query(collection(db, 'groomingAppointments'), orderBy('day', 'asc'), orderBy('time', 'asc')), (snapshot) => {
+        renderList(snapshot.docs);
+    });
+
+    // Adiciona os eventos para os botões de "Excluir" e "Contato"
+    groomingListEl.addEventListener('click', async (e) => {
+        const deleteBtn = e.target.closest('.delete-grooming-btn');
+        if (deleteBtn) {
+            const appointmentId = deleteBtn.dataset.appointmentId;
+            if (confirm('Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.')) {
+                try {
+                    await deleteDoc(doc(db, 'groomingAppointments', appointmentId));
+                    // A UI atualizará sozinha por causa do onSnapshot!
+                } catch (error) {
+                    console.error("Erro ao excluir agendamento:", error);
+                    alert('Falha ao excluir o agendamento.');
+                }
+            }
+        }
+
+        const whatsappBtn = e.target.closest('.send-grooming-whatsapp-btn');
+        if (whatsappBtn) {
+            const appointmentId = whatsappBtn.dataset.appointmentId;
+            handleSendGroomingWhatsAppMessage(appointmentId);
+        }
+    });
 }
 async function renderAdminSettingsView() {
     const adminContent = document.getElementById('admin-content');
@@ -2491,8 +2619,11 @@ async function loadPage(pageName, params = {}) {
                 await renderFavoritesPage();
                 break;
             case 'banho-e-tosa':
-                renderModernCalendar();
-                initBanhoTosaEventListeners();
+                onSnapshot(query(collection(db, 'groomingAppointments')), (snapshot) => {
+        state.appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderModernCalendar(); // Atualiza o calendário sempre que houver uma mudança
+    });
+    initBanhoTosaEventListeners();
                 break;
             case 'meus-pedidos':
                 await renderMyOrdersPage();
@@ -2527,6 +2658,8 @@ async function loadPage(pageName, params = {}) {
                 loadPage('admin'); // Recarrega a página do admin para mostrar o dashboard
             } else if (adminPage === 'pedidos') {
                 renderAdminOrdersView();
+			} else if (adminPage === 'banho-tosa') {
+                renderAdminGroomingView();
             } else if (adminPage === 'clientes') {
                 renderAdminClientsView();
             } else if (adminPage === 'produtos') { 
@@ -2742,28 +2875,40 @@ function initBanhoTosaEventListeners() {
     });
 
     // A lógica do formulário de agendamento continua a mesma
-    const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const newAppointment = {
-                day: document.getElementById('booking-day').value,
-                time: document.getElementById('booking-time').value,
-                tutorName: document.getElementById('booking-tutor-name').value,
-                petName: document.getElementById('booking-pet-name').value,
-                phoneNumber: document.getElementById('booking-phone-number').value
-            };
-            state.appointments.push(newAppointment);
-            save.appointments(); // Assumindo que você tem essa função global
-            document.getElementById('booking-modal').style.display = 'none';
-            showAnimation('success-animation-overlay', 1500, () => {
-                // Recarrega o calendário para mostrar o novo agendamento
-                renderModernCalendar(); 
-            });
-            bookingForm.reset();
+    bookingForm.addEventListener('submit', async (e) => { // Adicione 'async'
+    e.preventDefault();
+    const submitButton = bookingForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Agendando...';
+
+    const newAppointment = {
+        day: document.getElementById('booking-day').value,
+        time: document.getElementById('booking-time').value,
+        tutorName: document.getElementById('booking-tutor-name').value,
+        petName: document.getElementById('booking-pet-name').value,
+        phoneNumber: document.getElementById('booking-phone-number').value,
+        status: 'Agendado',
+        createdAt: serverTimestamp() // Adiciona data de criação
+    };
+
+    try {
+        // ✅ SALVANDO NO FIRESTORE
+        await addDoc(collection(db, 'groomingAppointments'), newAppointment);
+        
+        document.getElementById('booking-modal').style.display = 'none';
+        showAnimation('success-animation-overlay', 1500, () => {
+            // O calendário será atualizado automaticamente pelo onSnapshot que busca os dados
         });
+        bookingForm.reset();
+
+    } catch (error) {
+        console.error("Erro ao salvar agendamento:", error);
+        alert('Não foi possível realizar o agendamento. Tente novamente.');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Confirmar Agendamento';
     }
-}
+});
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 async function startApplication() {
@@ -3530,6 +3675,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
