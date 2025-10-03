@@ -810,7 +810,7 @@ async function renderAdminGroomingView() {
     // Função interna para montar a lista de agendamentos
     const renderList = (docs) => {
         if (docs.length === 0) {
-            groomingListEl.innerHTML = '<div class="admin-card text-center p-8 text-gray-500">Nenhum agendamento encontrado.</div>';
+            groomingListEl.innerHTML = '<div class="admin-card text-center p-8 text-gray-500">Nenhum agendamento pendente encontrado.</div>';
             return;
         }
 
@@ -818,7 +818,6 @@ async function renderAdminGroomingView() {
             const appointment = doc.data();
             const appointmentId = doc.id;
             
-            // Determina se é manhã ou tarde para o ícone
             const period = parseInt(appointment.time.split(':')[0]) < 12 ? 'Manhã' : 'Tarde';
             const periodIcon = period === 'Manhã' ? 'fa-sun text-yellow-500' : 'fa-moon text-indigo-500';
 
@@ -843,8 +842,10 @@ async function renderAdminGroomingView() {
         }).join('');
     };
 
-    // Ouve por atualizações em tempo real na coleção de agendamentos
-    onSnapshot(query(collection(db, 'groomingAppointments'), orderBy('day', 'asc'), orderBy('time', 'asc')), (snapshot) => {
+    // ✅ ALTERAÇÃO 1: Adicionado "where('status', '!=', 'Concluído')" para buscar apenas agendamentos pendentes.
+    const q = query(collection(db, 'groomingAppointments'), where('status', '!=', 'Concluído'), orderBy('status'), orderBy('day', 'asc'), orderBy('time', 'asc'));
+
+    onSnapshot(q, (snapshot) => {
         renderList(snapshot.docs);
     });
 
@@ -853,21 +854,108 @@ async function renderAdminGroomingView() {
         const deleteBtn = e.target.closest('.delete-grooming-btn');
         if (deleteBtn) {
             const appointmentId = deleteBtn.dataset.appointmentId;
-            if (confirm('Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.')) {
-                try {
-                    await deleteDoc(doc(db, 'groomingAppointments', appointmentId));
-                    // A UI atualizará sozinha por causa do onSnapshot!
-                } catch (error) {
-                    console.error("Erro ao excluir agendamento:", error);
-                    alert('Falha ao excluir o agendamento.');
-                }
-            }
+            // ✅ ALTERAÇÃO 2: Em vez de confirm(), chamamos a função que abre o novo modal.
+            openGroomingActionModal(appointmentId); 
         }
 
         const whatsappBtn = e.target.closest('.send-grooming-whatsapp-btn');
         if (whatsappBtn) {
             const appointmentId = whatsappBtn.dataset.appointmentId;
             handleSendGroomingWhatsAppMessage(appointmentId);
+        }
+    });
+}
+async function openGroomingActionModal(appointmentId) {
+    // Cria o HTML do modal dinamicamente
+    const modalHTML = `
+        <div id="grooming-action-modal" class="action-modal-overlay">
+            <div class="action-modal-content">
+                <button class="action-modal-close">×</button>
+                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Agendamento</h3>
+                
+                <div class="action-modal-split">
+                    <div class="modal-column">
+                        <h4><i class="fas fa-calendar-times text-red-500 mr-2"></i>Cancelar Agendamento</h4>
+                        <p>Esta opção irá notificar o cliente sobre o cancelamento e remover o horário da agenda.</p>
+                        <textarea id="cancel-reason-input" placeholder="Escreva o motivo do cancelamento aqui (ex: imprevisto, feriado, etc.). Esta mensagem será enviada ao cliente."></textarea>
+                        <button id="confirm-cancel-btn" class="admin-btn btn-danger">Notificar Cliente e Cancelar</button>
+                    </div>
+                    
+                    <div class="modal-column">
+                        <h4><i class="fas fa-check-circle text-green-500 mr-2"></i>Concluir Serviço</h4>
+                        <p>Use esta opção quando o serviço já foi realizado. Isso removerá o agendamento da lista de pendentes.</p>
+                        <button id="confirm-conclude-btn" class="admin-btn btn-primary">Marcar como Concluído</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Adiciona o modal ao corpo da página
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modal = document.getElementById('grooming-action-modal');
+
+    // Adiciona um pequeno delay para a animação de entrada funcionar
+    setTimeout(() => modal.classList.add('active'), 10);
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300); // Remove da DOM após a animação
+    };
+
+    // Lógica dos botões
+    modal.querySelector('.action-modal-close').addEventListener('click', closeModal);
+
+    // Botão de MARCAR COMO CONCLUÍDO
+    modal.querySelector('#confirm-conclude-btn').addEventListener('click', async () => {
+        if (confirm('Tem certeza que deseja marcar este serviço como concluído?')) {
+            try {
+                const appointmentRef = doc(db, 'groomingAppointments', appointmentId);
+                await updateDoc(appointmentRef, { status: 'Concluído' });
+                closeModal();
+            } catch (error) {
+                console.error("Erro ao concluir agendamento:", error);
+                alert('Não foi possível marcar como concluído. Tente novamente.');
+            }
+        }
+    });
+
+    // Botão de CONFIRMAR CANCELAMENTO
+    modal.querySelector('#confirm-cancel-btn').addEventListener('click', async () => {
+        const reason = modal.querySelector('#cancel-reason-input').value.trim();
+        if (!reason) {
+            alert('Por favor, escreva o motivo do cancelamento antes de continuar.');
+            return;
+        }
+
+        if (confirm('Tem certeza que deseja cancelar este agendamento e notificar o cliente?')) {
+            try {
+                // 1. Pega os dados do agendamento para obter o telefone
+                const appointmentRef = doc(db, 'groomingAppointments', appointmentId);
+                const appointmentSnap = await getDoc(appointmentRef);
+                
+                if (!appointmentSnap.exists()) throw new Error('Agendamento não encontrado.');
+
+                const appointmentData = appointmentSnap.data();
+                const clientPhone = appointmentData.phoneNumber.replace(/\D/g, '');
+
+                // 2. Monta a mensagem para o WhatsApp
+                const message = `Olá! Gostaríamos de informar que seu agendamento de banho e tosa na J.A Pet Clínica para o dia ${appointmentData.day} às ${appointmentData.time} precisou ser cancelado. Motivo: "${reason}". Pedimos desculpas pelo transtorno.`;
+                let formattedPhone = clientPhone.startsWith('55') ? clientPhone : `55${clientPhone}`;
+                const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+                
+                // 3. Abre o WhatsApp
+                window.open(whatsappUrl, '_blank');
+
+                // 4. Exclui o agendamento do banco de dados
+                await deleteDoc(appointmentRef);
+                
+                closeModal();
+
+            } catch (error) {
+                console.error("Erro ao cancelar agendamento:", error);
+                alert('Não foi possível cancelar o agendamento. Tente novamente.');
+            }
         }
     });
 }
@@ -3678,6 +3766,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
