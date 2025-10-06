@@ -2723,47 +2723,77 @@ async function loadPage(pageName, params = {}) {
                     await renderMyOrdersPage();
                 }
                 break;
-            case 'admin':
-    // Configurações básicas do painel
-    const adminUserNameEl = document.getElementById('admin-user-name');
-    if (adminUserNameEl) {
-        adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
-    }
-    document.querySelector('#admin-user-profile .logout-btn')?.addEventListener('click', handleLogout);
-
-    // CHAMA A NOVA FUNÇÃO PARA PREENCHER OS DADOS DA DASHBOARD
-    renderAdminDashboard();
-    
-    // Lógica de navegação da barra lateral
-    document.querySelectorAll('.admin-nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-
-            const adminPage = link.dataset.adminPage;
-            if (adminPage === 'dashboard') {
-                loadPage('admin'); // Recarrega a página do admin para mostrar o dashboard
-            } else if (adminPage === 'pedidos') {
-                renderAdminOrdersView();
-			} else if (adminPage === 'banho-tosa') {
-                renderAdminGroomingView();
-            } else if (adminPage === 'clientes') {
-                renderAdminClientsView();
-            } else if (adminPage === 'produtos') { 
-                renderAdminProductsView();
-			} else if (adminPage === 'cupons') { 
-                renderAdminCouponsView();
-            } else if (adminPage === 'importar-xml') { 
-                renderAdminImportXMLView();
-				} else if (adminPage === 'configuracoes') { 
-                renderAdminSettingsView();
-            } else {
-                document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
+              case 'admin':
+            // Configurações básicas do painel
+            const adminUserNameEl = document.getElementById('admin-user-name');
+            if (adminUserNameEl) {
+                adminUserNameEl.textContent = state.loggedInUser.displayName || state.loggedInUser.email.split('@')[0];
             }
-        });
-    });
-    break;
+            document.querySelector('#admin-user-profile .logout-btn')?.addEventListener('click', handleLogout);
+
+            // Renderiza o conteúdo inicial do dashboard
+            renderAdminDashboard();
+
+            // --- NOVA LÓGICA PARA O MENU MOBILE ---
+            const sidebar = document.getElementById('admin-sidebar');
+            const menuToggleBtn = document.getElementById('admin-menu-toggle');
+            const adminContent = document.getElementById('admin-content');
+
+            const closeSidebar = () => {
+                if (sidebar) sidebar.classList.remove('is-open');
+            };
+            
+            if (menuToggleBtn && sidebar) {
+                menuToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Impede que o clique no conteúdo feche o menu imediatamente
+                    sidebar.classList.toggle('is-open');
+                });
+            }
+
+            // Fecha a sidebar se o usuário clicar fora dela (no conteúdo principal)
+            if (adminContent) {
+                adminContent.addEventListener('click', () => {
+                    if (sidebar && sidebar.classList.contains('is-open')) {
+                        closeSidebar();
+                    }
+                });
+            }
+            // --- FIM DA NOVA LÓGICA ---
+
+            // Lógica de navegação da barra lateral (MODIFICADA PARA FECHAR O MENU)
+            document.querySelectorAll('.admin-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Fecha a sidebar ao clicar em um link (essencial para mobile)
+                    closeSidebar();
+
+                    document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    const adminPage = link.dataset.adminPage;
+                    if (adminPage === 'dashboard') {
+                        loadPage('admin'); // Recarrega a página do admin para mostrar o dashboard
+                    } else if (adminPage === 'pedidos') {
+                        renderAdminOrdersView();
+                    } else if (adminPage === 'banho-tosa') {
+                        renderAdminGroomingView();
+                    } else if (adminPage === 'clientes') {
+                        renderAdminClientsView();
+                    } else if (adminPage === 'produtos') {
+                        renderAdminProductsView();
+                    } else if (adminPage === 'cupons') {
+                        renderAdminCouponsView();
+                    } else if (adminPage === 'importar-xml') {
+                        renderAdminImportXMLView();
+                    } else if (adminPage === 'configuracoes') {
+                        renderAdminSettingsView();
+                    } else {
+                        document.getElementById('admin-content').innerHTML = `<h1 class="text-3xl font-bold">Página de ${adminPage} em construção...</h1>`;
+                    }
+                });
+            });
+            break;
             case 'adocao-caes':
             case 'adocao-gatos':
             case 'como-baixar-app':
@@ -3766,6 +3796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
