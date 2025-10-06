@@ -2855,16 +2855,37 @@ input[type='number'] {
     display: none;
 }
 
-/* Responsividade para telas menores */
+/* Responsividade para telas menores (SUBSTITUA ESTE BLOCO INTEIRO) */
 @media (max-width: 768px) {
     .admin-dashboard-layout {
-        grid-template-columns: 1fr; /* Coluna única */
+        /* Remove o layout de grid no mobile, deixando o conteúdo principal fluir */
+        display: block;
     }
+
     #admin-sidebar {
-       display: none; /* Em um projeto real, isso viraria um menu hamburguer */
+        /* Fica por cima do conteúdo, posicionado fora da tela à esquerda */
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 260px; /* Mesma largura da versão desktop */
+        z-index: 1000; /* Garante que fique sobre o conteúdo principal */
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        
+        /* Garante que o menu seja visível, caso estivesse com display:none */
+        display: flex; 
     }
+
+    /* Classe que será adicionada via JavaScript para mostrar o menu */
+    #admin-sidebar.is-open {
+        transform: translateX(0);
+    }
+
     #admin-content {
-        grid-column: 1 / -1;
+        grid-column: 1 / -1; /* Ocupa todo o espaço disponível */
+        padding-top: 5rem; /* Adiciona espaço no topo para não ficar atrás do botão */
     }
 }
 
@@ -4594,3 +4615,4 @@ input[type='number'] {
     width: 100%;
     margin-top: 1rem;
 }
+
