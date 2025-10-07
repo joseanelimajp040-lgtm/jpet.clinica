@@ -2637,7 +2637,7 @@ async function loadPage(pageName, params = {}) {
         if (!response.ok) throw new Error(`Página não encontrada: ${pageName}.html`);
         appRoot.innerHTML = await response.text();
 
-        if (pageName !== 'home') {
+        if (pageName !== 'home' && pageName !== 'admin') {
             const backButtonHTML = `<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                 <a href="#" class="nav-link btn-voltar-inicio" data-page="home" data-dynamic-back-button="true">
                     <i class="fas fa-arrow-left mr-3"></i>Voltar para o início
@@ -3796,6 +3796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
