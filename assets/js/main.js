@@ -2075,28 +2075,6 @@ function renderProductSpecs(specs = {}) {
     specsHTML += '</ul>';
     container.innerHTML = specsHTML;
 }
-function renderStarRating(reviews) {
-    const container = document.getElementById('product-stars');
-    if (!container) return;
-
-    if (!reviews || reviews.length === 0) {
-        container.innerHTML = '<span class="text-sm text-gray-500">(Nenhuma avaliação)</span>';
-        return;
-    }
-
-    const rating = reviews.reduce((acc, r) => acc + r.estrelas, 0) / reviews.length;
-    const reviewCount = reviews.length;
-    let starsHTML = '';
-    const fullStars = Math.floor(rating);
-    const halfStar = rating - fullStars >= 0.5;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-    for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fas fa-star"></i>';
-    if (halfStar) starsHTML += '<i class="fas fa-star-half-alt"></i>';
-    for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="far fa-star"></i>';
-
-    container.innerHTML = `${starsHTML} <span class="review-count text-gray-600 hover:underline cursor-pointer">(${reviewCount} avaliações)</span>`;
-}
 async function renderRelatedProducts(category, currentProductId) {
     const container = document.getElementById('related-products-container');
     if (!container) return;
@@ -3866,6 +3844,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
