@@ -4616,3 +4616,141 @@ input[type='number'] {
     margin-top: 1rem;
 }
 
+/* ================================================================== */
+/* ========== NOVOS ESTILOS PARA PÁGINA DE PRODUTO ========== */
+/* ================================================================== */
+
+/* --- 1. Ícones de Ação (Favoritar/Compartilhar) --- */
+.product-actions-container .product-action-btn {
+    background-color: #f3f4f6; /* bg-gray-100 */
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem; /* 16px */
+    color: #4b5563; /* text-gray-600 */
+}
+.product-actions-container .product-action-btn:hover {
+    background-color: #e5e7eb; /* bg-gray-200 */
+    color: #1f2937; /* text-gray-800 */
+}
+.product-actions-container .product-action-btn.favorite-btn i.fas {
+    color: #ef4444; /* text-red-500 */
+}
+
+/* --- 2. Bloco de Preço --- */
+.product-price-box {
+    background-color: #FFF7F2; /* Cor pêssego/laranja claro */
+}
+
+/* --- 3. Variações de Produto --- */
+.variations-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem; /* 12px */
+}
+.variation-btn {
+    padding: 0.75rem 1.25rem; /* 12px 20px */
+    border: 2px solid #e2e8f0; /* border-slate-200 */
+    background-color: #ffffff;
+    border-radius: 8px; /* rounded-lg */
+    font-weight: 600;
+    color: #334155; /* text-slate-700 */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative; /* Para o ícone de check */
+}
+.variation-btn:hover {
+    border-color: #cbd5e1; /* border-slate-300 */
+}
+.variation-btn.selected {
+    border-color: #00A8A8; /* Sua cor secundária */
+    background-color: #f0fdfa; /* teal-50 */
+}
+.variation-btn.selected::after {
+    content: '\f00c'; /* Código do ícone de check do Font Awesome */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background-color: #00A8A8;
+    color: white;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 6px;
+}
+
+/* --- 4. Novo Seletor de Quantidade --- */
+.quantity-selector-new {
+    display: flex;
+    align-items: center;
+}
+.quantity-input-new {
+    width: 50px;
+    height: 48px;
+    text-align: center;
+    font-weight: 600;
+    color: #1f2937; /* gray-800 */
+    border-top: 2px solid #cbd5e1;
+    border-bottom: 2px solid #cbd5e1;
+    background-color: #f9fafb; /* gray-50 */
+    padding: 0.5rem 0;
+    -moz-appearance: textfield;
+}
+.quantity-btn-new {
+    background-color: #ffffff;
+    width: 40px;
+    height: 48px;
+    border: 2px solid #cbd5e1;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #4b5563; /* gray-600 */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.quantity-btn-new:hover {
+    background-color: #f1f5f9; /* gray-100 */
+}
+.quantity-btn-new:first-child { 
+    border-right: none;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+.quantity-btn-new:last-child {
+    border-left: none;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* --- 5. Novo Botão de Adicionar ao Carrinho --- */
+.add-to-cart-button-new {
+    background-color: #27D8A7; /* Cor verde-água da imagem */
+    height: 48px;
+}
+.add-to-cart-button-new:hover {
+    background-color: #22C597; /* Um tom mais escuro para o hover */
+}
+.add-to-cart-button-new:disabled {
+    background-color: #9ca3af; /* gray-400 */
+    cursor: not-allowed;
+}
+.add-to-cart-button-new:disabled:hover {
+    background-color: #9ca3af;
+}
+
+/* --- 6. Outros Ajustes --- */
+/* Estilo para as avaliações com contagem */
+.review-count {
+    color: #4b5563; /* gray-600 */
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+}
