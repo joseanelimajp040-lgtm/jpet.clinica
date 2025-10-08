@@ -2075,38 +2075,6 @@ function renderProductSpecs(specs = {}) {
     specsHTML += '</ul>';
     container.innerHTML = specsHTML;
 }
-
-function renderReviews(reviews) {
-    const container = document.getElementById('tab-reviews');
-    if (!container) return;
-    if (!reviews || reviews.length === 0) {
-        container.innerHTML = '<p>Este produto ainda não possui avaliações.</p>';
-        return;
-    }
-    let reviewsHTML = '';
-    reviews.forEach(review => {
-        let starsHTML = '';
-        const fullStars = Math.floor(review.estrelas);
-        const halfStar = review.estrelas % 1 !== 0;
-        for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fas fa-star"></i>';
-        if (halfStar) starsHTML += '<i class="fas fa-star-half-alt"></i>';
-        reviewsHTML += `
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">${review.avatar}</div>
-                    <div>
-                        <p class="review-author">${review.nome}</p>
-                        <p class="review-date">${review.data}</p>
-                    </div>
-                    ${review.verificada ? '<span class="verified-purchase"><i class="fas fa-check-circle"></i> Compra Verificada</span>' : ''}
-                </div>
-                <div class="review-stars text-yellow-500">${starsHTML}</div>
-                <p class="review-comment">${review.comentario}</p>
-            </div>`;
-    });
-    container.innerHTML = reviewsHTML;
-}
-
 function renderStarRating(reviews) {
     const container = document.getElementById('product-stars');
     if (!container) return;
@@ -3898,6 +3866,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
