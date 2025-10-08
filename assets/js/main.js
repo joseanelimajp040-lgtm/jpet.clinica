@@ -2044,7 +2044,91 @@ async function renderProductPage(productId) {
         appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
     }
 }
+function renderStockStatus(stock = 0) {
+    const container = document.getElementById('product-stock-status');
+    if (!container) return;
 
+    if (stock > 0) {
+        container.innerHTML = `<span class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+            <span class="w-1.5 h-1.5 inline-block bg-emerald-500 rounded-full"></span>
+            Em estoque
+        </span>`;
+    } else {
+        container.innerHTML = `<span class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-red-100 text-red-700">
+            <span class="w-1.5 h-1.5 inline-block bg-red-500 rounded-full"></span>
+            Esgotado
+        </span>`;
+    }
+}
+
+function renderProductSpecs(specs = {}) {
+    const container = document.getElementById('tab-specs');
+    if (!container) return;
+    if (Object.keys(specs).length === 0) {
+        container.innerHTML = '<p>Não há especificações técnicas para este produto.</p>';
+        return;
+    }
+    let specsHTML = '<ul class="space-y-4 text-gray-600">';
+    for (const [key, value] of Object.entries(specs)) {
+        specsHTML += `<li><strong class="font-semibold text-gray-800">${key}:</strong> ${value}</li>`;
+    }
+    specsHTML += '</ul>';
+    container.innerHTML = specsHTML;
+}
+
+function renderReviews(reviews) {
+    const container = document.getElementById('tab-reviews');
+    if (!container) return;
+    if (!reviews || reviews.length === 0) {
+        container.innerHTML = '<p>Este produto ainda não possui avaliações.</p>';
+        return;
+    }
+    let reviewsHTML = '';
+    reviews.forEach(review => {
+        let starsHTML = '';
+        const fullStars = Math.floor(review.estrelas);
+        const halfStar = review.estrelas % 1 !== 0;
+        for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fas fa-star"></i>';
+        if (halfStar) starsHTML += '<i class="fas fa-star-half-alt"></i>';
+        reviewsHTML += `
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">${review.avatar}</div>
+                    <div>
+                        <p class="review-author">${review.nome}</p>
+                        <p class="review-date">${review.data}</p>
+                    </div>
+                    ${review.verificada ? '<span class="verified-purchase"><i class="fas fa-check-circle"></i> Compra Verificada</span>' : ''}
+                </div>
+                <div class="review-stars text-yellow-500">${starsHTML}</div>
+                <p class="review-comment">${review.comentario}</p>
+            </div>`;
+    });
+    container.innerHTML = reviewsHTML;
+}
+
+function renderStarRating(reviews) {
+    const container = document.getElementById('product-stars');
+    if (!container) return;
+
+    if (!reviews || reviews.length === 0) {
+        container.innerHTML = '<span class="text-sm text-gray-500">(Nenhuma avaliação)</span>';
+        return;
+    }
+
+    const rating = reviews.reduce((acc, r) => acc + r.estrelas, 0) / reviews.length;
+    const reviewCount = reviews.length;
+    let starsHTML = '';
+    const fullStars = Math.floor(rating);
+    const halfStar = rating - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fas fa-star"></i>';
+    if (halfStar) starsHTML += '<i class="fas fa-star-half-alt"></i>';
+    for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="far fa-star"></i>';
+
+    container.innerHTML = `${starsHTML} <span class="review-count text-gray-600 hover:underline cursor-pointer">(${reviewCount} avaliações)</span>`;
+}
 async function renderRelatedProducts(category, currentProductId) {
     const container = document.getElementById('related-products-container');
     if (!container) return;
@@ -3814,6 +3898,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
