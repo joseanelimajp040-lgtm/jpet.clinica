@@ -1934,44 +1934,52 @@ async function renderPromocoesPage() {
 }
 // --- Funções da Página de Produto ---
 async function renderProductPage(productId) {
-    try {
-        const docRef = doc(db, 'produtos', productId);
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
-            return;
-        }
+    try {
+        const docRef = doc(db, 'produtos', productId);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Produto não encontrado.</p>`;
+            return;
+        }
 
-        const productData = docSnap.data();
-        if (!productData.variations || productData.variations.length === 0) {
-            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
-            return;
-        }
+        const productData = docSnap.data();
+        if (!productData.variations || productData.variations.length === 0) {
+            appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
+            return;
+        }
 
-        const defaultIndex = productData.defaultVariationIndex || 0;
-        const defaultVariation = productData.variations[defaultIndex];
-        const categoryForReviews = productData.category || 'geral';
-        const reviews = generateRealisticReviews(productId, categoryForReviews);
+        const defaultIndex = productData.defaultVariationIndex || 0;
+        const defaultVariation = productData.variations[defaultIndex];
 
-        const el = (id) => document.getElementById(id);
-        if (el('main-product-image')) el('main-product-image').src = defaultVariation.image || productData.image;
-        if (el('product-name')) el('product-name').textContent = defaultVariation.fullName || productData.nome;
-        if (el('product-brand')) el('product-brand').querySelector('span').textContent = productData.brand || "N/A";
-        if (el('product-price')) el('product-price').textContent = formatCurrency(defaultVariation.price);
-        if (el('breadcrumb-category')) el('breadcrumb-category').textContent = productData.category || "N/A";
-
-        // Atualiza o texto de parcelamento usando a nova lógica
-renderInstallmentsText(el('product-installments'), defaultVariation.price);
-        // --- FIM DA MODIFICAÇÃO ---
-
-        const descriptionContainer = el('product-description');
-        if (descriptionContainer) {
-            descriptionContainer.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
-        }
-        
-        // --- INÍCIO DA MODIFICAÇÃO: Botão Favoritar ---
+        // --- Seleção de Elementos ---
+        const el = (id) => document.getElementById(id);
+        const mainImageEl = el('main-product-image');
+        const nameEl = el('product-name');
+        const brandEl = el('product-brand');
+        const priceEl = el('product-price');
+        const originalPriceEl = el('product-original-price');
+        const discountBadgeEl = el('product-discount-badge');
+        const installmentsEl = el('product-installments');
+        const breadcrumbEl = el('breadcrumb-category');
+        const descriptionEl = el('product-description');
         const favBtnPage = el('favorite-btn-page');
-        if(favBtnPage) {
+        const variationsContainer = document.querySelector('#product-variations .variations-container');
+        const addToCartBtn = el('add-to-cart-product-page');
+        
+        // --- Atualização da UI com dados da variação padrão ---
+        if (mainImageEl) mainImageEl.src = defaultVariation.image || productData.image;
+        if (nameEl) nameEl.textContent = defaultVariation.fullName || productData.nome;
+        if (brandEl) brandEl.querySelector('span').textContent = productData.brand || "N/A";
+        if (priceEl) priceEl.textContent = formatCurrency(defaultVariation.price);
+        if (breadcrumbEl) breadcrumbEl.textContent = productData.category || "N/A";
+        
+        renderInstallmentsText(installmentsEl, defaultVariation.price);
+        
+        if (descriptionEl) {
+            descriptionEl.innerHTML = productData.description ? `<p>${productData.description.replace(/\n/g, '</p><p>')}</p>` : '<p>Sem descrição.</p>';
+        }
+
+        if (favBtnPage) {
             favBtnPage.dataset.id = productId;
             const isFav = state.favorites.some(fav => fav.id === productId);
             const icon = favBtnPage.querySelector('i');
@@ -1983,78 +1991,58 @@ renderInstallmentsText(el('product-installments'), defaultVariation.price);
                 icon.classList.add('far');
             }
         }
-        // --- FIM DA MODIFICAÇÃO ---
 
-        renderStockStatus(defaultVariation.stock);
-        renderReviews(reviews);
-        renderStarRating(reviews);
-        renderProductSpecs(productData.specifications);
-        renderRelatedProducts(productData.category, productId);
+        renderStockStatus(defaultVariation.stock);
+        
+        const categoryForReviews = productData.category || 'geral';
+        const reviews = generateRealisticReviews(productId, categoryForReviews);
+        renderReviews(reviews);
+        renderStarRating(reviews);
+        renderProductSpecs(productData.specifications);
+        renderRelatedProducts(productData.category, productId);
 
-        const originalPriceEl = el('product-original-price');
-        const discountBadgeEl = el('product-discount-badge');
-        if (originalPriceEl && discountBadgeEl) {
-            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
-                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
-                originalPriceEl.classList.remove('hidden');
-                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.originalPrice) * 100);
-                discountBadgeEl.textContent = `-${discount}%`;
-                discountBadgeEl.classList.remove('hidden');
-            } else {
-                originalPriceEl.classList.add('hidden');
-                discountBadgeEl.classList.add('hidden');
-            }
-        }
+        if (originalPriceEl && discountBadgeEl) {
+            if (defaultVariation.originalPrice && defaultVariation.originalPrice > defaultVariation.price) {
+                originalPriceEl.textContent = formatCurrency(defaultVariation.originalPrice);
+                originalPriceEl.classList.remove('hidden');
+                const discount = Math.round(((defaultVariation.originalPrice - defaultVariation.price) / defaultVariation.price) * 100);
+                discountBadgeEl.textContent = `-${discount}%`;
+                discountBadgeEl.classList.remove('hidden');
+            } else {
+                originalPriceEl.classList.add('hidden');
+                discountBadgeEl.classList.add('hidden');
+            }
+        }
 
-        const variationsContainer = document.querySelector('#product-variations .variations-container');
-        if (variationsContainer) {
-            variationsContainer.innerHTML = productData.variations.map((v, index) => `
-                <button class="variation-btn ${index === defaultIndex ? 'selected' : ''}" data-price="${v.price}" data-original-price="${v.originalPrice || ''}" data-weight="${v.weight}" data-stock="${v.stock}" data-image="${v.image || productData.image}" data-full-name="${v.fullName || productData.nome}">
-                    ${v.weight}
-                </button>`).join('');
-        }
+        if (variationsContainer) {
+             variationsContainer.innerHTML = productData.variations.map((v, index) => `
+                <button 
+                    class="variation-btn ${index === defaultIndex ? 'selected' : ''} ${v.stock <= 0 ? 'unavailable' : ''}" 
+                    data-price="${v.price}" 
+                    data-original-price="${v.originalPrice || ''}" 
+                    data-weight="${v.weight}" 
+                    data-stock="${v.stock}" 
+                    data-image="${v.image || productData.image}" 
+                    data-full-name="${v.fullName || productData.nome}"
+                    ${v.stock <= 0 ? 'disabled' : ''}>
+                    ${v.weight}
+                </button>`).join('');
+        }
+        
+        if (addToCartBtn) {
+            addToCartBtn.disabled = defaultVariation.stock <= 0;
+            addToCartBtn.innerHTML = defaultVariation.stock <= 0 ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-3"></i> Adicionar';
+            addToCartBtn.dataset.id = productId;
+            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
+            addToCartBtn.dataset.price = defaultVariation.price;
+            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
+            addToCartBtn.dataset.weight = defaultVariation.weight;
+        }
 
-        const addToCartBtn = el('add-to-cart-product-page');
-        if (addToCartBtn) {
-            addToCartBtn.dataset.id = productId;
-            addToCartBtn.dataset.name = defaultVariation.fullName || productData.nome;
-            addToCartBtn.dataset.price = defaultVariation.price;
-            addToCartBtn.dataset.image = defaultVariation.image || productData.image;
-            addToCartBtn.dataset.weight = defaultVariation.weight;
-            addToCartBtn.classList.add('add-to-cart-btn');
-        }
-
-    } catch (error) {
-        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
-    }
-}
-
-function renderStockStatus(stock = 0) {
-    const container = document.getElementById('product-stock-status');
-    if (!container) return;
-    if (stock > 10) {
-        container.innerHTML = `<span class="stock-status stock-in"><i class="fas fa-check-circle"></i> Em estoque</span>`;
-    } else if (stock > 0) {
-        container.innerHTML = `<span class="stock-status stock-low"><i class="fas fa-exclamation-triangle"></i> Últimas ${stock} unidades!</span>`;
-    } else {
-        container.innerHTML = `<span class="stock-status stock-out"><i class="fas fa-times-circle"></i> Esgotado</span>`;
+    } catch (error) {
+        console.error("Erro CRÍTICO ao renderizar página do produto:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Ocorreu um erro ao carregar este produto.</p>`;
     }
-}
-
-function renderProductSpecs(specs = {}) {
-    const container = document.getElementById('tab-specs');
-    if (!container) return;
-    if (Object.keys(specs).length === 0) {
-        container.innerHTML = '<p>Não há especificações técnicas para este produto.</p>';
-        return;
-    }
-    let specsHTML = '<ul class="space-y-4 text-gray-600">';
-    for (const [key, value] of Object.entries(specs)) {
-        specsHTML += `<li><strong class="font-semibold text-gray-800">${key}:</strong> ${value}</li>`;
-    }
-    specsHTML += '</ul>';
-    container.innerHTML = specsHTML;
 }
 
 async function renderRelatedProducts(category, currentProductId) {
@@ -2824,41 +2812,91 @@ async function loadPage(pageName, params = {}) {
 
 // --- INICIALIZAÇÃO DE LISTENERS ---
 function initProductPageListeners() {
-    // Lógica das abas de informação (permanece a mesma)
+    const pageContainer = document.getElementById('app-root');
+    if (!pageContainer) return;
+
+    // Lógica das abas
     const tabContainer = document.getElementById('info-tabs');
     if (tabContainer) {
-        // ... (o código das abas continua aqui, sem alterações)
-        const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
         tabContainer.addEventListener('click', (e) => {
             const clickedTab = e.target.closest('.tab-btn');
             if (!clickedTab) return;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
+            tabContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
             clickedTab.classList.add('active');
             document.getElementById('tab-' + clickedTab.dataset.tab)?.classList.add('active');
         });
     }
 
-    // Lógica da quantidade (permanece a mesma)
+    // Lógica da quantidade
     const quantityInput = document.getElementById('product-quantity');
-    const minusBtn = document.getElementById('quantity-minus');
-    const plusBtn = document.getElementById('quantity-plus');
-    if (minusBtn && plusBtn && quantityInput) {
-        // ... (o código da quantidade continua aqui, sem alterações)
-        minusBtn.addEventListener('click', () => {
-            let val = parseInt(quantityInput.value);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        plusBtn.addEventListener('click', () => {
-            quantityInput.value = parseInt(quantityInput.value) + 1;
+    if (quantityInput) {
+        pageContainer.addEventListener('click', (e) => {
+            if (e.target.id === 'quantity-minus') {
+                let val = parseInt(quantityInput.value);
+                if (val > 1) quantityInput.value = val - 1;
+            }
+            if (e.target.id === 'quantity-plus') {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            }
         });
     }
 
-    // --- INÍCIO DA NOVA LÓGICA DO MODAL DE IMAGEM ---
+    // Lógica de clique nas variações
+    const variationsContainer = document.querySelector('#product-variations .variations-container');
+    if (variationsContainer) {
+        variationsContainer.addEventListener('click', (e) => {
+            const variationBtn = e.target.closest('.variation-btn');
+            if (!variationBtn) return;
+            
+            variationsContainer.querySelectorAll('.variation-btn').forEach(btn => btn.classList.remove('selected'));
+            variationBtn.classList.add('selected');
+            
+            const data = variationBtn.dataset;
+            const stock = parseInt(data.stock, 10);
+            const isOutOfStock = stock <= 0;
+
+            const el = (id) => document.getElementById(id);
+            
+            // Atualiza todos os elementos da página com os dados da nova variação
+            if (el('main-product-image')) el('main-product-image').src = data.image;
+            if (el('product-name')) el('product-name').textContent = data.fullName;
+            if (el('product-price')) el('product-price').textContent = formatCurrency(data.price);
+            
+            renderInstallmentsText(el('product-installments'), data.price);
+            renderStockStatus(stock);
+
+            const originalPriceEl = el('product-original-price');
+            const discountBadgeEl = el('product-discount-badge');
+            if (originalPriceEl && discountBadgeEl) {
+                if (data.originalPrice && parseFloat(data.originalPrice) > parseFloat(data.price)) {
+                    originalPriceEl.textContent = formatCurrency(data.originalPrice);
+                    originalPriceEl.classList.remove('hidden');
+                    const discount = Math.round(((parseFloat(data.originalPrice) - parseFloat(data.price)) / parseFloat(data.originalPrice)) * 100);
+                    discountBadgeEl.textContent = `-${discount}%`;
+                    discountBadgeEl.classList.remove('hidden');
+                } else {
+                    originalPriceEl.classList.add('hidden');
+                    discountBadgeEl.classList.add('hidden');
+                }
+            }
+            
+            const addToCartBtn = el('add-to-cart-product-page');
+            if (addToCartBtn) {
+                addToCartBtn.dataset.price = data.price;
+                addToCartBtn.dataset.weight = data.weight;
+                addToCartBtn.dataset.image = data.image;
+                addToCartBtn.dataset.name = data.fullName;
+                addToCartBtn.disabled = isOutOfStock;
+                addToCartBtn.innerHTML = isOutOfStock ? 'Indisponível' : '<i class="fas fa-shopping-cart mr-3"></i> Adicionar';
+            }
+        });
+    }
+
+    // Lógica do Modal de Imagem (acionado ao clicar na imagem principal)
     const imageModal = document.getElementById('image-zoom-modal');
-    if (imageModal) {
-        const openModalBtn = document.getElementById('open-image-modal');
+    const openModalTrigger = document.getElementById('open-image-modal'); // Agora é a própria div da imagem
+    if (imageModal && openModalTrigger) {
         const closeModalBtn = document.getElementById('close-image-modal');
         const modalMainImage = document.getElementById('modal-main-image');
         const thumbnailsContainer = document.getElementById('modal-thumbnails-container');
@@ -2868,36 +2906,27 @@ function initProductPageListeners() {
         let productImages = [];
         let currentImageIndex = 0;
         
-        // Função para atualizar a imagem principal e a miniatura ativa
         const updateModalImage = (index) => {
             if (index < 0 || index >= productImages.length) return;
-            
             currentImageIndex = index;
             modalMainImage.src = productImages[index];
-            
-            // Atualiza a classe 'active' nas miniaturas
             thumbnailsContainer.querySelectorAll('.modal-thumbnail-item').forEach((thumb, i) => {
                 thumb.classList.toggle('active', i === index);
             });
         };
 
-        // Evento para ABRIR o modal
-        openModalBtn.addEventListener('click', () => {
-            // Pega todas as URLs das imagens dos botões de variação
+        openModalTrigger.addEventListener('click', () => {
             const variationButtons = document.querySelectorAll('#product-variations .variation-btn');
-            productImages = Array.from(variationButtons).map(btn => btn.dataset.image);
-
-            // Limpa miniaturas antigas e popula com as novas
+            productImages = [...new Set(Array.from(variationButtons).map(btn => btn.dataset.image))]; // Pega imagens únicas
+            
             thumbnailsContainer.innerHTML = productImages.map((src, index) => 
                 `<img src="${src}" class="modal-thumbnail-item" data-index="${index}" alt="Miniatura ${index + 1}">`
             ).join('');
             
-            // Determina qual imagem abrir. Procura a variação selecionada.
-            const selectedVariation = document.querySelector('#product-variations .variation-btn.selected');
-            const startIndex = Array.from(variationButtons).indexOf(selectedVariation);
+            const currentMainImageSrc = document.getElementById('main-product-image').src;
+            const startIndex = productImages.findIndex(src => src === currentMainImageSrc);
             updateModalImage(startIndex >= 0 ? startIndex : 0);
 
-            // Esconde as setas se houver apenas uma imagem
             const showArrows = productImages.length > 1;
             prevBtn.style.display = showArrows ? 'flex' : 'none';
             nextBtn.style.display = showArrows ? 'flex' : 'none';
@@ -2905,36 +2934,25 @@ function initProductPageListeners() {
             imageModal.classList.add('active');
         });
 
-        // Eventos para FECHAR o modal
         const closeModal = () => imageModal.classList.remove('active');
         closeModalBtn.addEventListener('click', closeModal);
         imageModal.addEventListener('click', (e) => {
             if (e.target === imageModal) closeModal();
         });
 
-        // Evento para NAVEGAÇÃO
-        nextBtn.addEventListener('click', () => {
-            const nextIndex = (currentImageIndex + 1) % productImages.length;
-            updateModalImage(nextIndex);
-        });
-        prevBtn.addEventListener('click', () => {
-            const prevIndex = (currentImageIndex - 1 + productImages.length) % productImages.length;
-            updateModalImage(prevIndex);
-        });
+        nextBtn.addEventListener('click', () => updateModalImage((currentImageIndex + 1) % productImages.length));
+        prevBtn.addEventListener('click', () => updateModalImage((currentImageIndex - 1 + productImages.length) % productImages.length));
 
-        // Evento para cliques nas MINIATURAS
         thumbnailsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-thumbnail-item')) {
-                const index = parseInt(e.target.dataset.index);
-                updateModalImage(index);
+                updateModalImage(parseInt(e.target.dataset.index));
             }
         });
     }
 
-    // Lógica de compartilhamento (permanece a mesma)
+    // Lógica de compartilhamento
     const shareBtn = document.getElementById('share-btn');
     if(shareBtn) {
-        // ... (o código de compartilhamento continua aqui, sem alterações)
         shareBtn.addEventListener('click', async () => {
             const shareData = {
                 title: document.getElementById('product-name').textContent,
@@ -3796,6 +3814,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
