@@ -37,6 +37,25 @@ let state = {};
 let appRoot, loadingOverlay;
 let currentSearchResults = [];
 
+const didYouKnowFacts = [
+    {
+        image: 'https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?q=80&w=1780&auto=format&fit=crop',
+        fact: "Gatos podem fazer cerca de 100 sons diferentes, enquanto os cães fazem apenas cerca de 10."
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2069&auto=format&fit=crop',
+        fact: "O nariz de um cão é tão único quanto uma impressão digital humana e pode ser usado para identificá-lo com precisão."
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?q=80&w=2070&auto=format&fit=crop',
+        fact: "Se um gato consegue passar a cabeça por uma abertura, ele consegue passar o corpo todo, pois não possui clavícula."
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1505628346881-b72b27e84530?q=80&w=1887&auto=format&fit=crop',
+        fact: "Cães têm cerca de 1.700 papilas gustativas, em comparação com as 9.000 dos humanos."
+    },
+];
+
 // --- FUNÇÕES UTILITÁRIAS ---
 const formatCurrency = (val) => parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -670,6 +689,51 @@ async function renderAdminDashboard() {
 }
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE COMPONENTES E PÁGINAS ---
+// --- FUNÇÃO PARA O CARROSSEL "VOCÊ SABIA?" ---
+function initDidYouKnowCarousel() {
+    const carousel = document.getElementById('dyk-carousel');
+    if (!carousel) return; // Só executa se o carrossel estiver na página
+
+    const imageEl = document.getElementById('dyk-image');
+    const factEl = document.getElementById('dyk-fact');
+    const prevBtn = document.getElementById('dyk-prev-btn');
+    const nextBtn = document.getElementById('dyk-next-btn');
+    const shareBtn = document.getElementById('dyk-share-btn');
+
+    let currentIndex = 0;
+
+    function updateCarousel(index, direction) {
+        // Animação de saída
+        imageEl.classList.add('dyk-fade-out');
+        factEl.classList.add('dyk-fade-out');
+
+        setTimeout(() => {
+            // Atualiza o conteúdo
+            currentIndex = (index + didYouKnowFacts.length) % didYouKnowFacts.length;
+            const currentFact = didYouKnowFacts[currentIndex];
+
+            imageEl.src = currentFact.image;
+            factEl.textContent = currentFact.fact;
+
+            // Animação de entrada
+            imageEl.classList.remove('dyk-fade-out');
+            factEl.classList.remove('dyk-fade-out');
+        }, 250); // Metade do tempo da transição do CSS
+    }
+
+    nextBtn.addEventListener('click', () => updateCarousel(currentIndex + 1, 'next'));
+    prevBtn.addEventListener('click', () => updateCarousel(currentIndex - 1, 'prev'));
+
+    shareBtn.addEventListener('click', () => {
+        const currentFact = didYouKnowFacts[currentIndex].fact;
+        const shareText = `🐾 Você sabia? "${currentFact}"\n\nDescubra mais na J.A Pet Clínica!`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        window.open(whatsappUrl, '_blank');
+    });
+
+    // Carrega o primeiro fato
+    updateCarousel(0);
+}
 async function renderDetailedOrderView(orderId) {
     const adminContent = document.getElementById('admin-content');
     if (!adminContent) return;
@@ -2680,6 +2744,7 @@ async function loadPage(pageName, params = {}) {
             case 'home':
                 initSlider();
                 initComparisonSlider();
+				initDidYouKnowCarousel();
                 await renderFeaturedProducts();
                 break;
             case 'cart':
@@ -3844,6 +3909,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
