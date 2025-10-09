@@ -4754,3 +4754,64 @@ input[type='number'] {
     font-size: 0.875rem;
     margin-left: 0.5rem;
 }
+
+/* ================================================================== */
+/* ========== INÍCIO: ESTILOS DA SEÇÃO "VOCÊ SABIA?" ========== */
+/* ================================================================== */
+
+#dyk-carousel {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+#dyk-carousel:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+#dyk-image-container {
+    background-color: #f3f4f6; /* bg-gray-100 */
+}
+
+/* Animação de transição para o texto e imagem */
+#dyk-fact.dyk-fade-out,
+#dyk-image.dyk-fade-out {
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+
+/* Botões de navegação */
+.dyk-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #f3f4f6; /* bg-gray-100 */
+    color: #4b5563; /* text-gray-600 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.dyk-nav-btn:hover {
+    background-color: #e5e7eb; /* bg-gray-200 */
+    color: #1f2937; /* text-gray-800 */
+    transform: scale(1.1);
+}
+
+/* Botão de compartilhar */
+.dyk-share-btn {
+    background-color: #00A8A8; /* Sua cor secundária */
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.dyk-share-btn:hover {
+    background-color: #007f7f; /* Um tom mais escuro */
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 168, 168, 0.3);
+}
