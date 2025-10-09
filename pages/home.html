@@ -512,64 +512,38 @@
     </div>
 </section>
 
-<section class="py-16 bg-gray-50">
+<section id="did-you-know-section" class="bg-gray-50 py-16">
     <div class="container mx-auto px-4">
+        <div id="dyk-carousel" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
+            
+            <div id="dyk-image-container" class="relative min-h-[250px] md:min-h-0">
+                <img id="dyk-image" src="" alt="Curiosidade sobre pets" class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out">
+            </div>
 
-        <a href="#" class="block bg-secondary rounded-2xl shadow-lg p-6 md:p-8 mb-8 text-white overflow-hidden relative">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="flex-1 text-center md:text-left z-10">
-                    <h3 class="text-3xl lg:text-4xl font-extrabold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Aniversário j.A Pet!</h3>
-                    <p class="mt-2 text-lg lg:text-xl text-orange-200 font-medium">Mês de ofertas com prêmios e descontos exclusivos!</p>
-                </div>
-
-                <div class="relative w-48 h-32 md:w-56 md:h-40 flex-shrink-0 z-10">
-                    <img src="https://i.postimg.cc/Xv25P2Y0/cat-banner.png" alt="Gato" class="absolute bottom-0 left-0 h-24 md:h-32 w-auto drop-shadow-lg">
-                    <img src="https://i.postimg.cc/W12bNc13/dog-banner.png" alt="Cachorro" class="absolute bottom-0 right-0 h-32 md:h-40 w-auto drop-shadow-lg">
-                </div>
-
-                <div class="flex-shrink-0 bg-white/20 p-4 rounded-lg text-center z-10 backdrop-blur-sm border border-white/30">
-                    <i class="fas fa-truck text-3xl mb-2"></i>
-                    <p class="font-bold">Frete Grátis</p>
-                    <p class="text-sm">Acima de R$149,90</p>
+            <div id="dyk-content-container" class="p-8 flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Você Sabia?</h2>
+                <p id="dyk-fact" class="text-gray-600 text-lg min-h-[120px] mb-6"></p>
+                
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-4">
+                        <button id="dyk-prev-btn" class="dyk-nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="dyk-next-btn" class="dyk-nav-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <button id="dyk-share-btn" class="dyk-share-btn">
+                        <i class="fas fa-share-alt mr-2"></i>
+                        Compartilhar
+                    </button>
                 </div>
             </div>
-        </a>
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <a href="#" class="flex bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <div class="w-5/12 flex-shrink-0">
-                    <img src="https://i.postimg.cc/T167Rskp/oscar-sutton-yihla-RCCvd4-unsplash-1.jpg" alt="Cachorro feliz deitado em um sofá" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 p-6 md:p-8 relative">
-                    <h3 class="text-2xl font-bold text-gray-800">Ofertas para Cães</h3>
-                    <p class="mt-2 text-gray-600 text-lg">Até <span class="text-primary text-5xl font-extrabold">50</span>% OFF</p>
-                    <span class="inline-block mt-6 bg-primary text-white font-bold py-2 px-6 rounded-full group-hover:bg-orange-700 transition-colors">
-                        Conferir agora
-                    </span>
-                    <div class="absolute bottom-4 right-4 text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19.89,17.22,17,11.31V5a1,1,0,0,0-1-1H8A1,1,0,0,0,7,5v6.31L4.11,17.22A2,2,0,0,0,5,17.92,2.1,2.1,0,0,0,6,20H18a2.1,2.1,0,0,0,1-.08,2,2,0,0,0,.89-2.7ZM9,6h6V8H9ZM16,18H8a2,2,0,0,1-1.89-1.3l2.89-5.7,0-.05V6.35a.35.35,0,0,1,.35-.35h5.3a.35.35,0,0,1,.35.35V9l0,.05,2.89,5.7A2,2,0,0,1,16,18Z" />
-                        </svg>
-                    </div>
-                </div>
-            </a>
-
-            <a href="#" class="flex bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <div class="w-5/12 flex-shrink-0">
-                    <img src="https://images.unsplash.com/photo-1552933529-e359b2477252?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gato fofo deitado em uma manta" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 p-6 md:p-8 relative">
-                    <h3 class="text-2xl font-bold text-gray-800">Ofertas para Gatos</h3>
-                    <p class="mt-2 text-gray-600 text-lg">Até <span class="text-secondary text-5xl font-extrabold">50</span>% OFF</p>
-                    <span class="inline-block mt-6 bg-secondary text-white font-bold py-2 px-6 rounded-full group-hover:bg-teal-700 transition-colors">
-                        Conferir agora
-                    </span>
-                    <div class="absolute bottom-4 right-4 text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19.89,17.22,17,11.31V5a1,1,0,0,0-1-1H8A1,1,0,0,0,7,5v6.31L4.11,17.22A2,2,0,0,0,5,17.92,2.1,2.1,0,0,0,6,20H18a2.1,2.1,0,0,0,1-.08,2,2,0,0,0,.89-2.7ZM9,6h6V8H9ZM16,18H8a2,2,0,0,1-1.89-1.3l2.89-5.7,0-.05V6.35a.35.35,0,0,1,.35-.35h5.3a.35.35,0,0,1,.35.35V9l0,.05,2.89,5.7A2,2,0,0,1,16,18Z" />
-                        </svg>
-                    </div>
-                </div>
+        <div class="text-center mt-12">
+            <a href="#" class="nav-link inline-block bg-white text-primary font-bold py-3 px-8 rounded-full hover:bg-gray-100 shadow" data-page="blog">
+                Descubra mais no nosso Blog <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
     </div>
