@@ -1589,11 +1589,11 @@ async function renderAdminProductEditView(productId) {
             <form id="edit-product-form" class="admin-card p-6" data-product-id="${productId}">
                 <div class="space-y-6">
                     <fieldset>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="admin-form-label">Nome Principal do Produto</label>
-                                <input type="text" id="product-nome" value="${product.nome}" class="admin-form-input">
-                            </div>
+                        <div>
+                            <label class="admin-form-label">Nome Principal do Produto</label>
+                            <input type="text" id="product-nome" value="${product.nome}" class="admin-form-input">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <label class="admin-form-label">Categoria</label>
                                 <input type="text" id="product-category" value="${product.category || ''}" class="admin-form-input">
@@ -1608,13 +1608,11 @@ async function renderAdminProductEditView(productId) {
                             <textarea id="product-description" rows="5" class="admin-form-textarea">${product.description || ''}</textarea>
                         </div>
                     </fieldset>
-
                     <fieldset>
                         <legend class="text-xl font-bold text-gray-800 border-b pb-2 mb-2">Variações do Produto</legend>
                         <div id="variations-container" class="space-y-4">${variationsHTML}</div>
                     </fieldset>
                 </div>
-                
                 <div class="mt-8 flex justify-end">
                     <button type="submit" class="admin-btn btn-primary">
                         <i class="fas fa-save mr-2"></i> Salvar Alterações
@@ -3707,11 +3705,11 @@ function showProductRegistrationForm(xmlProductData, listItemElement) {
                 <button id="modal-close-btn" class="modal-close-button">×</button>
                 <h3 class="text-xl font-bold text-gray-800 mb-4">Cadastrar Novo Produto</h3>
                 <form id="new-product-form">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label for="product-nome" class="admin-form-label">Nome Principal do Produto</label>
-                            <input type="text" id="product-nome" class="admin-form-input" value="${xmlProductData.name}" required>
-                        </div>
+                    <div>
+                        <label for="product-nome" class="admin-form-label">Nome Principal do Produto</label>
+                        <input type="text" id="product-nome" class="admin-form-input" value="${xmlProductData.name}" required>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                         <div>
                             <label for="product-category" class="admin-form-label">Categoria</label>
                             <input type="text" id="product-category" class="admin-form-input" placeholder="Ex: Ração, Brinquedo" required>
@@ -3917,6 +3915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
