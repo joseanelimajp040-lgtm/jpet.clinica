@@ -4815,3 +4815,27 @@ input[type='number'] {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0, 168, 168, 0.3);
 }
+
+/* ================================================================== */
+/* ========== BOTÃO GOOGLE MAPS / TRAÇAR ROTA ========== */
+/* ================================================================== */
+
+.btn-google-maps {
+    background-color: #4285F4; /* Azul padrão do Google */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-google-maps:hover {
+    background-color: #357ae8; /* Um tom de azul mais escuro para o hover */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-google-maps i {
+    font-size: 0.9em; /* Ajusta o tamanho do ícone de rota */
+}
