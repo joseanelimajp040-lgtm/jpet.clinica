@@ -32,33 +32,40 @@
         <h2 class="text-2xl font-bold mb-2 text-gray-800">Confirmar Agendamento</h2>
         <p class="mb-6 text-gray-600">Você está agendando para <strong id="booking-info" class="text-primary"></strong>.</p>
         <form id="booking-form">
-            <div class="mb-4">
-                <label for="booking-tutor-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Tutor</label>
-                <input type="text" id="booking-tutor-name" class="form-input" placeholder="Seu nome completo" required>
-            </div>
-            <div class="mb-4">
-                <label for="booking-pet-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Pet</label>
-                <input type="text" id="booking-pet-name" class="form-input" placeholder="Nome do seu amiguinho" required>
-            </div>
-            <div class="mb-6">
-                <label for="booking-phone-number" class="block text-sm font-medium text-gray-700 mb-1">Telefone para Contato</label>
-                <input type="tel" id="booking-phone-number" class="form-input" placeholder="(83) 90000-0000" required>
-            </div>
-            <label for="booking-address-number" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                <input type="text" id="booking-address-number" class="form-input" placeholder="Ex: 123" required>
-            </div>
-          </div>
-
-          <div class="mb-6">
-              <label for="booking-address-neighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-              <input type="text" id="booking-address-neighborhood" class="form-input" placeholder="Ex: Valentina de Figueiredo" required>
-          </div>
-          <input type="hidden" id="booking-day">
-          <input type="hidden" id="booking-time">
-          <button type="submit" class="w-full bg-primary hover:bg-orange-700 text-white py-3 rounded-lg font-bold">Confirmar</button>
-        </form>
+    <div class="mb-4">
+        <label for="booking-tutor-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Tutor</label>
+        <input type="text" id="booking-tutor-name" class="form-input" placeholder="Seu nome completo" required>
     </div>
-</div>
+    <div class="mb-4">
+        <label for="booking-pet-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Pet</label>
+        <input type="text" id="booking-pet-name" class="form-input" placeholder="Nome do seu amiguinho" required>
+    </div>
+    <div class="mb-6">
+        <label for="booking-phone-number" class="block text-sm font-medium text-gray-700 mb-1">Telefone para Contato</label>
+        <input type="tel" id="booking-phone-number" class="form-input" placeholder="(83) 90000-0000" required>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div class="md:col-span-2">
+          <label for="booking-address-street" class="block text-sm font-medium text-gray-700 mb-1">Endereço (Rua/Avenida)</label>
+          <input type="text" id="booking-address-street" class="form-input" placeholder="Ex: Rua das Acácias" required>
+      </div>
+      <div>
+          <label for="booking-address-number" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+          <input type="text" id="booking-address-number" class="form-input" placeholder="Ex: 123" required>
+      </div>
+    </div>
+
+    <div class="mb-6">
+        <label for="booking-address-neighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+        <input type="text" id="booking-address-neighborhood" class="form-input" placeholder="Ex: Valentina de Figueiredo" required>
+    </div>
+    
+    <input type="hidden" id="booking-day">
+    <input type="hidden" id="booking-time">
+
+    <button type="submit" class="w-full bg-primary hover:bg-orange-700 text-white py-3 rounded-lg font-bold">Confirmar Agendamento</button>
+</form>
 
 <div id="appointment-details-modal" class="modal">
     <div class="modal-content relative">
@@ -93,4 +100,5 @@
         </button>
     </div>
 </div>
+
 
