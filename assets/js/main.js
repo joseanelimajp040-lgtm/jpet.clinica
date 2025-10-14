@@ -886,24 +886,24 @@ async function renderAdminGroomingView() {
             const periodIcon = period === 'Manhã' ? 'fa-sun text-yellow-500' : 'fa-moon text-indigo-500';
 
             return `
-            <div class="admin-card order-card" data-appointment-id="${appointmentId}">
-                <div class="card-header">
-                    <div>
-                        <p class="font-bold text-gray-800 text-lg">${appointment.petName} <span class="font-normal text-base">(Tutor: ${appointment.tutorName})</span></p>
-                        <p class="text-sm text-gray-500">Contato: ${appointment.phoneNumber || 'Não informado'}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-semibold text-secondary text-lg">${appointment.day} às ${appointment.time}</p>
-                        <p class="text-sm text-gray-500 mt-1"><i class="fas ${periodIcon} mr-1"></i>Período da ${period}</p>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <button class="admin-btn btn-danger delete-grooming-btn" data-appointment-id="${appointmentId}"><i class="fas fa-trash-alt"></i> Excluir</button>
-                    <button class="admin-btn btn-whatsapp send-grooming-whatsapp-btn" data-appointment-id="${appointmentId}"><i class="fab fa-whatsapp"></i> Contato</button>
-                </div>
-            </div>
-            `;
-        }).join('');
+          <div class="admin-card order-card grooming-details-trigger cursor-pointer" data-appointment-id="${appointmentId}">
+              <div class="card-header">
+                  <div>
+                      <p class="font-bold text-gray-800 text-lg">${appointment.petName} <span class="font-normal text-base">(Tutor: ${appointment.tutorName})</span></p>
+                      <p class="text-sm text-gray-500">Contato: ${appointment.phoneNumber || 'Não informado'}</p>
+                  </div>
+                  <div class="text-right">
+                      <p class="font-semibold text-secondary text-lg">${appointment.day} às ${appointment.time}</p>
+                      <p class="text-sm text-gray-500 mt-1"><i class="fas ${periodIcon} mr-1"></i>Período da ${period}</p>
+                  </div>
+              </div>
+              <div class="card-footer">
+                  <button class="admin-btn btn-danger delete-grooming-btn" data-appointment-id="${appointmentId}"><i class="fas fa-trash-alt"></i> Excluir</button>
+                  <button class="admin-btn btn-whatsapp send-grooming-whatsapp-btn" data-appointment-id="${appointmentId}"><i class="fab fa-whatsapp"></i> Contato</button>
+              </div>
+          </div>
+          `;
+      }).join('');
     };
 
     // ✅ ALTERAÇÃO 1: Adicionado "where('status', '!=', 'Concluído')" para buscar apenas agendamentos pendentes.
@@ -913,21 +913,119 @@ async function renderAdminGroomingView() {
         renderList(snapshot.docs);
     });
 
-    // Adiciona os eventos para os botões de "Excluir" e "Contato"
-    groomingListEl.addEventListener('click', async (e) => {
-        const deleteBtn = e.target.closest('.delete-grooming-btn');
-        if (deleteBtn) {
-            const appointmentId = deleteBtn.dataset.appointmentId;
-            // ✅ ALTERAÇÃO 2: Em vez de confirm(), chamamos a função que abre o novo modal.
-            openGroomingActionModal(appointmentId); 
+    // Adiciona os eventos para os botões de "Excluir", "Contato" e para o clique no card
+   groomingListEl.addEventListener('click', async (e) => {
+       // Primeiro, encontra o card pai mais próximo que foi clicado
+       const appointmentCard = e.target.closest('.order-card');
+       if (!appointmentCard) return; // Se não clicou dentro de um card, não faz nada
+
+       const appointmentId = appointmentCard.dataset.appointmentId;
+
+       // VERIFICAÇÃO 1: O clique foi no botão de excluir?
+       if (e.target.closest('.delete-grooming-btn')) {
+           openGroomingActionModal(appointmentId);
+           return; // Para a execução para não abrir o modal de detalhes também
+       }
+
+       // VERIFICAÇÃO 2: O clique foi no botão do WhatsApp?
+       if (e.target.closest('.send-grooming-whatsapp-btn')) {
+           handleSendGroomingWhatsAppMessage(appointmentId);
+           return; // Para a execução
+       }
+
+       // VERIFICAÇÃO 3: Se não foi em nenhum botão, foi no card com a classe de gatilho?
+       if (e.target.closest('.grooming-details-trigger')) {
+           renderGroomingDetailsModal(appointmentId); // Chama a nova função do modal de detalhes
+       }
+   });
+}
+/**
+ * Renderiza um modal com os detalhes completos de um agendamento de banho e tosa.
+ * @param {string} appointmentId - O ID do agendamento no Firestore.
+ */
+async function renderGroomingDetailsModal(appointmentId) {
+    // Mostra um feedback de carregamento
+    const loadingModalHTML = `
+        <div id="grooming-details-modal" class="admin-modal-overlay">
+            <div class="admin-modal-content"><p>Carregando detalhes do agendamento...</p></div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', loadingModalHTML);
+
+    try {
+        const appointmentSnap = await getDoc(doc(db, 'groomingAppointments', appointmentId));
+        if (!appointmentSnap.exists()) {
+            throw new Error("Agendamento não encontrado.");
         }
 
-        const whatsappBtn = e.target.closest('.send-grooming-whatsapp-btn');
-        if (whatsappBtn) {
-            const appointmentId = whatsappBtn.dataset.appointmentId;
-            handleSendGroomingWhatsAppMessage(appointmentId);
-        }
-    });
+        const appointment = appointmentSnap.data();
+
+        // Constrói o endereço completo para o Google Maps
+        const addressParts = [
+            appointment.address?.street,
+            appointment.address?.number,
+            appointment.address?.neighborhood,
+        ].filter(part => part); // Filtra partes vazias
+        const fullAddress = addressParts.join(', ');
+
+        // Gera o link do Google Maps apenas se houver um endereço
+        const googleMapsLinkHTML = fullAddress
+            ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}" target="_blank" class="btn-google-maps mt-4 inline-flex items-center gap-2 text-sm font-medium">
+                   <i class="fas fa-route"></i> Traçar Rota
+               </a>`
+            : '<p class="text-sm text-gray-400 mt-4">Endereço não fornecido para traçar rota.</p>';
+
+        const modalHTML = `
+            <div id="grooming-details-modal" class="admin-modal-overlay">
+                <div class="admin-modal-content">
+                    <button id="modal-close-btn" class="modal-close-button">×</button>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                        Detalhes do Agendamento
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">CLIENTE E PET</h4>
+                                <p><strong class="w-16 inline-block">Tutor:</strong> ${appointment.tutorName}</p>
+                                <p><strong class="w-16 inline-block">Pet:</strong> ${appointment.petName}</p>
+                                <p><strong class="w-16 inline-block">Contato:</strong> ${appointment.phoneNumber}</p>
+                            </div>
+                             <div>
+                                <h4 class="font-bold text-gray-600 mb-1">DATA E HORA</h4>
+                                <p class="font-semibold text-secondary text-lg">${appointment.day} às ${appointment.time}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-600 mb-1">ENDEREÇO</h4>
+                                <p>${appointment.address?.street || 'Rua não informada'}, ${appointment.address?.number || 'S/N'}</p>
+                                <p>${appointment.address?.neighborhood || 'Bairro não informado'}</p>
+                                ${googleMapsLinkHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove o modal de loading e insere o modal com os detalhes
+        document.getElementById('grooming-details-modal')?.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Adiciona listeners para fechar o modal
+        const modal = document.getElementById('grooming-details-modal');
+        document.getElementById('modal-close-btn').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar detalhes do agendamento:", error);
+        alert(`Não foi possível carregar os detalhes: ${error.message}`);
+        document.getElementById('grooming-details-modal')?.remove();
+    }
 }
 async function openGroomingActionModal(appointmentId) {
     // Cria o HTML do modal dinamicamente
@@ -3131,6 +3229,11 @@ function initBanhoTosaEventListeners() {
                 tutorName: document.getElementById('booking-tutor-name').value,
                 petName: document.getElementById('booking-pet-name').value,
                 phoneNumber: document.getElementById('booking-phone-number').value,
+				address: {
+                    street: document.getElementById('booking-address-street').value,
+                    number: document.getElementById('booking-address-number').value,
+                    neighborhood: document.getElementById('booking-address-neighborhood').value
+                },
                 status: 'Agendado',
                 createdAt: serverTimestamp()
             };
@@ -3951,6 +4054,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
