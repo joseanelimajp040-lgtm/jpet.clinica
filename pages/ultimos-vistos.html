@@ -1,0 +1,24 @@
+<main class="bg-gray-50 py-8 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h1 class="text-3xl font-bold text-gray-800">Vistos Recentemente</h1>
+            <button id="clear-history-btn" class="text-sm font-medium text-red-600 hover:text-red-800 transition-colors hidden">
+                <i class="fas fa-trash-alt mr-1"></i> Limpar Histórico
+            </button>
+        </div>
+
+        <div id="recently-viewed-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+
+        <div id="recently-viewed-empty-state" class="text-center py-20 hidden">
+            <div class="inline-block bg-gray-200 p-6 rounded-full">
+                <i class="fas fa-history text-6xl text-gray-400"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mt-6 mb-2">Seu histórico está vazio</h2>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">Os produtos que você visualizar e as buscas que realizar aparecerão aqui para fácil acesso.</p>
+            <a href="#" class="nav-link inline-block bg-primary text-white font-bold py-3 px-8 rounded-full hover:bg-orange-700 transition-transform hover:scale-105" data-page="home">
+                Começar a navegar
+            </a>
+        </div>
+    </div>
+</main>
