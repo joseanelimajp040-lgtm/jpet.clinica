@@ -1996,7 +1996,94 @@ function renderModernCalendar() {
         container.innerHTML += columnHTML;
     }
 }
+const MAX_RECENT_ITEMS = 20; // Define um limite de 20 itens no histórico
 
+/**
+ * Adiciona um item (produto ou busca) ao histórico de itens recentes.
+ * @param {object} itemData - O objeto do item a ser adicionado.
+ */
+function addRecentlyViewedItem(itemData) {
+    let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+
+    // Remove a instância anterior do mesmo item para evitar duplicatas e movê-lo para o topo
+    recentlyViewed = recentlyViewed.filter(item => {
+        if (item.type === 'product' && itemData.type === 'product') {
+            return item.id !== itemData.id;
+        }
+        if (item.type === 'search' && itemData.type === 'search') {
+            // Compara os termos de busca ignorando maiúsculas/minúsculas
+            return item.term.toLowerCase() !== itemData.term.toLowerCase();
+        }
+        return true;
+    });
+
+    // Adiciona o novo item no início da lista
+    recentlyViewed.unshift(itemData);
+
+    // Limita o tamanho do histórico
+    recentlyViewed = recentlyViewed.slice(0, MAX_RECENT_ITEMS);
+
+    // Salva a lista atualizada no localStorage
+    localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+}
+
+
+/**
+ * Renderiza a página "Últimos Itens Vistos" com base nos dados do localStorage.
+ */
+function renderUltimosVistosPage() {
+    const container = document.getElementById('recently-viewed-container');
+    const emptyState = document.getElementById('recently-viewed-empty-state');
+    const clearBtn = document.getElementById('clear-history-btn');
+
+    if (!container || !emptyState || !clearBtn) return;
+
+    const items = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+
+    if (items.length === 0) {
+        container.innerHTML = '';
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        clearBtn.classList.add('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    clearBtn.classList.remove('hidden');
+
+    container.innerHTML = items.map(item => {
+        if (item.type === 'product') {
+            // Reutiliza a sua função existente para criar cards de produto
+            return createProductCardHTML(item.data, item.id);
+        }
+        if (item.type === 'search') {
+            // Cria um card especial para termos de busca
+            return `
+                <a href="#" class="nav-link search-history-card" data-page="busca" data-query="${item.term}">
+                    <div class="search-history-icon"><i class="fas fa-search"></i></div>
+                    <div class="search-history-info">
+                        <p class="search-history-label">Você buscou por:</p>
+                        <h3 class="search-history-term">"${item.term}"</h3>
+                    </div>
+                    <div class="search-history-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+            `;
+        }
+        return '';
+    }).join('');
+
+    // Adiciona o evento de clique para o botão de limpar histórico
+    clearBtn.addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja limpar seu histórico de itens vistos?')) {
+            localStorage.removeItem('recentlyViewed');
+            renderUltimosVistosPage(); // Re-renderiza a página para mostrar o estado vazio
+        }
+    });
+
+    // Atualiza os ícones de coração (favoritos) dos produtos renderizados
+    updateAllHeartIcons();
+}
 async function renderFeaturedProducts() {
     const container = document.getElementById('featured-products-container');
     if (!container) return;
@@ -2114,6 +2201,11 @@ async function renderProductPage(productId) {
         }
 
         const productData = docSnap.data();
+		addRecentlyViewedItem({
+            type: 'product',
+            id: productId,
+            data: productData // Armazena os dados do produto para re-renderizar o card
+        });
         if (!productData.variations || productData.variations.length === 0) {
             appRoot.innerHTML = `<p class="text-center text-red-500 py-20">Erro: Produto sem variações cadastradas.</p>`;
             return;
@@ -2383,7 +2475,10 @@ function renderStarRating(reviews) {
 async function renderBuscaPage(params) {
     const searchTerm = params.query || '';
     const searchCategory = params.category || ''; // <-- NOVA LINHA
-
+const termToSave = searchTerm || searchCategory;
+    if (termToSave) {
+        addRecentlyViewedItem({ type: 'search', term: termToSave });
+    }
     const grid = document.getElementById('products-grid');
     const countEl = document.getElementById('products-count');
     const titleEl = document.querySelector('#app-root h1');
@@ -2872,6 +2967,9 @@ async function loadPage(pageName, params = {}) {
              break;
             case 'produtos':
                 await renderProdutosPage();
+                break;
+			case 'ultimos-vistos':
+                renderUltimosVistosPage();
                 break;
             case 'promocoes':
                 await renderPromocoesPage();
@@ -4054,6 +4152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
