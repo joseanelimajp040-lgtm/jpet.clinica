@@ -4839,3 +4839,71 @@ input[type='number'] {
 .btn-google-maps i {
     font-size: 0.9em; /* Ajusta o tamanho do ícone de rota */
 }
+
+/* ================================================================== */
+/* ========== ESTILOS PARA PÁGINA "VISTOS RECENTEMENTE" ========== */
+/* ================================================================== */
+
+.search-history-card {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    border-radius: 12px;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    grid-column: 1 / -1; /* Faz o card de busca ocupar a largura inteira da grid */
+}
+
+.search-history-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--secondary-color);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07);
+}
+
+.search-history-icon {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f1f5f9; /* slate-100 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem; /* 28px */
+    color: var(--secondary-color);
+    transition: transform 0.3s ease;
+}
+
+.search-history-card:hover .search-history-icon {
+    transform: scale(1.1);
+}
+
+.search-history-info {
+    flex-grow: 1;
+}
+
+.search-history-label {
+    font-size: 0.875rem; /* 14px */
+    color: #64748b; /* slate-500 */
+}
+
+.search-history-term {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 600;
+    color: #1e293b; /* slate-800 */
+}
+
+.search-history-arrow {
+    font-size: 1.25rem;
+    color: #94a3b8; /* slate-400 */
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.search-history-card:hover .search-history-arrow {
+    transform: translateX(5px);
+    color: var(--primary-color);
+}
