@@ -4988,3 +4988,189 @@ input[type='number'] {
     background-size: 100% 2px;
     color: var(--primary-color);
 }
+
+/* ================================================================== */
+/* ========== MODO BLACK FRIDAY (TEMA ESCURO & ARTE) ================ */
+/* ================================================================== */
+
+/* --- 1. Variáveis e Overrides Globais --- */
+body.black-friday-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0;
+}
+
+/* Inverte cards brancos para cinza escuro */
+body.black-friday-mode .bg-white,
+body.black-friday-mode .os-card,
+body.black-friday-mode .service-card,
+body.black-friday-mode .product-card,
+body.black-friday-mode .product-card-v2,
+body.black-friday-mode .admin-card,
+body.black-friday-mode .modal-content {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+}
+
+/* Inverte fundos cinza claros para preto/cinza bem escuro */
+body.black-friday-mode .bg-gray-50,
+body.black-friday-mode .bg-gray-100,
+body.black-friday-mode .bg-light {
+    background-color: #000000 !important;
+    color: #cccccc !important;
+}
+
+/* Ajusta textos escuros para claros */
+body.black-friday-mode .text-gray-800,
+body.black-friday-mode .text-gray-700,
+body.black-friday-mode .text-gray-600 {
+    color: #d1d5db !important; /* Cinza claro */
+}
+
+/* Ajusta inputs */
+body.black-friday-mode input,
+body.black-friday-mode select,
+body.black-friday-mode textarea {
+    background-color: #2d2d2d !important;
+    color: white !important;
+    border-color: #444 !important;
+}
+
+/* Ajusta Navbar e Footer (se já não tiverem cor fixa) */
+body.black-friday-mode nav, 
+body.black-friday-mode footer {
+    border-color: #333;
+}
+
+/* Preços ganham destaque Neon */
+body.black-friday-mode .current-price,
+body.black-friday-mode .text-primary {
+    color: #ff5e00 !important;
+    text-shadow: 0 0 5px rgba(255, 94, 0, 0.4);
+}
+
+/* Ajuste específico para o Header (evitar fundo branco) */
+body.black-friday-mode header {
+    background-color: #1a1a1a !important;
+}
+
+/* --- 2. Painel com Arte CSS (Banner Black Friday) --- */
+.bf-panel-container {
+    width: 100%;
+    background-color: #000;
+    padding: 2rem 1rem;
+    text-align: center;
+    border-bottom: 4px solid #ff5e00;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    /* Padrão de fundo sutil */
+    background-image: 
+        linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111),
+        linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+/* Texto Neon Principal */
+.bf-neon-text {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    color: white;
+    text-transform: uppercase;
+    /* Efeito Neon Branco/Laranja */
+    text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px #ff5e00,
+        0 0 35px #ff5e00,
+        0 0 40px #ff5e00;
+    animation: bf-pulse 1.5s infinite alternate;
+}
+
+/* Efeito de piscar na palavra "FRIDAY" */
+.bf-flicker {
+    animation: bf-flicker 2s infinite;
+}
+
+.bf-subtext {
+    font-family: 'Courier New', monospace;
+    color: #00A8A8;
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(0, 168, 168, 0.8);
+}
+
+/* Animações */
+@keyframes bf-pulse {
+    from {
+        text-shadow: 
+            0 0 5px #fff,
+            0 0 10px #fff,
+            0 0 20px #ff5e00,
+            0 0 35px #ff5e00;
+    }
+    to {
+        text-shadow: 
+            0 0 10px #fff,
+            0 0 20px #fff,
+            0 0 30px #ff5e00,
+            0 0 50px #ff5e00,
+            0 0 70px #ff5e00;
+    }
+}
+
+@keyframes bf-flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 1;
+    }
+    20%, 24%, 55% {
+        opacity: 0.4;
+    }
+}
+
+/* Partículas/Confetes Caindo (Efeito CSS Puro) */
+.bf-particles::before, .bf-particles::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    width: 10px;
+    height: 10px;
+    background: #ff5e00;
+    border-radius: 50%;
+    animation: bf-drop 3s linear infinite;
+    box-shadow: 
+        20vw 10vh 0 #00A8A8,
+        -15vw 25vh 0 #fff,
+        30vw 15vh 0 #ff5e00,
+        -40vw 5vh 0 #00A8A8,
+        10vw 40vh 0 #fff;
+}
+
+.bf-particles::after {
+    animation-delay: 1.5s;
+    top: -60px;
+    width: 8px;
+    height: 8px;
+    box-shadow: 
+        -20vw 15vh 0 #ff5e00,
+        15vw 35vh 0 #fff,
+        -30vw 25vh 0 #00A8A8,
+        40vw 10vh 0 #ff5e00,
+        -10vw 50vh 0 #fff;
+}
+
+@keyframes bf-drop {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(300px); opacity: 0; }
+}
+
+/* Responsividade do Banner */
+@media (max-width: 768px) {
+    .bf-neon-text { font-size: 2.5rem; }
+    .bf-subtext { font-size: 1rem; }
+}
