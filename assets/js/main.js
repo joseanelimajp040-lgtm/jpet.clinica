@@ -3406,6 +3406,7 @@ function initBanhoTosaEventListeners() {
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
 // Função para inserir o Banner CSS de Black Friday
 function insertBlackFridayBanner() {
+    // Evita duplicar se já existir
     if (document.getElementById('bf-banner-panel')) return;
 
     const bannerHTML = `
@@ -3418,12 +3419,12 @@ function insertBlackFridayBanner() {
             <div class="bf-particles"></div>
         </div>
     `;
-    // Insere no topo do app-root ou body
-    const appRoot = document.getElementById('app-root');
-    if(appRoot) appRoot.insertAdjacentHTML('afterbegin', bannerHTML);
+    
+    // ALTERAÇÃO AQUI: Inserir no body (prepend) ao invés do appRoot
+    // Isso coloca o banner no topo absoluto do site, fora da área que recarrega
+    document.body.insertAdjacentHTML('afterbegin', bannerHTML);
 }
 
-// Função para remover o Banner
 function removeBlackFridayBanner() {
     const banner = document.getElementById('bf-banner-panel');
     if (banner) banner.remove();
@@ -4239,6 +4240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
