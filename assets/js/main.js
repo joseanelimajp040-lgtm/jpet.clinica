@@ -1132,72 +1132,121 @@ async function renderAdminSettingsView() {
             <p>Controle configurações importantes do seu site.</p>
         </header>
 
-        <div class="admin-card p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Modo Manutenção</h2>
-            <p class="text-gray-600 mb-6">
-                Ao ativar, apenas administradores logados poderão acessar o site. 
-                Visitantes e clientes comuns verão uma página de manutenção.
-            </p>
-            
-            <div class="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
-                <span id="maintenance-status-text" class="font-semibold text-gray-700">Verificando status...</span>
-                <button id="toggle-maintenance-btn" class="admin-btn" disabled>
-                    Aguarde
-                </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="admin-card p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Modo Manutenção</h2>
+                <p class="text-gray-600 mb-6 text-sm">
+                    Bloqueia o acesso de clientes ao site. Apenas admins logados podem acessar.
+                </p>
+                <div class="flex flex-col gap-2">
+                    <span id="maintenance-status-text" class="font-semibold text-gray-700 text-sm">Verificando...</span>
+                    <button id="toggle-maintenance-btn" class="admin-btn w-full justify-center" disabled>
+                        Aguarde
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-card p-6 border-2 border-black">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-tag text-black text-xl"></i>
+                    <h2 class="text-xl font-bold text-gray-800">Modo Black Friday</h2>
+                </div>
+                <p class="text-gray-600 mb-6 text-sm">
+                    Transforma o site para o tema escuro e exibe o banner promocional no topo.
+                </p>
+                <div class="flex flex-col gap-2">
+                    <span id="bf-status-text" class="font-semibold text-gray-700 text-sm">Verificando...</span>
+                    <button id="toggle-bf-btn" class="admin-btn w-full justify-center" disabled>
+                        Aguarde
+                    </button>
+                </div>
             </div>
         </div>
     `;
 
-    const toggleBtn = document.getElementById('toggle-maintenance-btn');
-    const statusText = document.getElementById('maintenance-status-text');
+    const maintBtn = document.getElementById('toggle-maintenance-btn');
+    const maintStatus = document.getElementById('maintenance-status-text');
+    const bfBtn = document.getElementById('toggle-bf-btn');
+    const bfStatus = document.getElementById('bf-status-text');
     
     // Caminho para o documento de configurações no Firestore
     const settingsRef = doc(db, 'settings', 'siteStatus');
 
-    // Função para atualizar a aparência do botão
-    const updateUI = (isMaintenanceMode) => {
-        if (isMaintenanceMode) {
-            statusText.textContent = "O modo manutenção está ATIVADO.";
-            toggleBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i> Desativar Modo Manutenção';
-            toggleBtn.classList.remove('btn-primary');
-            toggleBtn.classList.add('btn-danger');
+    // Função auxiliar para atualizar UI
+    const updateUI = (data) => {
+        // Manutenção
+        const isMaintenance = data?.isMaintenance || false;
+        if (isMaintenance) {
+            maintStatus.textContent = "Status: ATIVADO";
+            maintStatus.className = "font-bold text-red-600 text-sm";
+            maintBtn.innerHTML = '<i class="fas fa-power-off"></i> Desativar Manutenção';
+            maintBtn.className = "admin-btn btn-danger w-full justify-center";
         } else {
-            statusText.textContent = "O modo manutenção está DESATIVADO.";
-            toggleBtn.innerHTML = '<i class="fas fa-power-off mr-2"></i> Ativar Modo Manutenção';
-            toggleBtn.classList.remove('btn-danger');
-            toggleBtn.classList.add('btn-primary');
+            maintStatus.textContent = "Status: DESATIVADO";
+            maintStatus.className = "font-bold text-green-600 text-sm";
+            maintBtn.innerHTML = '<i class="fas fa-power-off"></i> Ativar Manutenção';
+            maintBtn.className = "admin-btn btn-primary w-full justify-center";
         }
-        toggleBtn.disabled = false;
+        maintBtn.disabled = false;
+
+        // Black Friday
+        const isBlackFriday = data?.isBlackFriday || false;
+        if (isBlackFriday) {
+            bfStatus.textContent = "Status: ATIVADO (Tema Escuro)";
+            bfStatus.className = "font-bold text-purple-600 text-sm";
+            bfBtn.innerHTML = '<i class="fas fa-moon"></i> Desativar Black Friday';
+            bfBtn.className = "admin-btn bg-gray-800 text-white hover:bg-gray-900 w-full justify-center";
+        } else {
+            bfStatus.textContent = "Status: DESATIVADO (Tema Padrão)";
+            bfStatus.className = "font-bold text-gray-500 text-sm";
+            bfBtn.innerHTML = '<i class="fas fa-sun"></i> Ativar Black Friday';
+            bfBtn.className = "admin-btn bg-black text-white hover:bg-gray-800 w-full justify-center";
+        }
+        bfBtn.disabled = false;
     };
 
-    // Ouve por mudanças em tempo real no documento
+    // Listener em tempo real
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
-            const isMaintenanceMode = docSnap.data().isMaintenance;
-            updateUI(isMaintenanceMode);
+            updateUI(docSnap.data());
         } else {
-            // Se o documento não existe, considera que a manutenção está desligada
-            updateUI(false);
+            updateUI({});
         }
     });
 
-    // Evento de clique para ligar/desligar
-    toggleBtn.addEventListener('click', async () => {
-        toggleBtn.disabled = true;
-        toggleBtn.textContent = 'Alterando...';
-        
+    // Handler Manutenção
+    maintBtn.addEventListener('click', async () => {
+        maintBtn.disabled = true;
         try {
             const docSnap = await getDoc(settingsRef);
-            const newStatus = !docSnap.exists() || !docSnap.data().isMaintenance;
-            // setDoc com { merge: true } cria o documento se não existir, ou atualiza se já existir.
-            await setDoc(settingsRef, { isMaintenance: newStatus }, { merge: true });
-            // A UI será atualizada automaticamente pelo onSnapshot
+            const current = docSnap.exists() ? docSnap.data().isMaintenance : false;
+            await setDoc(settingsRef, { isMaintenance: !current }, { merge: true });
         } catch (error) {
-            console.error("Erro ao alterar o modo de manutenção:", error);
-            alert('Falha ao alterar o status. Tente novamente.');
-            // Reabilita o botão em caso de erro
+            console.error(error);
+            alert('Erro ao alterar manutenção.');
+        }
+    });
+
+    // Handler Black Friday
+    bfBtn.addEventListener('click', async () => {
+        bfBtn.disabled = true;
+        try {
             const docSnap = await getDoc(settingsRef);
-            updateUI(docSnap.exists() && docSnap.data().isMaintenance);
+            const current = docSnap.exists() ? docSnap.data().isBlackFriday : false;
+            // Atualiza no banco
+            await setDoc(settingsRef, { isBlackFriday: !current }, { merge: true });
+            
+            // Força atualização visual imediata para o admin ver o efeito
+            if (!current) {
+                document.body.classList.add('black-friday-mode');
+                insertBlackFridayBanner();
+            } else {
+                document.body.classList.remove('black-friday-mode');
+                removeBlackFridayBanner();
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao alterar Black Friday.');
         }
     });
 }
@@ -3355,18 +3404,56 @@ function initBanhoTosaEventListeners() {
 }
 
 // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA APLICAÇÃO ---
+// Função para inserir o Banner CSS de Black Friday
+function insertBlackFridayBanner() {
+    if (document.getElementById('bf-banner-panel')) return;
+
+    const bannerHTML = `
+        <div id="bf-banner-panel" class="bf-panel-container">
+            <div class="bf-neon-text">
+                <span>BLACK</span>
+                <span class="bf-flicker">FRIDAY</span>
+            </div>
+            <div class="bf-subtext">Descontos Monstruosos na J.A Pet</div>
+            <div class="bf-particles"></div>
+        </div>
+    `;
+    // Insere no topo do app-root ou body
+    const appRoot = document.getElementById('app-root');
+    if(appRoot) appRoot.insertAdjacentHTML('afterbegin', bannerHTML);
+}
+
+// Função para remover o Banner
+function removeBlackFridayBanner() {
+    const banner = document.getElementById('bf-banner-panel');
+    if (banner) banner.remove();
+}
 async function startApplication() {
-	 const settingsRef = doc(db, 'settings', 'siteStatus');
+    const settingsRef = doc(db, 'settings', 'siteStatus');
     try {
         const docSnap = await getDoc(settingsRef);
         
-        // A lógica agora funciona, pois esta função só será chamada DEPOIS do login ser verificado.
-        if (docSnap.exists() && docSnap.data().isMaintenance && (!state.loggedInUser || state.loggedInUser.role !== 'admin')) {
-            document.body.innerHTML = await (await fetch('pages/maintenance.html')).text();
-            return;
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            // Lógica Manutenção (Mantida)
+            if (data.isMaintenance && (!state.loggedInUser || state.loggedInUser.role !== 'admin')) {
+                document.body.innerHTML = await (await fetch('pages/maintenance.html')).text();
+                return;
+            }
+
+            // Lógica Black Friday (NOVA)
+            if (data.isBlackFriday) {
+                document.body.classList.add('black-friday-mode');
+                // Aguarda o DOM carregar um pouco para inserir o banner
+                setTimeout(() => insertBlackFridayBanner(), 500); 
+            } else {
+                document.body.classList.remove('black-friday-mode');
+                removeBlackFridayBanner();
+            }
         }
     } catch (error) {
-        console.error("Erro ao verificar o modo de manutenção:", error);
+        console.error("Erro ao verificar status do site:", error);
     }
     await Promise.all([
         loadComponent('components/header.html', 'header-placeholder'),
@@ -4152,6 +4239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
