@@ -5174,3 +5174,41 @@ body.black-friday-mode header {
     .bf-neon-text { font-size: 2.5rem; }
     .bf-subtext { font-size: 1rem; }
 }
+
+/* --- Melhoria das Imagens na Black Friday --- */
+
+/* 1. Arredonda e suaviza o container da imagem */
+body.black-friday-mode .product-image-container,
+body.black-friday-mode .product-list-item-thumbnail {
+    background-color: #000000; /* Fundo preto puro atrás da imagem */
+    border-radius: 15px; /* Bordas bem arredondadas */
+    overflow: hidden;
+    position: relative;
+}
+
+/* 2. Aplica a máscara na imagem para "fundir" com o preto */
+body.black-friday-mode .product-card-image,
+body.black-friday-mode .product-list-item-thumbnail img,
+body.black-friday-mode .modal-main-image-wrapper img {
+    /* Arredonda a própria imagem */
+    border-radius: 15px; 
+    
+    /* EFEITO MÁGICO: Cria uma vinheta que apaga as bordas brancas duras */
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+    
+    /* Garante que a imagem não toque nas bordas do container */
+    transform: scale(0.95); 
+    transition: transform 0.3s ease;
+}
+
+/* Efeito de Zoom suave ao passar o mouse (mantendo a máscara) */
+body.black-friday-mode .product-card-v2:hover .product-card-image {
+    transform: scale(1.05);
+}
+
+/* 3. Ajuste opcional para o Card do Produto para destacar no fundo preto */
+body.black-friday-mode .product-card-v2 {
+    border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(255, 107, 0, 0.15); /* Sombra laranja fraca */
+}
