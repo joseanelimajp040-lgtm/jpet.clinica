@@ -1741,9 +1741,26 @@ input[type='number'] {
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
+    
+    /* MODIFICAÇÃO 1: Adicionamos um delay na transição */
+    /* Isso faz o menu esperar 0.2s antes de sumir, dando tempo para o mouse chegar */
     transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s;
-    pointer-events: none; /* Impede interação quando escondido */
-    border-top: 3px solid #FF6B00; /* Detalhe laranja no topo */
+    transition-delay: 0.1s; 
+    
+    pointer-events: none;
+    border-top: 3px solid #FF6B00;
+}
+
+/* MODIFICAÇÃO 2: A Ponte Invisível */
+/* Isso cria uma área transparente acima do menu que preenche o buraco vazio */
+.user-menu-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -20px; /* Estende a área sensível para cima em direção ao botão */
+    left: 0;
+    width: 100%;
+    height: 20px; /* Altura da ponte */
+    background: transparent; /* Invisível */
 }
 
 /* Efeito de hover: mostra o dropdown */
@@ -1751,12 +1768,10 @@ input[type='number'] {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    pointer-events: auto; /* Permite clicar nos itens */
-}
-
-/* Gira a setinha para baixo quando o menu está aberto */
-.user-menu-container:hover .fa-chevron-down {
-    transform: rotate(180deg);
+    pointer-events: auto;
+    
+    /* Quando o mouse entra, o menu aparece instantaneamente (sem delay) */
+    transition-delay: 0s; 
 }
 
 /* Estilo para cada item/link no dropdown */
@@ -5212,3 +5227,4 @@ body.black-friday-mode .product-card-v2 {
     border: 1px solid #333;
     box-shadow: 0 4px 20px rgba(255, 107, 0, 0.15); /* Sombra laranja fraca */
 }
+
