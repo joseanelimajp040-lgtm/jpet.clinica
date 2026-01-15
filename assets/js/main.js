@@ -2650,8 +2650,8 @@ function displayProducts(products) {
 
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
-    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão.
-    const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2');
+    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão e o ID da página de produto.
+    const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2, #add-to-cart-product-page');
     if (!button || button.classList.contains('added')) return;
     
     const quantityInput = document.getElementById('product-quantity');
@@ -3630,7 +3630,7 @@ async function startApplication() {
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
 
         // CORREÇÃO: Delegadores de evento unificados
-        if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2')) handleAddToCart(e);
+       if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2, #add-to-cart-product-page')) handleAddToCart(e);
         if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
         if (target.closest('.remove-from-cart')) {
@@ -4240,6 +4240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
