@@ -2702,24 +2702,42 @@ function handleAddToCart(event) {
 function handleFavoriteToggle(event) {
     const button = event.target.closest('.favorite-btn');
     if (!button) return;
-    // CORREÇÃO: Usar um seletor mais genérico que funciona para ambos os cards.
+
+    // --- CORREÇÃO AQUI ---
+    // Tenta pegar o ID do card (se for na home) OU direto do botão (se for na página de produto)
     const card = button.closest('[data-product-id]');
-    if (!card) return;
-    
-    const productId = card.dataset.productId;
+    const productId = card ? card.dataset.productId : button.dataset.id;
+
+    // Se não encontrou ID de produto em lugar nenhum, para.
+    if (!productId) {
+        console.error("ID do produto não encontrado para favoritar.");
+        return;
+    }
+    // ---------------------
+
     const favoriteIndex = state.favorites.findIndex(item => item.id === productId);
 
     if (favoriteIndex > -1) {
+        // Remover dos favoritos
         state.favorites.splice(favoriteIndex, 1);
         showAnimation('unfavorite-animation-overlay', 1500);
     } else {
+        // Adicionar aos favoritos
         state.favorites.push({ id: productId });
+        
+        // Adiciona animação de pulso no botão clicado
+        const icon = button.querySelector('i');
+        if(icon) {
+            icon.classList.add('animate-heart-pulse');
+            setTimeout(() => icon.classList.remove('animate-heart-pulse'), 500);
+        }
     }
 
     save.favorites();
     updateCounters();
     updateAllHeartIcons();
 
+    // Se estiver na página de favoritos, recarrega a lista
     if (document.getElementById('favorites-items-container')) {
         renderFavoritesPage();
     }
@@ -4256,6 +4274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
