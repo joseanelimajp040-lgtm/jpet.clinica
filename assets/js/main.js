@@ -2650,14 +2650,21 @@ function displayProducts(products) {
 
 // --- MANIPULADORES DE EVENTOS (HANDLERS) ---
 function handleAddToCart(event) {
-    // CORREÇÃO: Selecionador unificado para ambos os tipos de botão e o ID da página de produto.
+    // CORREÇÃO: Adicionamos o ID '#add-to-cart-product-page' na lista de verificação
     const button = event.target.closest('.add-to-cart-btn, .add-to-cart-btn-v2, #add-to-cart-product-page');
+    
+    // Se não clicou em um botão válido ou se o botão já foi clicado ("added"), para a execução
     if (!button || button.classList.contains('added')) return;
     
     const quantityInput = document.getElementById('product-quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
     const productData = button.dataset;
-    if (!productData.id) return;
+
+    // Se o botão não tiver o ID do produto (ainda não carregou), não faz nada
+    if (!productData.id) {
+        console.warn("Botão clicado, mas sem ID do produto vinculado.");
+        return;
+    }
 
     const existingProduct = state.cart.find(item => item.id === productData.id && item.name === productData.name);
     if (existingProduct) {
@@ -2675,11 +2682,18 @@ function handleAddToCart(event) {
     save.cart();
     updateCounters();
     
+    // Animação visual do botão
     const originalContent = button.innerHTML;
-    button.classList.add('added', 'bg-orange-500', 'hover:bg-orange-600');
+    const originalColor = button.style.backgroundColor; // Salva a cor original (verde azulado)
+
+    button.classList.add('added');
+    // Muda para laranja temporariamente para indicar sucesso
+    button.style.backgroundColor = "#f97316"; 
     button.innerHTML = `<i class="fas fa-check mr-2"></i> Adicionado!`;
+    
     setTimeout(() => {
-        button.classList.remove('added', 'bg-orange-500', 'hover:bg-orange-600');
+        button.classList.remove('added');
+        button.style.backgroundColor = originalColor; // Volta para o verde azulado
         button.innerHTML = originalContent;
         if (quantityInput) quantityInput.value = '1';
     }, 2000);
@@ -3630,7 +3644,9 @@ async function startApplication() {
         if (target.closest('#apple-login-btn')) handleSocialLogin('apple');
 
         // CORREÇÃO: Delegadores de evento unificados
-       if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2, #add-to-cart-product-page')) handleAddToCart(e);
+       if (target.closest('.add-to-cart-btn, .add-to-cart-btn-v2, #add-to-cart-product-page')) {
+    handleAddToCart(e);
+}
         if (target.closest('.favorite-btn')) handleFavoriteToggle(e);
 
         if (target.closest('.remove-from-cart')) {
@@ -4240,6 +4256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
