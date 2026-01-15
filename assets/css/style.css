@@ -5228,3 +5228,43 @@ body.black-friday-mode .product-card-v2 {
     box-shadow: 0 4px 20px rgba(255, 107, 0, 0.15); /* Sombra laranja fraca */
 }
 
+/* === CORREÇÃO BOTÃO DE FAVORITAR PÁGINA DE PRODUTO === */
+
+#favorite-btn-page {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Faz ficar redondo */
+    background-color: #f3f4f6; /* Fundo cinza claro para contraste */
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    font-size: 1.5rem;
+    color: #9ca3af; /* Cinza escuro (estado inativo) */
+}
+
+/* Efeito ao passar o mouse */
+#favorite-btn-page:hover {
+    background-color: #e5e7eb;
+    transform: scale(1.1); /* Aumenta levemente */
+    color: #6b7280;
+}
+
+/* Quando o ícone dentro dele vira 'fas' (solid/favoritado) */
+#favorite-btn-page i.fas {
+    color: #ef4444 !important; /* Força a cor vermelha */
+    animation: heart-pulse 0.4s ease-in-out; /* Animação de pulso */
+}
+
+/* Correção para o ícone inativo garantir visibilidade */
+#favorite-btn-page i.far {
+    color: #9ca3af;
+}
+
+/* Definição da animação de pulso (caso não exista no seu CSS) */
+@keyframes heart-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
