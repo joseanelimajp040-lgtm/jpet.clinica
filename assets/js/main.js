@@ -3461,6 +3461,153 @@ function removeBlackFridayBanner() {
     const banner = document.getElementById('bf-banner-panel');
     if (banner) banner.remove();
 }
+// ======================================================================
+// --- LÓGICA DE BUSCA INTELIGENTE (AUTOCOMPLETE) ---
+// ======================================================================
+
+let globalProductCache = []; // Cache para evitar requisições repetidas ao Firestore
+
+/**
+ * Inicializa o cache de produtos para a busca rápida.
+ * Deve ser chamado ao iniciar a aplicação.
+ */
+async function initProductCache() {
+    if (globalProductCache.length > 0) return; // Já carregado
+
+    try {
+        const snapshot = await getDocs(collection(db, 'produtos'));
+        globalProductCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("Cache de produtos para busca carregado.");
+    } catch (error) {
+        console.error("Erro ao carregar cache de produtos:", error);
+    }
+}
+
+/**
+ * Cria a estrutura HTML do dropdown abaixo do input alvo.
+ * @param {HTMLElement} inputElement - O input de busca (desktop ou mobile).
+ */
+function setupAutocomplete(inputElement) {
+    if (!inputElement) return;
+
+    // 1. Envolve o input em um wrapper relativo se ainda não estiver
+    const parent = inputElement.parentElement;
+    if (!parent.classList.contains('search-input-wrapper')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'search-input-wrapper flex-grow relative'; // flex-grow ajuda no layout flex
+        
+        // Clona os filhos para preservar botões/ícones que estejam junto
+        // Nota: Isso depende da estrutura exata do seu header. 
+        // Estratégia segura: Inserir o dropdown logo após o input, no mesmo pai, e ajustar CSS.
+        
+        // Estratégia Simplificada: Apenas adiciona o dropdown no pai atual do input
+        // e garante que o pai tenha position: relative.
+        parent.style.position = 'relative';
+    }
+
+    // 2. Cria o elemento do dropdown
+    let dropdown = parent.querySelector('.autocomplete-dropdown');
+    if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.className = 'autocomplete-dropdown';
+        // Insere logo após o input
+        inputElement.insertAdjacentElement('afterend', dropdown);
+    }
+
+    // 3. Evento de Input (Digitação)
+    inputElement.addEventListener('input', (e) => {
+        const term = e.target.value.trim().toLowerCase();
+        if (term.length < 2) {
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+            return;
+        }
+        
+        // Filtra os produtos
+        const matches = globalProductCache.filter(p => {
+            const nameMatch = typeof p.nome === 'string' ? p.nome.toLowerCase().includes(term) : false;
+            const brandMatch = (p.brand || "").toLowerCase().includes(term);
+            
+            // Verifica variações também
+            const variationMatch = p.variations && p.variations.some(v => v.fullName && v.fullName.toLowerCase().includes(term));
+            
+            return nameMatch || brandMatch || variationMatch;
+        });
+
+        renderAutocompleteResults(matches, dropdown, term);
+    });
+
+    // 4. Fechar ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!parent.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Renderiza o conteúdo do dropdown estilo Cobasi.
+ */
+function renderAutocompleteResults(products, container, term) {
+    if (products.length === 0) {
+        container.classList.remove('active');
+        return;
+    }
+
+    let html = '';
+
+    // --- Parte 1: Sugestões de Texto (Nomes dos 3 primeiros produtos) ---
+    const textSuggestions = products.slice(0, 3).map(p => {
+        const defaultVar = p.variations && p.variations[0] ? p.variations[0] : p;
+        return defaultVar.fullName || p.nome;
+    });
+
+    if (textSuggestions.length > 0) {
+        html += `<div class="suggestion-group-title">Sugestões</div>`;
+        textSuggestions.forEach(name => {
+            // Destaca o termo digitado em negrito
+            const regex = new RegExp(`(${term})`, 'gi');
+            const highlightedName = name.replace(regex, '<strong>$1</strong>');
+            
+            // Ao clicar, preenche o input e submete (ou vai para busca)
+            html += `
+                <div class="suggestion-text-item" onclick="window.location.hash = '#busca'; loadPage('busca', { query: '${name.replace(/'/g, "\\'")}' })">
+                    <i class="fas fa-search"></i>
+                    <span>${highlightedName}</span>
+                </div>
+            `;
+        });
+    }
+
+    // --- Parte 2: Produtos Sugeridos (Cards Visuais) ---
+    // Pegamos até 4 produtos para mostrar visualmente
+    const productSuggestions = products.slice(0, 4);
+
+    if (productSuggestions.length > 0) {
+        html += `<div class="suggestion-group-title">Produtos Sugeridos</div>`;
+        html += `<div class="suggestion-products-grid">`;
+        
+        productSuggestions.forEach(p => {
+            const defaultVar = (p.variations && p.variations[p.defaultVariationIndex || 0]) || (p.variations ? p.variations[0] : {});
+            const image = defaultVar.image || p.image || 'https://via.placeholder.com/100';
+            const price = defaultVar.price || 0;
+            const name = defaultVar.fullName || p.nome;
+
+            html += `
+                <a href="#" class="mini-product-card" onclick="loadPage('produto', { id: '${p.id}' }); return false;">
+                    <img src="${image}" alt="${name}" class="mini-product-image">
+                    <div class="mini-product-name">${name}</div>
+                    <div class="mini-product-price">${formatCurrency(price)}</div>
+                </a>
+            `;
+        });
+        
+        html += `</div>`;
+    }
+
+    container.innerHTML = html;
+    container.classList.add('active');
+}
 async function startApplication() {
     const settingsRef = doc(db, 'settings', 'siteStatus');
     try {
@@ -3492,6 +3639,18 @@ async function startApplication() {
         loadComponent('components/header.html', 'header-placeholder'),
         loadComponent('components/footer.html', 'footer-placeholder')
     ]);
+
+    // --- NOVA INICIALIZAÇÃO DA BUSCA INTELIGENTE ---
+    await initProductCache(); // Carrega produtos em segundo plano
+
+    // Tenta anexar ao input de Desktop (pode precisar de um pequeno delay se o header demorar)
+    setTimeout(() => {
+        const desktopInput = document.getElementById('search-input');
+        if (desktopInput) setupAutocomplete(desktopInput);
+
+        const mobileInput = document.getElementById('mobile-search-input');
+        if (mobileInput) setupAutocomplete(mobileInput);
+    }, 500);
 
     // --- LISTENERS GLOBAIS ---
     const mobileSearchIcon = document.getElementById('mobile-search-icon');
@@ -4274,6 +4433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
