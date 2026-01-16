@@ -3546,7 +3546,7 @@ function setupAutocomplete(inputElement) {
 }
 
 /**
- * Renderiza o conteúdo do dropdown estilo Cobasi.
+ * Renderiza o conteúdo do dropdown estilo Cobasi (VERSÃO CORRIGIDA COM CLIQUES).
  */
 function renderAutocompleteResults(products, container, term) {
     if (products.length === 0) {
@@ -3569,9 +3569,9 @@ function renderAutocompleteResults(products, container, term) {
             const regex = new RegExp(`(${term})`, 'gi');
             const highlightedName = name.replace(regex, '<strong>$1</strong>');
             
-            // Ao clicar, preenche o input e submete (ou vai para busca)
+            // NOTE: Removemos o onclick inline e usamos data-term
             html += `
-                <div class="suggestion-text-item" onclick="window.location.hash = '#busca'; loadPage('busca', { query: '${name.replace(/'/g, "\\'")}' })">
+                <div class="suggestion-text-item" data-term="${name}">
                     <i class="fas fa-search"></i>
                     <span>${highlightedName}</span>
                 </div>
@@ -3593,8 +3593,9 @@ function renderAutocompleteResults(products, container, term) {
             const price = defaultVar.price || 0;
             const name = defaultVar.fullName || p.nome;
 
+            // NOTE: Removemos o onclick inline e usamos data-id
             html += `
-                <a href="#" class="mini-product-card" onclick="loadPage('produto', { id: '${p.id}' }); return false;">
+                <a href="#" class="mini-product-card" data-id="${p.id}">
                     <img src="${image}" alt="${name}" class="mini-product-image">
                     <div class="mini-product-name">${name}</div>
                     <div class="mini-product-price">${formatCurrency(price)}</div>
@@ -3605,8 +3606,34 @@ function renderAutocompleteResults(products, container, term) {
         html += `</div>`;
     }
 
+    // Injeta o HTML
     container.innerHTML = html;
     container.classList.add('active');
+
+    // --- PARTE NOVA: ADICIONA OS CLIQUES VIA JAVASCRIPT ---
+    
+    // 1. Lógica para os cliques nas sugestões de TEXTO
+    const textItems = container.querySelectorAll('.suggestion-text-item');
+    textItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const query = item.dataset.term;
+            container.classList.remove('active'); // Fecha o dropdown
+            // Limpa o input se quiser, ou preenche ele
+            document.getElementById('search-input').value = query; 
+            loadPage('busca', { query: query });
+        });
+    });
+
+    // 2. Lógica para os cliques nos CARDS DE PRODUTO
+    const productItems = container.querySelectorAll('.mini-product-card');
+    productItems.forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que o href="#" suba a tela
+            const id = card.dataset.id;
+            container.classList.remove('active'); // Fecha o dropdown
+            loadPage('produto', { id: id });
+        });
+    });
 }
 async function startApplication() {
     const settingsRef = doc(db, 'settings', 'siteStatus');
@@ -4433,6 +4460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
