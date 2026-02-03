@@ -252,23 +252,25 @@ function updateLoginStatus() {
             : '';
 
         const userMenuHTML = `
-            <div class="relative user-menu-container group">
-                <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-user-check"></i>
-                        <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
-                        <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
-                    </div>
-                </div>
-                <div class="user-menu-dropdown hidden group-hover:block absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
-                    ${adminLinkHTML}
-                    <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
-                    <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
-                    <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
-                    <div class="border-t border-gray-100"></div>
-                    <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
-                </div>
-            </div>`;
+    <div class="relative user-menu-container group">
+        <div class="flex items-center justify-between bg-secondary text-white rounded-full px-4 py-2 cursor-pointer">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-user-check"></i>
+                <span class="font-medium text-sm whitespace-nowrap">Olá, ${firstName}</span>
+                <i class="fas fa-chevron-down text-xs ml-1 transition-transform"></i>
+            </div>
+        </div>
+        <div class="user-menu-dropdown hidden group-hover:block absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+            ${adminLinkHTML}
+            <a href="#" class="user-menu-item nav-link" data-page="meus-pedidos"><i class="fas fa-box-open"></i><span>Meus Pedidos</span></a>
+            <a href="#" class="user-menu-item nav-link" data-page="acompanhar-entrega"><i class="fas fa-truck"></i><span>Acompanhe sua Entrega</span></a>
+            
+            <a href="#" class="user-menu-item nav-link" data-page="prontuario"><i class="fas fa-file-medical"></i><span>Prontuário Veterinário</span></a>
+            <a href="#" class="user-menu-item nav-link" data-page="ultimos-vistos"><i class="fas fa-history"></i><span>Últimos Itens Vistos</span></a>
+            <div class="border-t border-gray-100"></div>
+            <button class="logout-btn user-menu-item text-red-500 w-full text-left"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button>
+        </div>
+    </div>`;
         
         desktopPlaceholder.innerHTML = userMenuHTML;
         mobilePlaceholder.innerHTML = userMenuHTML;
@@ -4460,6 +4462,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
