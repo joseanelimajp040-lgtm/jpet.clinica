@@ -571,6 +571,39 @@ function renderInstallmentsText(element, price) {
         element.style.display = 'none';
     }
 }
+/**
+ * Renderiza a página de Prontuário Veterinário (Estilo Dashboard Vetsmart)
+ */
+async function renderProntuarioPage() {
+    const appRoot = document.getElementById('app-root');
+    
+    // Carrega o HTML da página
+    try {
+        const response = await fetch('pages/prontuario.html');
+        if (!response.ok) throw new Error('Erro ao carregar prontuario.html');
+        appRoot.innerHTML = await response.text();
+
+        // Aqui você pode adicionar lógica específica para o prontuário no futuro
+        // Exemplo: Carregar contadores reais do Firebase para "Vacinas Atrasadas"
+        
+        // Simulação de interatividade nos botões (apenas visual por enquanto)
+        const buttons = appRoot.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Efeito simples de clique
+                if(!btn.classList.contains('toggle-checkbox')) {
+                    const originalTransform = btn.style.transform;
+                    btn.style.transform = 'scale(0.98)';
+                    setTimeout(() => btn.style.transform = originalTransform, 100);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error("Erro ao renderizar prontuário:", error);
+        appRoot.innerHTML = `<p class="text-center text-red-500 py-10">Erro ao carregar o módulo veterinário.</p>`;
+    }
+}
 async function renderAdminDashboard() {
     console.log("Iniciando renderização do Dashboard Admin...");
 
@@ -3032,6 +3065,15 @@ async function loadPage(pageName, params = {}) {
 				initDidYouKnowCarousel();
                 await renderFeaturedProducts();
                 break;
+				case 'prontuario':
+                // Verifica se é admin ou veterinário (Opcional, mas recomendado)
+                if (!state.loggedInUser) {
+                     alert("Você precisa estar logado.");
+                     loadPage('login');
+                     return;
+                }
+                await renderProntuarioPage();
+                break;
             case 'cart':
     renderCart();
     updateCouponUI();
@@ -4462,6 +4504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
