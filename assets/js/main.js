@@ -604,6 +604,132 @@ async function renderProntuarioPage() {
         appRoot.innerHTML = `<p class="text-center text-red-500 py-10">Erro ao carregar o módulo veterinário.</p>`;
     }
 }
+/**
+ * Renderiza a página de Lista de Animais do Prontuário
+ */
+async function renderProntuarioAnimaisPage() {
+    const appRoot = document.getElementById('app-root');
+    
+    try {
+        const response = await fetch('pages/prontuario-animais.html');
+        if (!response.ok) throw new Error('Erro ao carregar prontuario-animais.html');
+        appRoot.innerHTML = await response.text();
+
+        // --- DADOS FICTÍCIOS (MOCK) PARA VISUALIZAÇÃO IGUAL À IMAGEM ---
+        const animaisMock = [
+            {
+                id: '6141727',
+                name: 'Nami Swan',
+                breed: 'Shih Tzu',
+                age: '2 anos',
+                type: 'dog', // dog | cat
+                owner: 'Murilo Lacerda',
+                avatarColor: 'bg-yellow-100 text-yellow-600'
+            },
+            {
+                id: '6141663',
+                name: 'Wandinha',
+                breed: 'SRD',
+                age: '1 ano',
+                type: 'cat',
+                owner: 'Heloísa',
+                avatarColor: 'bg-purple-100 text-purple-600'
+            },
+            {
+                id: '6138796',
+                name: 'Gatinho',
+                breed: 'SRD',
+                age: '1 mês',
+                type: 'cat',
+                owner: 'Karoly Fernandes',
+                avatarColor: 'bg-purple-100 text-purple-600'
+            },
+            {
+                id: '5592011',
+                name: 'Thor',
+                breed: 'Golden Retriever',
+                age: '5 anos',
+                type: 'dog',
+                owner: 'Ana Souza',
+                avatarColor: 'bg-yellow-100 text-yellow-600'
+            }
+        ];
+
+        renderAnimaisList(animaisMock);
+
+        // Lógica de busca simples (Front-end filtering)
+        const searchInput = document.getElementById('animal-search');
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = animaisMock.filter(a => 
+                    a.name.toLowerCase().includes(term) || 
+                    a.owner.toLowerCase().includes(term) ||
+                    a.id.includes(term)
+                );
+                renderAnimaisList(filtered);
+            });
+        }
+
+    } catch (error) {
+        console.error("Erro ao renderizar animais:", error);
+    }
+}
+
+/**
+ * Função auxiliar para gerar os cards HTML
+ */
+function renderAnimaisList(animais) {
+    const container = document.getElementById('animais-list-container');
+    if (!container) return;
+
+    if (animais.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-white rounded-lg">Nenhum animal encontrado.</div>`;
+        return;
+    }
+
+    container.innerHTML = animais.map(animal => {
+        const iconClass = animal.type === 'dog' ? 'fa-dog' : 'fa-cat';
+        
+        return `
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-200">
+            <div class="p-4 flex flex-col md:flex-row items-center md:items-start gap-4">
+                
+                <div class="flex-shrink-0">
+                    <div class="w-14 h-14 rounded-full ${animal.avatarColor} flex items-center justify-center border-2 border-white shadow-sm text-2xl">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                </div>
+
+                <div class="flex-grow text-center md:text-left">
+                    <h3 class="font-bold text-gray-800 text-lg">${animal.name}</h3>
+                    <p class="text-sm text-gray-500 mb-1">
+                        <span class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded mr-1">ID: ${animal.id}</span>
+                        ${animal.breed} - ${animal.age}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        <span class="font-medium">Responsável:</span> ${animal.owner}
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 mt-3 md:mt-0 w-full md:w-auto">
+                    <button class="flex-1 md:flex-none border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition" onclick="alert('Abrir cadastro de ${animal.name}')">
+                        Abrir Cadastro Completo
+                    </button>
+                    <button class="w-10 h-10 border border-gray-300 text-gray-500 hover:text-secondary hover:border-secondary rounded flex items-center justify-center transition" title="Editar">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition">
+                <span class="text-xs font-bold text-secondary">Abrir Informações do(a) Responsável</span>
+                <i class="fas fa-chevron-down text-secondary text-xs"></i>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
 async function renderAdminDashboard() {
     console.log("Iniciando renderização do Dashboard Admin...");
 
@@ -3074,6 +3200,14 @@ async function loadPage(pageName, params = {}) {
                 }
                 await renderProntuarioPage();
                 break;
+				case 'prontuario-animais':
+                if (!state.loggedInUser) {
+                     alert("Acesso restrito.");
+                     loadPage('login');
+                     return;
+                }
+                await renderProntuarioAnimaisPage();
+                break;
             case 'cart':
     renderCart();
     updateCouponUI();
@@ -4504,6 +4638,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
