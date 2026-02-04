@@ -358,6 +358,47 @@ function updateTotals() {
         }
     }
 }
+// --- FUNÇÕES DO MODAL DE RESPONSÁVEL ---
+
+function openResponsavelModal() {
+    const modal = document.getElementById('modal-responsavel');
+    const panel = document.getElementById('modal-panel');
+    
+    if (modal && panel) {
+        modal.classList.remove('hidden');
+        // Pequeno delay para permitir que o navegador renderize antes de animar
+        setTimeout(() => {
+            panel.classList.remove('translate-x-full');
+        }, 10);
+    }
+}
+
+function closeResponsavelModal() {
+    const modal = document.getElementById('modal-responsavel');
+    const panel = document.getElementById('modal-panel');
+    
+    if (modal && panel) {
+        panel.classList.add('translate-x-full');
+        // Espera a animação terminar antes de esconder
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+}
+
+// Inicializa os listeners do modal (Botões de fechar e clicar fora)
+function initResponsavelModalListeners() {
+    // Botões de fechar (X no topo e Cancelar embaixo)
+    document.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', closeResponsavelModal);
+    });
+
+    // Fechar ao clicar no fundo escuro
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', closeResponsavelModal);
+    }
+}
 /**
  * Busca os dados de um pedido e abre o WhatsApp com uma mensagem pré-formatada.
  * @param {string} orderId - O ID do pedido no Firestore.
@@ -583,6 +624,7 @@ async function renderProntuarioPage() {
         const response = await fetch('pages/prontuario.html');
         if (!response.ok) throw new Error('Erro ao carregar prontuario.html');
         appRoot.innerHTML = await response.text();
+		initResponsavelModalListeners();
 
         // 1. Salva o conteúdo inicial (O Dashboard com botões coloridos) na memória
         const contentContainer = document.getElementById('prontuario-content');
@@ -642,6 +684,11 @@ function initProntuarioTabs() {
 			} else if (tab === 'responsaveis') { // <--- ADICIONE ISSO
     renderResponsaveisTabContent(contentContainer);
             }
+			// No final da função renderResponsaveisTabContent:
+const btnAdd = document.getElementById('btn-add-responsavel-tab');
+if (btnAdd) {
+    btnAdd.addEventListener('click', openResponsavelModal);
+            }
         });
     });
     
@@ -653,7 +700,26 @@ function initDashboardLinks() {
     // Faz o botão laranja grande "Criar Novo Animal" funcionar como a aba
     const btnAnimalDashboard = document.querySelector('.prontuario-link[data-tab="animais"]'); // Botão da sidebar
     const bigBtnAnimal = document.querySelector('.bg-primary[data-tab="animais"]'); // Botão grande
-
+// ADICIONE ISSO PARA O BOTÃO DE RESPONSÁVEL DO DASHBOARD:
+    // Procura o botão pelo data-tab ou classe
+    const btnNovoResponsavel = document.querySelector('[data-tab="responsaveis"]');
+    
+    if (btnNovoResponsavel) {
+        // Removemos o comportamento padrão de aba se quisermos abrir o modal direto
+        // OU mantemos a aba e abrimos o modal. Vamos abrir o modal direto neste caso.
+        
+        // Se for o botão GRANDE do dashboard (verifique se ele tem a classe .prontuario-card ou similar)
+        const bigCardResponsavel = document.querySelector('.prontuario-card[data-tab="responsaveis"]');
+        
+        if (bigCardResponsavel) {
+            bigCardResponsavel.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Impede que troque de aba se não quiser
+                openResponsavelModal();
+            });
+        }
+    }
+}
     if (bigBtnAnimal && btnAnimalDashboard) {
         bigBtnAnimal.addEventListener('click', (e) => {
             e.preventDefault();
@@ -749,8 +815,8 @@ function renderResponsaveisTabContent(container) {
                             <option>A-Z</option>
                         </select>
                     </div>
-                     <button class="bg-secondary hover:bg-teal-700 text-white px-6 py-2.5 rounded font-bold text-sm flex items-center gap-2 transition whitespace-nowrap">
-                        <i class="fas fa-plus"></i> <span class="hidden md:inline">CADASTRAR NOVO</span>
+                     <button id="btn-add-responsavel-tab" class="bg-secondary hover:bg-teal-700 ...">
+    <i class="fas fa-plus"></i> <span class="hidden md:inline">CADASTRAR NOVO</span>
                     </button>
                 </div>
             </div>
@@ -4713,6 +4779,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
