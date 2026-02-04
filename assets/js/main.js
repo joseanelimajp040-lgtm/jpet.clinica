@@ -726,7 +726,6 @@ function initDashboardLinks() {
             btnAnimalDashboard.click(); // Simula um clique na sidebar
         });
     }
-}
 
 function renderAnimaisTabContent(container) {
     // Dados Mockados (Iguais à imagem)
@@ -4779,6 +4778,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
