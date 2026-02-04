@@ -698,13 +698,11 @@ if (btnAdd) {
 
 function initDashboardLinks() {
     // --- 1. Lógica para o botão "Criar Novo Animal" (Laranja) ---
-    // Este botão deve simular um clique na sidebar para trocar de aba
     const btnAnimalSidebar = document.querySelector('.prontuario-link[data-tab="animais"]'); 
-    // Procura o botão grande no dashboard que tem o data-tab="animais"
     const bigBtnAnimal = document.querySelector('[data-tab="animais"]:not(a)'); 
 
     if (bigBtnAnimal && btnAnimalSidebar) {
-        // Remove listeners antigos para evitar duplicação (boa prática)
+        // Removemos ouvintes antigos clonando o botão
         const newBtn = bigBtnAnimal.cloneNode(true);
         bigBtnAnimal.parentNode.replaceChild(newBtn, bigBtnAnimal);
         
@@ -715,28 +713,19 @@ function initDashboardLinks() {
     }
 
     // --- 2. Lógica para o botão "Criar Novo Responsável" (Verde-azulado) ---
-    // Este botão deve abrir o MODAL diretamente
     const bigBtnResponsavel = document.querySelector('[data-tab="responsaveis"]:not(a)');
     
     if (bigBtnResponsavel) {
-        // Remove listeners antigos
         const newBtnRes = bigBtnResponsavel.cloneNode(true);
         bigBtnResponsavel.parentNode.replaceChild(newBtnRes, bigBtnResponsavel);
 
         newBtnRes.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation(); // Impede outros eventos
-            openResponsavelModal(); // Abre o modal
+            e.stopPropagation(); 
+            openResponsavelModal(); // Abre o modal direto
         });
     }
 }
-    if (bigBtnAnimal && btnAnimalDashboard) {
-        bigBtnAnimal.addEventListener('click', (e) => {
-            e.preventDefault();
-            btnAnimalDashboard.click(); // Simula um clique na sidebar
-        });
-    }
-
 function renderAnimaisTabContent(container) {
     // Dados Mockados (Iguais à imagem)
     const animais = [
@@ -4788,6 +4777,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
