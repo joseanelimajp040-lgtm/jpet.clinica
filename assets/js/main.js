@@ -571,9 +571,6 @@ function renderInstallmentsText(element, price) {
         element.style.display = 'none';
     }
 }
-// Variável global para salvar o conteúdo original do Dashboard (Botões coloridos, etc)
-let dashboardCacheHTML = '';
-
 // --- VARIÁVEL GLOBAL (Coloque isso no topo do seu main.js ou antes da função renderProntuarioPage) ---
 let dashboardCacheHTML = ''; 
 
@@ -4628,6 +4625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
