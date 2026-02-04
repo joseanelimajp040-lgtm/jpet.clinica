@@ -699,32 +699,33 @@ if (btnAdd) {
 }
 
 function initDashboardLinks() {
-    // --- 1. Lógica para o botão "Criar Novo Animal" (Laranja) ---
+    // 1. Botão "Criar Novo Animal" (Laranja) - Troca de Aba
     const btnAnimalSidebar = document.querySelector('.prontuario-link[data-tab="animais"]'); 
     const bigBtnAnimal = document.querySelector('[data-tab="animais"]:not(a)'); 
 
     if (bigBtnAnimal && btnAnimalSidebar) {
-        // Removemos ouvintes antigos clonando o botão
         const newBtn = bigBtnAnimal.cloneNode(true);
         bigBtnAnimal.parentNode.replaceChild(newBtn, bigBtnAnimal);
         
         newBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            btnAnimalSidebar.click(); // Força a troca de aba
+            btnAnimalSidebar.click();
         });
     }
 
-    // --- 2. Lógica para o botão "Criar Novo Responsável" (Verde-azulado) ---
-    const bigBtnResponsavel = document.querySelector('[data-tab="responsaveis"]:not(a)');
+    // 2. Botão "Criar Novo Responsável" (Verde-azulado) - Abre Modal
+    // Agora buscamos pelo ID específico que adicionamos no HTML
+    const bigBtnResponsavel = document.getElementById('btn-dashboard-responsavel');
     
     if (bigBtnResponsavel) {
+        // Removemos listeners antigos clonando
         const newBtnRes = bigBtnResponsavel.cloneNode(true);
         bigBtnResponsavel.parentNode.replaceChild(newBtnRes, bigBtnResponsavel);
 
         newBtnRes.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation(); 
-            openResponsavelModal(); // Abre o modal direto
+            e.stopPropagation();
+            openResponsavelModal(); // Abre o modal diretamente
         });
     }
 }
@@ -4766,6 +4767,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
