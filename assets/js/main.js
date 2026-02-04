@@ -574,21 +574,28 @@ function renderInstallmentsText(element, price) {
 // Variável global para salvar o conteúdo original do Dashboard (Botões coloridos, etc)
 let dashboardCacheHTML = '';
 
+// --- VARIÁVEL GLOBAL (Coloque isso no topo do seu main.js ou antes da função renderProntuarioPage) ---
+let dashboardCacheHTML = ''; 
+
+// --- SUBSTITUA A FUNÇÃO renderProntuarioPage ANTIGA POR ESTA ---
 async function renderProntuarioPage() {
     const appRoot = document.getElementById('app-root');
     
     try {
+        // Carrega o HTML base do prontuário
         const response = await fetch('pages/prontuario.html');
         if (!response.ok) throw new Error('Erro ao carregar prontuario.html');
         appRoot.innerHTML = await response.text();
 
-        // 1. Salva o conteúdo inicial (Dashboard) na memória para poder voltar depois
+        // 1. Salva o conteúdo inicial (O Dashboard com botões coloridos) na memória
         const contentContainer = document.getElementById('prontuario-content');
         if (contentContainer) {
             dashboardCacheHTML = contentContainer.innerHTML;
+        } else {
+            console.error("ERRO: Não encontrei a div com id='prontuario-content' no HTML.");
         }
 
-        // 2. Inicializa os ouvintes de clique da Sidebar (Navegação Interna)
+        // 2. Inicia os "ouvidos" para os cliques nos botões da sidebar
         initProntuarioTabs();
 
     } catch (error) {
@@ -596,62 +603,68 @@ async function renderProntuarioPage() {
     }
 }
 
+// --- ADICIONE ESTAS FUNÇÕES NOVAS LOGO ABAIXO ---
+
 function initProntuarioTabs() {
+    // Procura por todos os botões que tenham a classe 'prontuario-link'
     const links = document.querySelectorAll('.prontuario-link');
     const contentContainer = document.getElementById('prontuario-content');
 
+    if (links.length === 0) console.warn("Nenhum link com classe .prontuario-link encontrado.");
+
     links.forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Impede o comportamento padrão e o reload da página
 
-            // Atualiza visual da Sidebar (Ativo/Inativo)
+            // Visual: Remove a classe ativa de todos e adiciona no clicado
             links.forEach(l => {
-                l.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition';
+                // Volta para o estilo cinza padrão
+                l.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition cursor-pointer';
+                // Remove a borda colorida se tiver
+                l.style.borderLeft = 'none';
+                l.style.backgroundColor = 'transparent';
+                const icon = l.querySelector('i');
+                if(icon) icon.className = icon.className.replace('text-primary', 'text-gray-600'); // Reseta cor do icone
             });
-            // Aplica estilo ativo no clicado
-            link.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-primary bg-orange-50 font-bold rounded-md border-l-4 border-primary transition';
 
-            // Troca o Conteúdo
+            // Aplica o estilo "Ativo" (Laranja/Primary) no botão clicado
+            link.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-primary bg-orange-50 font-bold rounded-md transition cursor-pointer';
+            link.style.borderLeft = '4px solid #f97316'; // Cor laranja manual para garantir
+            const activeIcon = link.querySelector('i');
+            if(activeIcon) activeIcon.className = activeIcon.className.replace('text-gray-600', 'text-primary');
+
+            // Lógica: Troca o Conteúdo da direita
             const tab = link.dataset.tab;
 
             if (tab === 'dashboard') {
-                // Restaura o Dashboard original
                 contentContainer.innerHTML = dashboardCacheHTML;
+                // Re-adiciona o listener no botão "Criar Novo Animal" do dashboard se ele for recarregado
+                setTimeout(() => initDashboardLinks(), 100); 
             } else if (tab === 'animais') {
-                // Renderiza a lista de animais
                 renderAnimaisTabContent(contentContainer);
             }
         });
     });
+    
+    // Inicializa também os botões grandes do dashboard (como o card laranja)
+    initDashboardLinks();
+}
+
+function initDashboardLinks() {
+    // Faz o botão laranja grande "Criar Novo Animal" funcionar como a aba
+    const btnAnimalDashboard = document.querySelector('.prontuario-link[data-tab="animais"]'); // Botão da sidebar
+    const bigBtnAnimal = document.querySelector('.bg-primary[data-tab="animais"]'); // Botão grande
+
+    if (bigBtnAnimal && btnAnimalDashboard) {
+        bigBtnAnimal.addEventListener('click', (e) => {
+            e.preventDefault();
+            btnAnimalDashboard.click(); // Simula um clique na sidebar
+        });
+    }
 }
 
 function renderAnimaisTabContent(container) {
-    // HTML da barra de busca e filtros (igual a imagem)
-    const headerHTML = `
-        <h2 class="text-2xl font-bold text-gray-700">Animais</h2>
-        <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
-            <div class="flex flex-col md:flex-row gap-4 mb-4">
-                <div class="flex-1 relative">
-                    <input type="text" id="internal-animal-search" placeholder="Buscar por Nome do Animal, ID ou Responsável" class="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded hover:border-gray-400 focus:outline-none focus:border-secondary transition">
-                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
-                <div class="flex gap-2">
-                     <button class="bg-secondary hover:bg-teal-700 text-white px-6 py-2.5 rounded font-bold text-sm flex items-center gap-2 transition whitespace-nowrap">
-                        <i class="fas fa-plus"></i> CADASTRAR NOVO ANIMAL
-                    </button>
-                </div>
-            </div>
-            <div class="flex justify-between items-center border-t border-gray-100 pt-3">
-                 <span class="text-sm text-gray-500">Exibindo <span class="font-bold">01 - 04</span> de <span class="font-bold">4</span></span>
-                 <button class="text-secondary border border-secondary px-4 py-1 rounded-full text-sm font-medium"><i class="fas fa-filter"></i> FILTRAR</button>
-            </div>
-        </div>
-        <div id="internal-animais-list" class="space-y-3"></div>
-    `;
-
-    container.innerHTML = headerHTML;
-
-    // Dados Mockados
+    // Dados Mockados (Iguais à imagem)
     const animais = [
         { id: '6141727', name: 'Nami Swan', breed: 'Shih Tzu', age: '2 anos', type: 'dog', owner: 'Murilo Lacerda', color: 'bg-yellow-100 text-yellow-600' },
         { id: '6141663', name: 'Wandinha', breed: 'SRD', age: '1 ano', type: 'cat', owner: 'Heloísa', color: 'bg-purple-100 text-purple-600' },
@@ -659,38 +672,61 @@ function renderAnimaisTabContent(container) {
         { id: '5592011', name: 'Thor', breed: 'Golden Retriever', age: '5 anos', type: 'dog', owner: 'Ana Souza', color: 'bg-yellow-100 text-yellow-600' }
     ];
 
-    // Gera os Cards
-    const listContainer = document.getElementById('internal-animais-list');
+    // Gera HTML da Lista
     const cardsHTML = animais.map(a => `
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-            <div class="p-4 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full ${a.color} flex items-center justify-center text-2xl border-2 border-white shadow-sm">
-                    <i class="fas ${a.type === 'dog' ? 'fa-dog' : 'fa-cat'}"></i>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition mb-3">
+            <div class="p-4 flex flex-col md:flex-row items-center md:items-start gap-4">
+                <div class="flex-shrink-0">
+                    <div class="w-14 h-14 rounded-full ${a.color} flex items-center justify-center border-2 border-white shadow-sm text-2xl">
+                        <i class="fas ${a.type === 'dog' ? 'fa-dog' : 'fa-cat'}"></i>
+                    </div>
                 </div>
-                <div class="flex-grow">
+                <div class="flex-grow text-center md:text-left">
                     <h3 class="font-bold text-gray-800 text-lg">${a.name}</h3>
-                    <p class="text-sm text-gray-500"><span class="bg-gray-100 px-1 rounded font-mono text-xs">ID: ${a.id}</span> ${a.breed} - ${a.age}</p>
-                    <p class="text-sm text-gray-600">Responsável: ${a.owner}</p>
+                    <p class="text-sm text-gray-500 mb-1">
+                        <span class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded mr-1">ID: ${a.id}</span>
+                        ${a.breed} - ${a.age}
+                    </p>
+                    <p class="text-sm text-gray-600"><span class="font-medium">Responsável:</span> ${a.owner}</p>
                 </div>
-                <div class="flex gap-2">
-                    <button class="border border-secondary text-secondary font-bold text-xs uppercase px-4 py-2 rounded hover:bg-secondary hover:text-white transition">Abrir Cadastro</button>
-                    <button class="w-10 h-10 border border-gray-300 text-gray-500 rounded flex items-center justify-center hover:border-secondary hover:text-secondary"><i class="fas fa-pen"></i></button>
+                <div class="flex items-center gap-2 mt-3 md:mt-0 w-full md:w-auto">
+                    <button class="flex-1 md:flex-none border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition">ABRIR CADASTRO COMPLETO</button>
+                    <button class="w-10 h-10 border border-gray-300 text-gray-500 hover:text-secondary hover:border-secondary rounded flex items-center justify-center transition"><i class="fas fa-pen"></i></button>
                 </div>
             </div>
-            <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 text-xs font-bold text-secondary cursor-pointer hover:bg-gray-100 flex justify-between">
-                <span>Abrir Informações do Responsável</span>
-                <i class="fas fa-chevron-down"></i>
+            <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition">
+                <span class="text-xs font-bold text-secondary">Abrir Informações do(a) Responsável</span>
+                <i class="fas fa-chevron-down text-secondary text-xs"></i>
             </div>
         </div>
     `).join('');
 
-    listContainer.innerHTML = cardsHTML;
-    
-    // Ativa a busca interna
-    document.getElementById('internal-animal-search').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        // Lógica de filtro simples aqui se desejar...
-    });
+    // Injeta o HTML completo na área da direita
+    container.innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Animais</h2>
+        <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1 relative">
+                    <input type="text" id="internal-animal-search" placeholder="Buscar por Nome, ID ou Responsável..." class="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded focus:outline-none focus:border-secondary transition">
+                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex gap-2">
+                     <div class="flex items-center gap-2 border border-gray-300 rounded px-3 bg-white">
+                        <span class="text-xs text-gray-500 whitespace-nowrap">Ordenar:</span>
+                        <select class="text-sm bg-transparent font-medium text-gray-700 focus:outline-none"><option>Mais recentes</option></select>
+                    </div>
+                     <button class="bg-secondary hover:bg-teal-700 text-white px-4 py-2.5 rounded font-bold text-sm flex items-center gap-2 transition whitespace-nowrap">
+                        <i class="fas fa-plus"></i> <span class="hidden md:inline">CADASTRAR NOVO</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                 <span class="text-sm text-gray-500">Exibindo <span class="font-bold">01 - 04</span> de <span class="font-bold">4</span></span>
+                 <button class="text-secondary border border-secondary hover:bg-teal-50 px-4 py-1 rounded-full text-sm font-medium"><i class="fas fa-filter"></i> FILTRAR</button>
+            </div>
+        </div>
+        <div id="internal-animais-list">${cardsHTML}</div>
+    `;
 }
 async function renderAdminDashboard() {
     console.log("Iniciando renderização do Dashboard Admin...");
@@ -4592,6 +4628,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
