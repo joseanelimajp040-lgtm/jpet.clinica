@@ -610,33 +610,25 @@ function initProntuarioTabs() {
     if (links.length === 0) console.warn("Nenhum link com classe .prontuario-link encontrado.");
 
     links.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
+        link.addEventListener('click', (e) => {
+            e.preventDefault(); // Impede o comportamento padrão e o reload da página
 
-        // 1. Reset Visual (Desktop e Mobile)
-        links.forEach(l => {
-            // Remove classes ativas
-            l.classList.remove('text-primary', 'bg-orange-50', 'border-l-4', 'border-primary', 'font-bold');
-            l.classList.add('text-gray-500', 'hover:text-gray-900');
-            
-            // Reseta ícone
-            const icon = l.querySelector('i');
-            if(icon) {
-                icon.classList.remove('text-primary', 'text-secondary'); // Remove cores ativas
-                // Se for mobile, mantem cinza claro, se desktop cinza médio
-                // Simplificando: remove cores fortes
-            }
-        });
+            // Visual: Remove a classe ativa de todos e adiciona no clicado
+            links.forEach(l => {
+                // Volta para o estilo cinza padrão
+                l.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition cursor-pointer';
+                // Remove a borda colorida se tiver
+                l.style.borderLeft = 'none';
+                l.style.backgroundColor = 'transparent';
+                const icon = l.querySelector('i');
+                if(icon) icon.className = icon.className.replace('text-primary', 'text-gray-600'); // Reseta cor do icone
+            });
 
-        // 2. Ativa Visual do Clicado
-        link.classList.remove('text-gray-500', 'hover:text-gray-900');
-        link.classList.add('text-primary', 'font-bold');
-        
-        // Apenas adiciona fundo e borda se for Desktop (sidebar)
-        // Verificamos se o elemento pai é a nav lateral
-        if (link.parentElement.tagName === 'NAV' && !link.parentElement.classList.contains('mobile-bottom-nav')) {
-             link.classList.add('bg-orange-50/80', 'border-l-4', 'border-primary');
-        }
+            // Aplica o estilo "Ativo" (Laranja/Primary) no botão clicado
+            link.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-primary bg-orange-50 font-bold rounded-md transition cursor-pointer';
+            link.style.borderLeft = '4px solid #f97316'; // Cor laranja manual para garantir
+            const activeIcon = link.querySelector('i');
+            if(activeIcon) activeIcon.className = activeIcon.className.replace('text-gray-600', 'text-primary');
 
             // Lógica: Troca o Conteúdo da direita
             const tab = link.dataset.tab;
@@ -4721,8 +4713,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
-
-
 
 
 
