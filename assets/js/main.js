@@ -571,164 +571,126 @@ function renderInstallmentsText(element, price) {
         element.style.display = 'none';
     }
 }
-/**
- * Renderiza a página de Prontuário Veterinário (Estilo Dashboard Vetsmart)
- */
+// Variável global para salvar o conteúdo original do Dashboard (Botões coloridos, etc)
+let dashboardCacheHTML = '';
+
 async function renderProntuarioPage() {
     const appRoot = document.getElementById('app-root');
     
-    // Carrega o HTML da página
     try {
         const response = await fetch('pages/prontuario.html');
         if (!response.ok) throw new Error('Erro ao carregar prontuario.html');
         appRoot.innerHTML = await response.text();
 
-        // Aqui você pode adicionar lógica específica para o prontuário no futuro
-        // Exemplo: Carregar contadores reais do Firebase para "Vacinas Atrasadas"
-        
-        // Simulação de interatividade nos botões (apenas visual por enquanto)
-        const buttons = appRoot.querySelectorAll('button');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Efeito simples de clique
-                if(!btn.classList.contains('toggle-checkbox')) {
-                    const originalTransform = btn.style.transform;
-                    btn.style.transform = 'scale(0.98)';
-                    setTimeout(() => btn.style.transform = originalTransform, 100);
-                }
-            });
-        });
+        // 1. Salva o conteúdo inicial (Dashboard) na memória para poder voltar depois
+        const contentContainer = document.getElementById('prontuario-content');
+        if (contentContainer) {
+            dashboardCacheHTML = contentContainer.innerHTML;
+        }
+
+        // 2. Inicializa os ouvintes de clique da Sidebar (Navegação Interna)
+        initProntuarioTabs();
 
     } catch (error) {
         console.error("Erro ao renderizar prontuário:", error);
-        appRoot.innerHTML = `<p class="text-center text-red-500 py-10">Erro ao carregar o módulo veterinário.</p>`;
     }
 }
-/**
- * Renderiza a página de Lista de Animais do Prontuário
- */
-async function renderProntuarioAnimaisPage() {
-    const appRoot = document.getElementById('app-root');
-    
-    try {
-        const response = await fetch('pages/prontuario-animais.html');
-        if (!response.ok) throw new Error('Erro ao carregar prontuario-animais.html');
-        appRoot.innerHTML = await response.text();
 
-        // --- DADOS FICTÍCIOS (MOCK) PARA VISUALIZAÇÃO IGUAL À IMAGEM ---
-        const animaisMock = [
-            {
-                id: '6141727',
-                name: 'Nami Swan',
-                breed: 'Shih Tzu',
-                age: '2 anos',
-                type: 'dog', // dog | cat
-                owner: 'Murilo Lacerda',
-                avatarColor: 'bg-yellow-100 text-yellow-600'
-            },
-            {
-                id: '6141663',
-                name: 'Wandinha',
-                breed: 'SRD',
-                age: '1 ano',
-                type: 'cat',
-                owner: 'Heloísa',
-                avatarColor: 'bg-purple-100 text-purple-600'
-            },
-            {
-                id: '6138796',
-                name: 'Gatinho',
-                breed: 'SRD',
-                age: '1 mês',
-                type: 'cat',
-                owner: 'Karoly Fernandes',
-                avatarColor: 'bg-purple-100 text-purple-600'
-            },
-            {
-                id: '5592011',
-                name: 'Thor',
-                breed: 'Golden Retriever',
-                age: '5 anos',
-                type: 'dog',
-                owner: 'Ana Souza',
-                avatarColor: 'bg-yellow-100 text-yellow-600'
-            }
-        ];
+function initProntuarioTabs() {
+    const links = document.querySelectorAll('.prontuario-link');
+    const contentContainer = document.getElementById('prontuario-content');
 
-        renderAnimaisList(animaisMock);
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
 
-        // Lógica de busca simples (Front-end filtering)
-        const searchInput = document.getElementById('animal-search');
-        if(searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                const filtered = animaisMock.filter(a => 
-                    a.name.toLowerCase().includes(term) || 
-                    a.owner.toLowerCase().includes(term) ||
-                    a.id.includes(term)
-                );
-                renderAnimaisList(filtered);
+            // Atualiza visual da Sidebar (Ativo/Inativo)
+            links.forEach(l => {
+                l.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition';
             });
-        }
+            // Aplica estilo ativo no clicado
+            link.className = 'prontuario-link flex items-center gap-3 px-3 py-2 text-primary bg-orange-50 font-bold rounded-md border-l-4 border-primary transition';
 
-    } catch (error) {
-        console.error("Erro ao renderizar animais:", error);
-    }
+            // Troca o Conteúdo
+            const tab = link.dataset.tab;
+
+            if (tab === 'dashboard') {
+                // Restaura o Dashboard original
+                contentContainer.innerHTML = dashboardCacheHTML;
+            } else if (tab === 'animais') {
+                // Renderiza a lista de animais
+                renderAnimaisTabContent(contentContainer);
+            }
+        });
+    });
 }
 
-/**
- * Função auxiliar para gerar os cards HTML
- */
-function renderAnimaisList(animais) {
-    const container = document.getElementById('animais-list-container');
-    if (!container) return;
-
-    if (animais.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-white rounded-lg">Nenhum animal encontrado.</div>`;
-        return;
-    }
-
-    container.innerHTML = animais.map(animal => {
-        const iconClass = animal.type === 'dog' ? 'fa-dog' : 'fa-cat';
-        
-        return `
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-200">
-            <div class="p-4 flex flex-col md:flex-row items-center md:items-start gap-4">
-                
-                <div class="flex-shrink-0">
-                    <div class="w-14 h-14 rounded-full ${animal.avatarColor} flex items-center justify-center border-2 border-white shadow-sm text-2xl">
-                        <i class="fas ${iconClass}"></i>
-                    </div>
+function renderAnimaisTabContent(container) {
+    // HTML da barra de busca e filtros (igual a imagem)
+    const headerHTML = `
+        <h2 class="text-2xl font-bold text-gray-700">Animais</h2>
+        <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1 relative">
+                    <input type="text" id="internal-animal-search" placeholder="Buscar por Nome do Animal, ID ou Responsável" class="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded hover:border-gray-400 focus:outline-none focus:border-secondary transition">
+                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 </div>
-
-                <div class="flex-grow text-center md:text-left">
-                    <h3 class="font-bold text-gray-800 text-lg">${animal.name}</h3>
-                    <p class="text-sm text-gray-500 mb-1">
-                        <span class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded mr-1">ID: ${animal.id}</span>
-                        ${animal.breed} - ${animal.age}
-                    </p>
-                    <p class="text-sm text-gray-600">
-                        <span class="font-medium">Responsável:</span> ${animal.owner}
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2 mt-3 md:mt-0 w-full md:w-auto">
-                    <button class="flex-1 md:flex-none border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition" onclick="alert('Abrir cadastro de ${animal.name}')">
-                        Abrir Cadastro Completo
-                    </button>
-                    <button class="w-10 h-10 border border-gray-300 text-gray-500 hover:text-secondary hover:border-secondary rounded flex items-center justify-center transition" title="Editar">
-                        <i class="fas fa-pen"></i>
+                <div class="flex gap-2">
+                     <button class="bg-secondary hover:bg-teal-700 text-white px-6 py-2.5 rounded font-bold text-sm flex items-center gap-2 transition whitespace-nowrap">
+                        <i class="fas fa-plus"></i> CADASTRAR NOVO ANIMAL
                     </button>
                 </div>
             </div>
-
-            <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition">
-                <span class="text-xs font-bold text-secondary">Abrir Informações do(a) Responsável</span>
-                <i class="fas fa-chevron-down text-secondary text-xs"></i>
+            <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                 <span class="text-sm text-gray-500">Exibindo <span class="font-bold">01 - 04</span> de <span class="font-bold">4</span></span>
+                 <button class="text-secondary border border-secondary px-4 py-1 rounded-full text-sm font-medium"><i class="fas fa-filter"></i> FILTRAR</button>
             </div>
         </div>
-        `;
-    }).join('');
+        <div id="internal-animais-list" class="space-y-3"></div>
+    `;
+
+    container.innerHTML = headerHTML;
+
+    // Dados Mockados
+    const animais = [
+        { id: '6141727', name: 'Nami Swan', breed: 'Shih Tzu', age: '2 anos', type: 'dog', owner: 'Murilo Lacerda', color: 'bg-yellow-100 text-yellow-600' },
+        { id: '6141663', name: 'Wandinha', breed: 'SRD', age: '1 ano', type: 'cat', owner: 'Heloísa', color: 'bg-purple-100 text-purple-600' },
+        { id: '6138796', name: 'Gatinho', breed: 'SRD', age: '1 mês', type: 'cat', owner: 'Karoly Fernandes', color: 'bg-purple-100 text-purple-600' },
+        { id: '5592011', name: 'Thor', breed: 'Golden Retriever', age: '5 anos', type: 'dog', owner: 'Ana Souza', color: 'bg-yellow-100 text-yellow-600' }
+    ];
+
+    // Gera os Cards
+    const listContainer = document.getElementById('internal-animais-list');
+    const cardsHTML = animais.map(a => `
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
+            <div class="p-4 flex items-center gap-4">
+                <div class="w-14 h-14 rounded-full ${a.color} flex items-center justify-center text-2xl border-2 border-white shadow-sm">
+                    <i class="fas ${a.type === 'dog' ? 'fa-dog' : 'fa-cat'}"></i>
+                </div>
+                <div class="flex-grow">
+                    <h3 class="font-bold text-gray-800 text-lg">${a.name}</h3>
+                    <p class="text-sm text-gray-500"><span class="bg-gray-100 px-1 rounded font-mono text-xs">ID: ${a.id}</span> ${a.breed} - ${a.age}</p>
+                    <p class="text-sm text-gray-600">Responsável: ${a.owner}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="border border-secondary text-secondary font-bold text-xs uppercase px-4 py-2 rounded hover:bg-secondary hover:text-white transition">Abrir Cadastro</button>
+                    <button class="w-10 h-10 border border-gray-300 text-gray-500 rounded flex items-center justify-center hover:border-secondary hover:text-secondary"><i class="fas fa-pen"></i></button>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 text-xs font-bold text-secondary cursor-pointer hover:bg-gray-100 flex justify-between">
+                <span>Abrir Informações do Responsável</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    `).join('');
+
+    listContainer.innerHTML = cardsHTML;
+    
+    // Ativa a busca interna
+    document.getElementById('internal-animal-search').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        // Lógica de filtro simples aqui se desejar...
+    });
 }
 async function renderAdminDashboard() {
     console.log("Iniciando renderização do Dashboard Admin...");
@@ -3200,14 +3162,6 @@ async function loadPage(pageName, params = {}) {
                 }
                 await renderProntuarioPage();
                 break;
-				case 'prontuario-animais':
-                if (!state.loggedInUser) {
-                     alert("Acesso restrito.");
-                     loadPage('login');
-                     return;
-                }
-                await renderProntuarioAnimaisPage();
-                break;
             case 'cart':
     renderCart();
     updateCouponUI();
@@ -4638,6 +4592,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
