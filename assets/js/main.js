@@ -366,7 +366,8 @@ function openResponsavelModal() {
     
     if (modal && panel) {
         modal.classList.remove('hidden');
-        // Pequeno delay para permitir que o navegador renderize antes de animar
+        document.body.style.overflow = 'hidden'; // <--- TRAVA O SCROLL DA PÁGINA
+        
         setTimeout(() => {
             panel.classList.remove('translate-x-full');
         }, 10);
@@ -379,7 +380,8 @@ function closeResponsavelModal() {
     
     if (modal && panel) {
         panel.classList.add('translate-x-full');
-        // Espera a animação terminar antes de esconder
+        document.body.style.overflow = ''; // <--- DESTRAVA O SCROLL DA PÁGINA
+        
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300);
@@ -795,7 +797,6 @@ function renderAnimaisTabContent(container) {
  * Gera o HTML da lista de Responsáveis (Estilo Vetsmart)
  */
 function renderResponsaveisTabContent(container) {
-    // 1. Cabeçalho e Filtros
     const headerHTML = `
         <h2 class="text-2xl font-bold text-gray-700 mb-4">Responsáveis</h2>
         
@@ -808,13 +809,10 @@ function renderResponsaveisTabContent(container) {
                 <div class="flex gap-2">
                      <div class="flex items-center gap-2 border border-gray-300 rounded px-3 bg-white">
                         <span class="text-xs text-gray-500 whitespace-nowrap">Ordenar:</span>
-                        <select class="text-sm bg-transparent font-medium text-gray-700 focus:outline-none cursor-pointer">
-                            <option>Mais recentes</option>
-                            <option>A-Z</option>
-                        </select>
+                        <select class="text-sm bg-transparent font-medium text-gray-700 focus:outline-none cursor-pointer"><option>Mais recentes</option></select>
                     </div>
-                     <button id="btn-add-responsavel-tab" class="bg-secondary hover:bg-teal-700 ...">
-    <i class="fas fa-plus"></i> <span class="hidden md:inline">CADASTRAR NOVO</span>
+                     <button id="btn-add-responsavel-tab" class="bg-secondary hover:bg-teal-700 text-white font-sans font-bold px-6 py-2.5 rounded text-sm flex items-center gap-2 transition shadow-sm whitespace-nowrap">
+                        <i class="fas fa-plus text-white"></i> <span class="hidden md:inline text-white">CADASTRAR NOVO</span>
                     </button>
                 </div>
             </div>
@@ -827,55 +825,46 @@ function renderResponsaveisTabContent(container) {
 
     container.innerHTML = headerHTML;
 
-    // 2. Dados Mockados (Iguais à imagem enviada)
+    // ... (O restante da função com o .map dos cards continua igual) ...
+    // Vou colocar apenas o final para garantir que o listener funcione:
+    
     const responsaveis = [
         { name: 'Murilo Lacerda', info: 'CPF NÃO INFORMADO - RG NÃO INFORMADO' },
         { name: 'Heloísa', info: 'CPF NÃO INFORMADO - RG NÃO INFORMADO' },
-        { name: 'Cristiane', info: 'CPF NÃO INFORMADO - RG NÃO INFORMADO' },
-        { name: 'Karoly Fernandes', info: 'CPF: 123.***.***-** - RG: 3.***.***' } // Exemplo com dados
+        { name: 'Cristiane', info: 'CPF NÃO INFORMADO - RG NÃO INFORMADO' }
     ];
 
-    // 3. Gera os Cards
     const listContainer = document.getElementById('responsaveis-list');
-    
-    if (listContainer) {
-        listContainer.innerHTML = responsaveis.map(r => `
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-                <div class="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg mb-1">${r.name}</h3>
-                        <p class="text-xs text-gray-400 uppercase font-medium tracking-wide">${r.info}</p>
-                    </div>
-
-                    <div class="flex items-center gap-2 w-full md:w-auto">
-                        <button class="flex-1 md:flex-none border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition">
-                            ABRIR CADASTRO COMPLETO
-                        </button>
-                        <button class="w-10 h-10 border border-gray-300 text-gray-500 hover:text-secondary hover:border-secondary rounded flex items-center justify-center transition">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                    </div>
+    listContainer.innerHTML = responsaveis.map(r => `
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
+            <div class="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg mb-1">${r.name}</h3>
+                    <p class="text-xs text-gray-400 uppercase font-medium tracking-wide">${r.info}</p>
                 </div>
-
-                <div class="border-t border-gray-100">
-                    <div class="px-5 py-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition border-b border-gray-50 group">
-                        <span class="text-xs font-bold text-secondary group-hover:text-teal-700">Abrir Informações de Contato</span>
-                        <i class="fas fa-chevron-down text-secondary text-xs"></i>
-                    </div>
-                    <div class="px-5 py-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition group">
-                        <span class="text-xs font-bold text-secondary group-hover:text-teal-700">Abrir Animais do(a) Responsável</span>
-                        <i class="fas fa-chevron-down text-secondary text-xs"></i>
-                    </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button class="flex-1 md:flex-none border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition">ABRIR CADASTRO COMPLETO</button>
+                    <button class="w-10 h-10 border border-gray-300 text-gray-500 hover:text-secondary hover:border-secondary rounded flex items-center justify-center transition"><i class="fas fa-pen"></i></button>
                 </div>
             </div>
-        `).join('');
-    }
+            <div class="border-t border-gray-100">
+                <div class="px-5 py-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition border-b border-gray-50">
+                    <span class="text-xs font-bold text-secondary">Abrir Informações de Contato</span>
+                    <i class="fas fa-chevron-down text-secondary text-xs"></i>
+                </div>
+                <div class="px-5 py-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition">
+                    <span class="text-xs font-bold text-secondary">Abrir Animais do(a) Responsável</span>
+                    <i class="fas fa-chevron-down text-secondary text-xs"></i>
+                </div>
+            </div>
+        </div>
+    `).join('');
 
-    // Busca simples
-    document.getElementById('responsavel-search').addEventListener('input', (e) => {
-        // Lógica de filtro visual aqui...
-    });
+    // Listener do botão de adicionar
+    const btnAdd = document.getElementById('btn-add-responsavel-tab');
+    if (btnAdd) {
+        btnAdd.addEventListener('click', openResponsavelModal);
+    }
 }
 async function renderAdminDashboard() {
     console.log("Iniciando renderização do Dashboard Admin...");
@@ -4777,6 +4766,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
