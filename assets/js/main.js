@@ -697,27 +697,37 @@ if (btnAdd) {
 }
 
 function initDashboardLinks() {
-    // Faz o botão laranja grande "Criar Novo Animal" funcionar como a aba
-    const btnAnimalDashboard = document.querySelector('.prontuario-link[data-tab="animais"]'); // Botão da sidebar
-    const bigBtnAnimal = document.querySelector('.bg-primary[data-tab="animais"]'); // Botão grande
-// ADICIONE ISSO PARA O BOTÃO DE RESPONSÁVEL DO DASHBOARD:
-    // Procura o botão pelo data-tab ou classe
-    const btnNovoResponsavel = document.querySelector('[data-tab="responsaveis"]');
+    // --- 1. Lógica para o botão "Criar Novo Animal" (Laranja) ---
+    // Este botão deve simular um clique na sidebar para trocar de aba
+    const btnAnimalSidebar = document.querySelector('.prontuario-link[data-tab="animais"]'); 
+    // Procura o botão grande no dashboard que tem o data-tab="animais"
+    const bigBtnAnimal = document.querySelector('[data-tab="animais"]:not(a)'); 
+
+    if (bigBtnAnimal && btnAnimalSidebar) {
+        // Remove listeners antigos para evitar duplicação (boa prática)
+        const newBtn = bigBtnAnimal.cloneNode(true);
+        bigBtnAnimal.parentNode.replaceChild(newBtn, bigBtnAnimal);
+        
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            btnAnimalSidebar.click(); // Força a troca de aba
+        });
+    }
+
+    // --- 2. Lógica para o botão "Criar Novo Responsável" (Verde-azulado) ---
+    // Este botão deve abrir o MODAL diretamente
+    const bigBtnResponsavel = document.querySelector('[data-tab="responsaveis"]:not(a)');
     
-    if (btnNovoResponsavel) {
-        // Removemos o comportamento padrão de aba se quisermos abrir o modal direto
-        // OU mantemos a aba e abrimos o modal. Vamos abrir o modal direto neste caso.
-        
-        // Se for o botão GRANDE do dashboard (verifique se ele tem a classe .prontuario-card ou similar)
-        const bigCardResponsavel = document.querySelector('.prontuario-card[data-tab="responsaveis"]');
-        
-        if (bigCardResponsavel) {
-            bigCardResponsavel.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation(); // Impede que troque de aba se não quiser
-                openResponsavelModal();
-            });
-        }
+    if (bigBtnResponsavel) {
+        // Remove listeners antigos
+        const newBtnRes = bigBtnResponsavel.cloneNode(true);
+        bigBtnResponsavel.parentNode.replaceChild(newBtnRes, bigBtnResponsavel);
+
+        newBtnRes.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // Impede outros eventos
+            openResponsavelModal(); // Abre o modal
+        });
     }
 }
     if (bigBtnAnimal && btnAnimalDashboard) {
@@ -4778,6 +4788,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
