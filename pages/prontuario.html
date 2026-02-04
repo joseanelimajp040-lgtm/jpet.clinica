@@ -135,4 +135,117 @@
 
         </main>
     </div>
-</div>
+    <div id="modal-responsavel" class="fixed inset-0 z-50 hidden">
+        
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" id="modal-overlay"></div>
+
+        <div class="absolute right-0 top-0 h-full w-full md:w-[800px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full flex flex-col" id="modal-panel">
+            
+            <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center shadow-md shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fas fa-user-plus text-secondary"></i> Novo Cadastro de Responsável
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-white transition rounded-full p-1 hover:bg-gray-700">
+                    <i class="fas fa-times text-xl"></i> <span class="text-xs font-bold uppercase ml-1">Fechar</span>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scroll space-y-6">
+                
+                <form id="form-responsavel" onsubmit="event.preventDefault();">
+                    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 class="text-secondary font-bold text-sm uppercase border-b border-gray-100 pb-2 mb-4 flex justify-between items-center">
+                            Identificação <i class="fas fa-chevron-up text-gray-300"></i>
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            <div class="md:col-span-8">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Nome do responsável <span class="text-red-500">*</span></label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition" placeholder="Nome completo">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">CPF</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition" placeholder="000.000.000-00">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">RG</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Identidade Estrangeira</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Data de nascimento</label>
+                                <input type="date" class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-600 focus:border-secondary outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mt-4">
+                        <h4 class="text-secondary font-bold text-sm uppercase border-b border-gray-100 pb-2 mb-4">
+                            Dados de Contato
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Telefone</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Celular</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">E-mail</label>
+                                <input type="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mt-4">
+                        <h4 class="text-secondary font-bold text-sm uppercase border-b border-gray-100 pb-2 mb-4">
+                            Endereço
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">CEP</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition" onblur="handleCepSearch()">
+                            </div>
+                            <div class="md:col-span-7">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Endereço</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-gray-50">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Número</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Complemento</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Estado</label>
+                                <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-white">
+                                    <option value="">Selecione</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="SP">São Paulo</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-5">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Cidade</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-gray-50">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-4 border-t border-gray-200 flex justify-between items-center shrink-0">
+                <button class="close-modal-btn border border-orange-500 text-orange-500 hover:bg-orange-50 font-bold py-2.5 px-6 rounded transition text-sm uppercase">
+                    Cancelar Novo Cadastro
+                </button>
+                <button class="bg-secondary hover:bg-teal-700 text-white font-bold py-2.5 px-8 rounded shadow-lg shadow-teal-700/20 transition text-sm uppercase flex items-center gap-2" onclick="alert('Cadastro Salvo! (Simulação)')">
+                    <i class="fas fa-check"></i> Salvar Cadastro
+                </button>
+            </div>
+        </div>
+ </div>
