@@ -1,138 +1,168 @@
-<div class="bg-gray-100 min-h-screen font-sans">
+<div class="bg-gray-50 min-h-screen font-sans">
     
-    <div class="flex flex-col md:flex-row max-w-7xl mx-auto md:p-4 gap-4">
+    <div class="flex flex-col md:flex-row max-w-7xl mx-auto md:p-4 gap-6">
 
-        <aside class="w-full md:w-64 bg-white rounded-lg shadow-sm flex-shrink-0 hidden md:block">
-            <div class="p-4 border-b border-gray-100">
+        <aside class="w-full md:w-64 bg-white rounded-xl shadow-sm border border-gray-100 flex-shrink-0 hidden md:block sticky top-4 h-[calc(100vh-2rem)] overflow-y-auto custom-scroll">
+            <div class="p-5 border-b border-gray-50">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-primary text-white p-2 rounded-lg">
-                        <i class="fas fa-clinic-medical"></i>
+                    <div class="bg-gradient-to-br from-orange-400 to-orange-600 text-white p-2.5 rounded-xl shadow-orange-200 shadow-lg">
+                        <i class="fas fa-clinic-medical text-lg"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-gray-800 text-sm">Clínica J.A Pet</h3>
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">PRO</span>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold border border-blue-100 tracking-wide">PLANO PRO</span>
                     </div>
                 </div>
-                <button class="w-full text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded flex items-center justify-center gap-2 transition">
-                    <i class="fas fa-exchange-alt"></i> Trocar Unidade
+                <button class="w-full text-xs bg-gray-50 hover:bg-gray-100 text-gray-600 py-2.5 rounded-lg flex items-center justify-center gap-2 transition font-medium border border-gray-200">
+                    <i class="fas fa-exchange-alt text-gray-400"></i> Trocar Unidade
                 </button>
             </div>
 
-            <nav class="p-2 space-y-1">
-                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2 text-primary bg-orange-50 font-bold rounded-md border-l-4 border-primary transition" data-tab="dashboard">
+            <nav class="p-3 space-y-1">
+                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2.5 text-primary bg-orange-50/80 font-bold rounded-lg transition-all duration-200" data-tab="dashboard">
                     <i class="fas fa-home w-5 text-center"></i> Início
                 </a>
+                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200 group">
+                    <i class="fas fa-history w-5 text-center group-hover:text-primary transition-colors"></i> Histórico
+                </a>
                 
-                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition" data-tab="responsaveis">
-    <i class="fas fa-users w-5 text-center"></i> Responsáveis
+                <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cadastros</div>
+                
+                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200 group" data-tab="responsaveis">
+                    <i class="fas fa-users w-5 text-center group-hover:text-secondary transition-colors"></i> Responsáveis
+                </a>
+                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200 group" data-tab="animais">
+                    <i class="fas fa-paw w-5 text-center group-hover:text-primary transition-colors"></i> Animais
                 </a>
 
-                <a href="#" class="prontuario-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition" data-tab="animais">
-    <i class="fas fa-paw w-5 text-center"></i> Animais
-                </a>
+                <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gestão</div>
 
-                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition">
-                    <i class="fas fa-history w-5 text-center"></i> Histórico
-                </a>
-                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition">
-                    <i class="fas fa-calendar-check w-5 text-center"></i> Retornos
-                </a>
-                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition">
-                    <i class="fas fa-calendar-alt w-5 text-center"></i> Agenda
-                </a>
-                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition">
-                    <i class="fas fa-bed w-5 text-center"></i> Internação <i class="fas fa-lock text-xs ml-auto text-gray-400"></i>
+                <a href="#" class="nav-link flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200 group">
+                    <i class="fas fa-calendar-alt w-5 text-center group-hover:text-blue-500 transition-colors"></i> Agenda
                 </a>
             </nav>
         </aside>
 
-        <main id="prontuario-content" class="flex-1 flex flex-col gap-4">
+        <main id="prontuario-content" class="flex-1 flex flex-col gap-5 tab-animate w-full">
             
-            <div class="bg-white p-3 rounded-lg shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="bg-white p-2 md:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-40 md:static">
                 <div class="relative w-full md:max-w-lg">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Buscar responsável, animal ou ID (Microchip)..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <input type="text" placeholder="Buscar responsável, animal, ID..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all shadow-inner">
                 </div>
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button class="flex-1 md:flex-none bg-white border border-secondary text-secondary hover:bg-teal-50 px-4 py-2 rounded-full text-sm font-medium transition">
-                        <i class="fas fa-plus mr-1"></i> Cadastro Rápido
-                    </button>
-                    <button class="bg-secondary hover:bg-teal-700 text-white px-4 py-2 rounded-full text-sm font-medium transition shadow-sm">
-                        <i class="fas fa-magic mr-1"></i> Assistente IA
+                <div class="hidden md:flex items-center gap-2">
+                    <button class="bg-gradient-to-r from-secondary to-teal-700 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg shadow-teal-700/20 hover:shadow-teal-700/40 transition-all transform hover:-translate-y-0.5">
+                        <i class="fas fa-magic mr-2"></i> Assistente IA
                     </button>
                 </div>
             </div>
 
-            <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg relative">
-                <button class="absolute top-2 right-2 text-blue-400 hover:text-blue-600"><i class="fas fa-times"></i></button>
-                <h4 class="text-blue-800 font-bold mb-1">O Prontuário J.A Pet está mais inteligente!</h4>
-                <p class="text-blue-600 text-sm mb-3">Agora você pode usar nossa IA para transcrever consultas por voz. Experimente o novo recurso "Genesis Voice".</p>
-                <button class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full font-bold transition">CONHECER AGORA</button>
+            <div class="bg-gradient-to-r from-blue-50 to-white border border-blue-100 p-4 rounded-xl relative shadow-sm">
+                <button class="absolute top-2 right-2 text-blue-300 hover:text-blue-500"><i class="fas fa-times"></i></button>
+                <div class="flex items-start gap-4">
+                    <div class="bg-blue-100 p-2 rounded-lg text-blue-600 hidden sm:block"><i class="fas fa-robot text-xl"></i></div>
+                    <div>
+                        <h4 class="text-blue-800 font-bold text-sm mb-1">Otimize suas consultas com IA</h4>
+                        <p class="text-blue-600 text-xs md:text-sm mb-3 opacity-90">Experimente o "Genesis Voice" para transcrever consultas automaticamente.</p>
+                        <button class="text-[10px] md:text-xs bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full font-bold transition shadow-md shadow-blue-200">TESTAR AGORA</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 
-                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button class="bg-secondary hover:bg-teal-700 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-user text-xl"></i></div>
-                        <span class="font-bold">Criar Novo<br>Responsável</span>
+                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4">
+                    <button class="prontuario-link prontuario-card bg-white border-l-4 border-secondary p-4 rounded-xl shadow-sm hover:bg-teal-50/50 flex flex-col justify-between h-28 md:h-32 text-left group" data-tab="responsaveis">
+                        <div class="bg-secondary/10 w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:bg-secondary group-hover:text-white transition-colors text-secondary">
+                            <i class="fas fa-user text-lg"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm md:text-base leading-tight">Novo<br>Responsável</span>
                     </button>
-                    <button class="prontuario-link bg-primary hover:bg-orange-600 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left" data-tab="animais">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-paw text-xl"></i></div>
-                        <span class="font-bold">Criar Novo<br>Animal</span>
+
+                    <button class="prontuario-link prontuario-card bg-white border-l-4 border-primary p-4 rounded-xl shadow-sm hover:bg-orange-50/50 flex flex-col justify-between h-28 md:h-32 text-left group" data-tab="animais">
+                        <div class="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:bg-primary group-hover:text-white transition-colors text-primary">
+                            <i class="fas fa-paw text-lg"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm md:text-base leading-tight">Novo<br>Animal</span>
                     </button>
-                    <button class="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-file-prescription text-xl"></i></div>
-                        <span class="font-bold">Criar Nova<br>Prescrição</span>
+
+                    <button class="prontuario-card bg-white border-l-4 border-purple-500 p-4 rounded-xl shadow-sm hover:bg-purple-50/50 flex flex-col justify-between h-28 md:h-32 text-left group">
+                        <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:bg-purple-500 group-hover:text-white transition-colors text-purple-600">
+                            <i class="fas fa-file-prescription text-lg"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm md:text-base leading-tight">Nova<br>Prescrição</span>
                     </button>
-                    <button class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-syringe text-xl"></i></div>
-                        <span class="font-bold">Criar Nova<br>Vacina</span>
-                    </button>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-stethoscope text-xl"></i></div>
-                        <span class="font-bold">Criar Nova<br>Consulta</span>
-                    </button>
-                    <button class="bg-gray-500 hover:bg-gray-600 text-white p-4 rounded-lg shadow-sm hover:shadow-md transition flex flex-col justify-between h-32 group text-left">
-                        <div class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-2"><i class="fas fa-calendar-plus text-xl"></i></div>
-                        <span class="font-bold">Criar Novo<br>Evento</span>
+
+                    <button class="prontuario-card bg-white border-l-4 border-emerald-500 p-4 rounded-xl shadow-sm hover:bg-emerald-50/50 flex flex-col justify-between h-28 md:h-32 text-left group">
+                        <div class="bg-emerald-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 group-hover:bg-emerald-500 group-hover:text-white transition-colors text-emerald-600">
+                            <i class="fas fa-syringe text-lg"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm md:text-base leading-tight">Nova<br>Vacina</span>
                     </button>
                 </div>
 
                 <div class="flex flex-col gap-3">
-                    <div class="bg-red-600 rounded-lg shadow-sm text-white overflow-hidden">
-                        <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-red-700 transition">
+                    <div class="prontuario-card bg-red-500 rounded-xl shadow-red-200 shadow-lg text-white overflow-hidden group cursor-pointer">
+                        <div class="p-4 flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <span class="bg-white/20 px-2 py-1 rounded font-bold text-sm">86</span>
+                                <span class="bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md font-black text-sm">86</span>
                                 <span class="font-bold text-sm">Vacinas Atrasadas</span>
                             </div>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                            <i class="fas fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </div>
-                    <div class="bg-teal-700 rounded-lg shadow-sm text-white overflow-hidden">
-                        <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-teal-800 transition">
+                    
+                    <div class="prontuario-card bg-teal-600 rounded-xl shadow-teal-200 shadow-lg text-white overflow-hidden group cursor-pointer">
+                        <div class="p-4 flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <span class="bg-white/20 px-2 py-1 rounded font-bold text-sm">19</span>
-                                <span class="font-bold text-sm">Vacinas Programadas</span>
+                                <span class="bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md font-black text-sm">19</span>
+                                <span class="font-bold text-sm">Vacinas Hoje</span>
                             </div>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                            <i class="fas fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </div>
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 text-gray-700">
-                            <div class="flex items-center gap-2"><i class="far fa-calendar text-gray-400"></i> <span class="font-medium text-sm">Próximos Retornos</span></div>
-                            <i class="fas fa-chevron-down text-xs"></i>
+
+                    <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 text-gray-700 border-b border-gray-100">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs"><i class="far fa-calendar-alt"></i></div>
+                                <span class="font-bold text-xs md:text-sm text-gray-600">Agendamentos (Hoje)</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                         </div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div class="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 text-gray-700">
-                            <div class="flex items-center gap-2"><i class="far fa-calendar-alt text-gray-400"></i> <span class="font-medium text-sm">Agendamentos de Hoje</span></div>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                        <div class="p-3 bg-gray-50/50">
+                            <div class="flex justify-between items-center text-xs mb-2">
+                                <span class="font-semibold text-gray-700">14:00 - Thor</span>
+                                <span class="text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-bold">Banho</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-semibold text-gray-700">15:30 - Mel</span>
+                                <span class="text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold">Vacina</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
+
+    <nav class="mobile-bottom-nav border-t border-gray-200">
+        <a href="#" class="prontuario-link flex flex-col items-center justify-center w-full text-primary" data-tab="dashboard">
+            <i class="fas fa-home text-lg mb-1"></i>
+            <span class="text-[10px] font-bold">Início</span>
+        </a>
+        <a href="#" class="prontuario-link flex flex-col items-center justify-center w-full text-gray-400 hover:text-secondary transition" data-tab="animais">
+            <i class="fas fa-paw text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Animais</span>
+        </a>
+        <a href="#" class="prontuario-link flex flex-col items-center justify-center w-full text-gray-400 hover:text-secondary transition" data-tab="responsaveis">
+            <i class="fas fa-users text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Tutores</span>
+        </a>
+        <a href="#" class="nav-link flex flex-col items-center justify-center w-full text-gray-400 hover:text-secondary transition">
+            <i class="fas fa-calendar-alt text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Agenda</span>
+        </a>
+    </nav>
+
 </div>
