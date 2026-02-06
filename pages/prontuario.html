@@ -250,4 +250,140 @@
                 </button>
             </div>
         </div>
+        <div id="modal-animal" class="fixed inset-0 z-50 hidden">
+        
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeAnimalModal()"></div>
+
+        <div class="absolute right-0 top-0 h-full w-full md:w-[900px] bg-white shadow-2xl transform transition-transform duration-300 translate-x-full flex flex-col" id="modal-animal-panel">
+            
+            <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center shadow-md shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fas fa-paw text-secondary"></i> Novo Cadastro de Animal
+                </h3>
+                <button onclick="closeAnimalModal()" class="text-gray-400 hover:text-white transition rounded-full p-1 hover:bg-gray-700">
+                    <i class="fas fa-times text-xl"></i> <span class="text-xs font-bold uppercase ml-1">Fechar</span>
+                </button>
+            </div>
+
+            <div id="step-select-owner" class="flex-1 flex flex-col bg-gray-50 h-full">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="owner-search-for-animal" placeholder="Buscar responsável (Nome, CPF...)" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition text-sm">
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scroll" id="owner-selection-list">
+                    <p class="text-center text-gray-500 mt-10">Digite o nome do responsável para buscar...</p>
+                </div>
+            </div>
+
+            <div id="step-animal-form" class="hidden flex-1 flex flex-col bg-gray-50 h-full">
+                
+                <div class="bg-green-50 border-b border-green-100 p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-gray-800 uppercase" id="selected-owner-name">NOME DO TUTOR AQUI</h4>
+                        <p class="text-xs text-gray-500" id="selected-owner-doc">CPF: 000.000.000-00</p>
+                    </div>
+                    <button onclick="backToOwnerSelection()" class="text-secondary hover:text-teal-700 text-xs font-bold flex items-center gap-1 transition">
+                        <i class="fas fa-exchange-alt"></i> Trocar Responsável
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 custom-scroll">
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-sm font-bold text-gray-500 uppercase">ANIMAL ESTÁ VIVO?</span>
+                        <div class="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="animal-alive" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 checked:border-secondary"/>
+                            <label for="animal-alive" class="toggle-label block overflow-hidden h-6 rounded-full bg-secondary cursor-pointer"></label>
+                        </div>
+                    </div>
+
+                    <h4 class="text-secondary font-bold text-sm uppercase mb-4">Identificação</h4>
+                    
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-32 h-32 border-2 border-dashed border-secondary/50 rounded-lg flex flex-col items-center justify-center text-secondary cursor-pointer hover:bg-teal-50 transition shrink-0">
+                            <i class="fas fa-plus-circle text-2xl mb-2"></i>
+                            <span class="text-[10px] font-bold text-center leading-tight">ADICIONAR<br>FOTO</span>
+                        </div>
+
+                        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Nome do animal <span class="text-red-500">*</span></label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Microchip</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Espécie <span class="text-red-500">*</span></label>
+                                <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-white">
+                                    <option>Canina</option>
+                                    <option>Felina</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Sexo</label>
+                                <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-white">
+                                    <option>Macho</option>
+                                    <option>Fêmea</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Raça</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                            </div>
+
+                            <div class="md:col-span-2 grid grid-cols-2 gap-4 items-end">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 mb-1">Data de nascimento</label>
+                                    <input type="date" class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-600 focus:border-secondary outline-none transition">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-gray-400">OU</span>
+                                    <input type="number" placeholder="Anos" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none">
+                                    <input type="number" placeholder="Meses" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="text-secondary font-bold text-sm uppercase mt-6 mb-4">Dados Complementares</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Temperamento</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Porte</label>
+                            <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition bg-white">
+                                <option>Pequeno</option>
+                                <option>Médio</option>
+                                <option>Grande</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Pelagem</label>
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-secondary outline-none transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 border-t border-gray-200 flex justify-between items-center shrink-0">
+                    <button onclick="closeAnimalModal()" class="border border-orange-500 text-orange-500 hover:bg-orange-50 font-bold py-2.5 px-6 rounded transition text-sm uppercase">
+                        Cancelar Novo Cadastro
+                    </button>
+                    <button class="bg-secondary hover:bg-teal-700 text-white font-bold py-2.5 px-8 rounded shadow-lg shadow-teal-700/20 transition text-sm uppercase flex items-center gap-2" onclick="alert('Animal Salvo!')">
+                        Salvar Cadastro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
  </div>
