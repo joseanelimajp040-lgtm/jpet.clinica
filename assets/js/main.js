@@ -358,6 +358,112 @@ function updateTotals() {
         }
     }
 }
+// ==========================================================
+// --- FUNÇÕES DO MODAL DE CADASTRO DE ANIMAL (2 ETAPAS) ---
+// ==========================================================
+
+function openAnimalModal() {
+    const modal = document.getElementById('modal-animal');
+    const panel = document.getElementById('modal-animal-panel');
+    
+    // Reseta para a Etapa 1 sempre que abrir
+    backToOwnerSelection();
+    // Limpa a busca e carrega a lista inicial
+    const searchInput = document.getElementById('owner-search-for-animal');
+    if(searchInput) {
+        searchInput.value = '';
+        renderOwnerSelectionList(''); 
+    }
+
+    if (modal && panel) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            panel.classList.remove('translate-x-full');
+        }, 10);
+    }
+}
+
+function closeAnimalModal() {
+    const modal = document.getElementById('modal-animal');
+    const panel = document.getElementById('modal-animal-panel');
+    
+    if (modal && panel) {
+        panel.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+}
+
+// Renderiza a lista de tutores na Etapa 1 (Mock Data)
+function renderOwnerSelectionList(filterText = '') {
+    const listContainer = document.getElementById('owner-selection-list');
+    if (!listContainer) return;
+
+    // Dados Mockados de Tutores
+    const owners = [
+        { name: 'ADRIANA PEIXOTO DANTAS', cpf: '030.199.964-30' },
+        { name: 'MURILO LACERDA', cpf: '123.456.789-00' },
+        { name: 'HELOÍSA DA SILVA', cpf: '987.654.321-11' },
+        { name: 'KAROLY FERNANDES', cpf: '555.444.333-22' },
+        { name: 'ANA SOUZA', cpf: 'NÃO INFORMADO' }
+    ];
+
+    const filtered = owners.filter(o => o.name.toLowerCase().includes(filterText.toLowerCase()) || o.cpf.includes(filterText));
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `<p class="text-center text-gray-500 mt-4">Nenhum responsável encontrado.</p>`;
+        return;
+    }
+
+    listContainer.innerHTML = filtered.map(owner => `
+        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h4 class="font-bold text-gray-700 text-sm md:text-base">${owner.name}</h4>
+                    <p class="text-xs text-gray-400">CPF ${owner.cpf} - RG NÃO INFORMADO</p>
+                </div>
+                <button onclick="selectOwnerForAnimal('${owner.name}', '${owner.cpf}')" class="border border-secondary text-secondary hover:bg-secondary hover:text-white font-bold text-xs uppercase px-4 py-2 rounded transition whitespace-nowrap">
+                    SELECIONAR RESPONSÁVEL
+                </button>
+            </div>
+            <div class="mt-3 pt-2 border-t border-gray-50 space-y-1">
+                <div class="flex justify-between items-center text-secondary text-xs cursor-pointer hover:underline">
+                    <span>Abrir Informações de Contato</span> <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="flex justify-between items-center text-secondary text-xs cursor-pointer hover:underline">
+                    <span>Abrir Animais do(a) Responsável</span> <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Transição da Etapa 1 para a Etapa 2
+function selectOwnerForAnimal(name, cpf) {
+    document.getElementById('step-select-owner').classList.add('hidden');
+    document.getElementById('step-animal-form').classList.remove('hidden');
+    
+    // Preenche o cabeçalho da Etapa 2
+    document.getElementById('selected-owner-name').textContent = name;
+    document.getElementById('selected-owner-doc').textContent = `CPF: ${cpf}`;
+}
+
+// Voltar da Etapa 2 para a Etapa 1
+function backToOwnerSelection() {
+    document.getElementById('step-animal-form').classList.add('hidden');
+    document.getElementById('step-select-owner').classList.remove('hidden');
+}
+
+// Listener para a barra de busca da Etapa 1
+document.addEventListener('DOMContentLoaded', () => {
+    // Usamos delegação de evento ou verificação direta se o elemento existe no DOM
+    const inputSearch = document.getElementById('owner-search-for-animal');
+    if(inputSearch) {
+        inputSearch.addEventListener('input', (e) => renderOwnerSelectionList(e.target.value));
+    }
 // --- FUNÇÕES DO MODAL DE RESPONSÁVEL ---
 
 function openResponsavelModal() {
@@ -4767,6 +4873,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
