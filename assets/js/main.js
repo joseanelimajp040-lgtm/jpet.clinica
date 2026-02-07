@@ -886,10 +886,11 @@ function renderAnimaisTabContent(container) {
                      <div class="flex items-center gap-2 border border-gray-300 rounded px-3 bg-white">
                         <span class="text-xs text-gray-500 whitespace-nowrap">Ordenar:</span>
                         <select class="text-sm bg-transparent font-medium text-gray-700 focus:outline-none"><option>Mais recentes</option></select>
-                    </div>
-                     <button class="bg-secondary hover:bg-teal-700 text-white px-4 py-2.5 rounded font-bold text-sm flex items-center gap-2 transition whitespace-nowrap">
-                        <i class="fas fa-plus"></i> <span class="hidden md:inline">CADASTRAR NOVO</span>
-                    </button>
+                    <div class="flex gap-2">
+         <button id="btn-add-animal-tab" class="bg-secondary hover:bg-teal-700 ..." onclick="openAnimalModal()">
+            <i class="fas fa-plus"></i> CADASTRAR NOVO ANIMAL
+        </button>
+                </div>
                 </div>
             </div>
             <div class="flex justify-between items-center border-t border-gray-100 pt-3">
@@ -4873,6 +4874,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginStatus(); 
     });
 }); 
+
 
 
 
