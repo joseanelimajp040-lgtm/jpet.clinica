@@ -45,16 +45,3 @@ self.addEventListener('notificationclick', function(event) {
     })
   );
 });
-```
-
----
-
-## Depois de criar o arquivo
-
-1. Aguarde o Netlify fazer o deploy (1-2 minutos)
-2. Abra o app, pressione **F12 → Console**
-3. **Limpe o cache do Service Worker:** F12 → aba **Aplicação → Service Workers → Unregister** em todos
-4. Recarregue a página e faça login como entregador
-5. Verifique se agora aparece no console:
-```
-[FCM] Token registrado: fXyz123...
